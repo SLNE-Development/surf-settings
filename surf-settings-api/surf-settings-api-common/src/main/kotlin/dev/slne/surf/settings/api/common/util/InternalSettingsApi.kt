@@ -14,4 +14,4 @@ package dev.slne.surf.settings.api.common.util
     AnnotationTarget.VALUE_PARAMETER,
     AnnotationTarget.FIELD
 )
-annotation class InternalApi
+annotation class InternalSettingsApi

@@ -5,11 +5,11 @@ import dev.slne.surf.cloud.api.common.startSpringApplication
 import dev.slne.surf.cloud.api.server.plugin.bootstrap.BootstrapContext
 import dev.slne.surf.cloud.api.server.plugin.bootstrap.StandalonePluginBootstrap
 import dev.slne.surf.settings.SurfSettingsApplication
-import dev.slne.surf.settings.core.ContextHolderImpl
+import dev.slne.surf.settings.core.SettingsContextHolderImpl
 
 class PluginBootstrap : StandalonePluginBootstrap {
     override suspend fun bootstrap(context: BootstrapContext) {
-        ContextHolderImpl.instance.context =
+        SettingsContextHolderImpl.instance.context =
             CloudInstance.startSpringApplication(SurfSettingsApplication::class)
     }
 }

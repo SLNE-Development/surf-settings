@@ -8,7 +8,7 @@ import com.velocitypowered.api.proxy.ProxyServer
 import dev.slne.surf.cloud.api.common.CloudInstance
 import dev.slne.surf.cloud.api.common.startSpringApplication
 import dev.slne.surf.settings.SurfSettingsApplication
-import dev.slne.surf.settings.core.ContextHolderImpl
+import dev.slne.surf.settings.core.SettingsContextHolderImpl
 import java.nio.file.Path
 
 class VelocityMain @Inject constructor(
@@ -20,7 +20,7 @@ class VelocityMain @Inject constructor(
 
     init {
         instance = this
-        ContextHolderImpl.instance.context =
+        SettingsContextHolderImpl.instance.context =
             CloudInstance.startSpringApplication(SurfSettingsApplication::class)
     }
 
