@@ -15,7 +15,7 @@ class SettingPacketListener(
         packet.respond(
             ClientboundSettingCreateIgnoringResultPacket(
                 settingService.createIfNotExists(
-                    packet.setting.setting
+                    packet.setting
                 )
             )
         )
@@ -23,7 +23,7 @@ class SettingPacketListener(
 
     @SurfNettyPacketHandler
     suspend fun handleSettingCreatePacket(packet: ServerboundSettingCreatePacket) {
-        packet.respond(ClientboundSettingCreateResultPacket(settingService.createSetting(packet.setting.setting)))
+        packet.respond(ClientboundSettingCreateResultPacket(settingService.createSetting(packet.setting)))
     }
 
     @SurfNettyPacketHandler

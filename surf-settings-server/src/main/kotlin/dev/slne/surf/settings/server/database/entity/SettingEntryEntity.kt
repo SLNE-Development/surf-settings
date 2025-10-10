@@ -3,7 +3,7 @@ package dev.slne.surf.settings.server.database.entity
 import dev.slne.surf.cloud.api.common.player.OfflineCloudPlayer
 import dev.slne.surf.cloud.api.server.exposed.table.AuditableLongEntity
 import dev.slne.surf.cloud.api.server.exposed.table.AuditableLongEntityClass
-import dev.slne.surf.settings.core.setting.SettingEntryImpl
+import dev.slne.surf.settings.core.setting.entry.SettingEntryImpl
 import dev.slne.surf.settings.server.database.table.SettingsEntryTable
 import org.jetbrains.exposed.dao.id.EntityID
 

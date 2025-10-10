@@ -4,7 +4,7 @@ import dev.slne.surf.settings.api.common.result.entry.SettingEntryModifyResult
 import dev.slne.surf.settings.api.common.result.entry.SettingEntryQueryResult
 import dev.slne.surf.settings.api.common.result.entry.SettingEntryResetResult
 import dev.slne.surf.settings.api.common.setting.Setting
-import dev.slne.surf.settings.api.common.setting.SettingEntry
+import dev.slne.surf.settings.api.common.setting.entry.SettingEntry
 import dev.slne.surf.settings.server.repository.SettingEntryRepository
 import it.unimi.dsi.fastutil.objects.ObjectSet
 import org.springframework.stereotype.Service

@@ -1,8 +1,8 @@
-package dev.slne.surf.settings.core.setting
+package dev.slne.surf.settings.core.setting.entry
 
 import dev.slne.surf.cloud.api.common.player.OfflineCloudPlayer
 import dev.slne.surf.settings.api.common.setting.Setting
-import dev.slne.surf.settings.api.common.setting.SettingEntry
+import dev.slne.surf.settings.api.common.setting.entry.SettingEntry
 import kotlinx.serialization.Serializable
 
 @Serializable
