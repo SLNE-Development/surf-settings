@@ -6,6 +6,7 @@ import dev.slne.surf.settings.api.common.result.SettingDeleteResult
 import dev.slne.surf.settings.api.common.result.SettingQueryResult
 import dev.slne.surf.settings.api.common.setting.Setting
 import dev.slne.surf.settings.server.repository.SettingRepository
+import it.unimi.dsi.fastutil.objects.ObjectSet
 import org.springframework.stereotype.Service
 
 @Service
@@ -42,5 +43,5 @@ class SettingService(
         return SettingQueryResult.Success(query)
     }
 
-    suspend fun queryAll() = settingRepository.all()
+    suspend fun queryAll(): ObjectSet<Setting> = settingRepository.all()
 }

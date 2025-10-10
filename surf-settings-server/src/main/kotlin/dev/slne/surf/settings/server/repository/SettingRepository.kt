@@ -5,19 +5,20 @@ import dev.slne.surf.cloud.api.server.plugin.CoroutineTransactional
 import dev.slne.surf.settings.api.common.setting.Setting
 import dev.slne.surf.settings.server.database.entity.SettingEntity
 import dev.slne.surf.settings.server.database.table.SettingsTable
+import it.unimi.dsi.fastutil.objects.ObjectSet
 import org.jetbrains.exposed.sql.SqlExpressionBuilder.eq
 import org.springframework.stereotype.Repository
 
 @Repository
 @CoroutineTransactional
 class SettingRepository {
-    suspend fun query(identifier: String) =
+    suspend fun query(identifier: String): Setting? =
         SettingEntity.find(SettingsTable.identifier eq identifier).firstOrNull()?.toDto()
 
     suspend fun queryInternal(identifier: String) =
         SettingEntity.find(SettingsTable.identifier eq identifier).firstOrNull()
 
-    suspend fun all() = SettingEntity.all().map { it.toDto() }.toObjectSet()
+    suspend fun all(): ObjectSet<Setting> = SettingEntity.all().map { it.toDto() }.toObjectSet()
     suspend fun delete(identifier: String) =
         SettingEntity.find(SettingsTable.identifier eq identifier).firstOrNull()?.delete() != null
 
