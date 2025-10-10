@@ -4,6 +4,8 @@ plugins {
 
 surfVelocityApi {
     withCloudClientVelocity()
+
+    authors.add("red")
 }
 
 dependencies {

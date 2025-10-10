@@ -29,3 +29,6 @@ interface InternalSettingEntryBridge {
         val instance get() = InternalSettingsContextHolder.instance.context.getBean<InternalSettingEntryBridge>()
     }
 }
+
+@OptIn(InternalSettingsApi::class)
+val settingsEntryBridge get() = InternalSettingEntryBridge.instance

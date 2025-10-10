@@ -6,6 +6,8 @@ surfPaperPluginApi {
     withCloudClientPaper()
     mainClass("dev.slne.surf.settings.paper.PaperMain")
     bootstrapper("dev.slne.surf.settings.paper.PaperBootstrap")
+
+    authors.add("red")
 }
 
 dependencies {
