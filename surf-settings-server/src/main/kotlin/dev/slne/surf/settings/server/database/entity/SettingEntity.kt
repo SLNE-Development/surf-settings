@@ -10,6 +10,7 @@ class SettingEntity(id: EntityID<Long>) : LongEntity(id) {
     companion object : LongEntityClass<SettingEntity>(SettingsTable)
 
     var identifier by SettingsTable.identifier
+    var category by SettingsTable.category
     var displayName by SettingsTable.displayName
     var description by SettingsTable.description
     var defaultValue by SettingsTable.defaultValue
@@ -20,5 +21,6 @@ class SettingEntity(id: EntityID<Long>) : LongEntity(id) {
         displayName = displayName,
         description = description,
         defaultValue = defaultValue,
+        category = category
     )
 }

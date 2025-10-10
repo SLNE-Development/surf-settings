@@ -43,5 +43,8 @@ class SettingService(
         return SettingQueryResult.Success(query)
     }
 
+    suspend fun queryByCategory(category: String): ObjectSet<Setting> =
+        settingRepository.queryByCategory(category)
+
     suspend fun queryAll(): ObjectSet<Setting> = settingRepository.all()
 }

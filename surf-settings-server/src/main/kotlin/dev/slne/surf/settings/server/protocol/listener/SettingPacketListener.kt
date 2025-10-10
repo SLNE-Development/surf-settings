@@ -40,4 +40,9 @@ class SettingPacketListener(
     suspend fun handleSettingQueryPacket(packet: ServerboundSettingQueryPacket) {
         packet.respond(ClientboundSettingQueryResultPacket(settingService.query(packet.identifier)))
     }
+
+    @SurfNettyPacketHandler
+    suspend fun handleSettingQueryByCategoryPacket(packet: ServerboundSettingQueryByCategoryPacket) {
+        packet.respond(ClientboundSettingQueryManyPacket(settingService.queryByCategory(packet.category)))
+    }
 }

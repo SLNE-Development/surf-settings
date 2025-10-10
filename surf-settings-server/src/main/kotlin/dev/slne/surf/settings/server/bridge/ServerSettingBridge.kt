@@ -20,4 +20,6 @@ class ServerSettingBridge(
     override suspend fun delete(identifier: String) = settingService.delete(identifier)
     override suspend fun query(identifier: String) = settingService.query(identifier)
     override suspend fun queryAll() = settingService.queryAll()
+    override suspend fun queryByCategory(category: String) =
+        settingService.queryByCategory(category)
 }

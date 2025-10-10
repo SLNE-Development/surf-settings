@@ -37,4 +37,7 @@ class ClientSettingBridge : CommonSettingBridge() {
 
     override suspend fun queryAll(): ObjectSet<Setting> =
         ServerboundSettingQueryAllPacket().fireAndAwaitOrThrow().queries
+
+    override suspend fun queryByCategory(category: String): ObjectSet<Setting> =
+        ServerboundSettingQueryByCategoryPacket(category).fireAndAwaitOrThrow().queries
 }

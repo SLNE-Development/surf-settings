@@ -19,6 +19,7 @@ interface InternalSettingBridge {
     suspend fun delete(identifier: String): SettingDeleteResult
     suspend fun query(identifier: String): SettingQueryResult
     suspend fun queryAll(): ObjectSet<Setting>
+    suspend fun queryByCategory(category: String): ObjectSet<Setting>
 
     val descriptor: SerialDescriptor
     fun serialize(encoder: Encoder, value: Setting)

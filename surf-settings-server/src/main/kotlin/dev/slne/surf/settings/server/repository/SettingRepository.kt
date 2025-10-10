@@ -15,6 +15,9 @@ class SettingRepository {
     suspend fun query(identifier: String): Setting? =
         SettingEntity.find(SettingsTable.identifier eq identifier).firstOrNull()?.toDto()
 
+    suspend fun queryByCategory(category: String): ObjectSet<Setting> =
+        SettingEntity.find(SettingsTable.category eq category).map { it.toDto() }.toObjectSet()
+
     suspend fun queryInternal(identifier: String) =
         SettingEntity.find(SettingsTable.identifier eq identifier).firstOrNull()
 
@@ -22,12 +25,11 @@ class SettingRepository {
     suspend fun delete(identifier: String) =
         SettingEntity.find(SettingsTable.identifier eq identifier).firstOrNull()?.delete() != null
 
-    suspend fun delete(setting: Setting) = delete(setting.identifier)
-
     suspend fun create(setting: Setting) =
         if (query(setting.identifier) == null) SettingEntity.new {
             this.displayName = setting.displayName
             this.identifier = setting.identifier
+            this.category = setting.category
             this.description = setting.description
             this.defaultValue = setting.defaultValue
         }.toDto() else null
