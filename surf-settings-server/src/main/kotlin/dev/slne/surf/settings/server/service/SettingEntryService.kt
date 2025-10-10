@@ -6,6 +6,7 @@ import dev.slne.surf.settings.api.common.result.entry.SettingEntryResetResult
 import dev.slne.surf.settings.api.common.setting.Setting
 import dev.slne.surf.settings.api.common.setting.SettingEntry
 import dev.slne.surf.settings.server.repository.SettingEntryRepository
+import it.unimi.dsi.fastutil.objects.ObjectSet
 import org.springframework.stereotype.Service
 import java.util.*
 
@@ -31,8 +32,10 @@ class SettingEntryService(
         }
     }
 
-    suspend fun all(playerUuid: UUID) = settingEntryRepository.all(playerUuid)
-    suspend fun all() = settingEntryRepository.all()
+    suspend fun all(playerUuid: UUID): ObjectSet<SettingEntry> =
+        settingEntryRepository.all(playerUuid)
+
+    suspend fun all(): ObjectSet<SettingEntry> = settingEntryRepository.all()
 
     suspend fun query(playerUUID: UUID, setting: Setting): SettingEntryQueryResult {
         val entry = settingEntryRepository.query(playerUUID, setting)?.toDto()

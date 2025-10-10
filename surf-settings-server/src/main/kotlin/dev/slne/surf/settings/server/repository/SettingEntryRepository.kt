@@ -6,6 +6,7 @@ import dev.slne.surf.settings.api.common.setting.Setting
 import dev.slne.surf.settings.api.common.setting.SettingEntry
 import dev.slne.surf.settings.server.database.entity.SettingEntryEntity
 import dev.slne.surf.settings.server.database.table.SettingsEntryTable
+import it.unimi.dsi.fastutil.objects.ObjectSet
 import org.jetbrains.exposed.sql.SqlExpressionBuilder.eq
 import org.jetbrains.exposed.sql.and
 import org.springframework.stereotype.Repository
@@ -16,7 +17,7 @@ import java.util.*
 class SettingEntryRepository(
     private val settingRepository: SettingRepository
 ) {
-    suspend fun all(playerUuid: UUID) =
+    suspend fun all(playerUuid: UUID): ObjectSet<SettingEntry> =
         SettingEntryEntity.find(SettingsEntryTable.player eq playerUuid).map { it.toDto() }
             .toObjectSet()
 
@@ -39,7 +40,9 @@ class SettingEntryRepository(
         return updated.toDto()
     }
 
-    suspend fun all() = SettingEntryEntity.all().map { it.toDto() }.toObjectSet()
+    suspend fun all(): ObjectSet<SettingEntry> =
+        SettingEntryEntity.all().map { it.toDto() }.toObjectSet()
+
     suspend fun reset(playerUuid: UUID, setting: Setting) = query(playerUuid, setting)?.apply {
         value = setting.defaultValue
     }
