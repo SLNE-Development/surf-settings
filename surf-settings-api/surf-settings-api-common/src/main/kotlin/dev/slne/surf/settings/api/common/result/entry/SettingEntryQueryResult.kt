@@ -1,0 +1,18 @@
+package dev.slne.surf.settings.api.common.result.entry
+
+import dev.slne.surf.settings.api.common.setting.SettingEntry
+import kotlinx.serialization.Serializable
+
+@Serializable
+sealed class SettingEntryQueryResult {
+    data class Success(val setting: SettingEntry) : SettingEntryQueryResult()
+    data class Failure(val failureReason: SettingEntryQueryFailureReason) :
+        SettingEntryQueryResult()
+
+    enum class SettingEntryQueryFailureReason {
+        SETTING_NOT_FOUND
+    }
+
+    fun isFailure() = this is Failure
+    fun isSuccess() = this is Success
+}
