@@ -6,7 +6,7 @@ interface SettingEntry {
     val id: Long
     val player: OfflineCloudPlayer
     val setting: Setting
-    val value: String
+    var value: String
     val addedAt: Long
     val updatedAt: Long
 }
