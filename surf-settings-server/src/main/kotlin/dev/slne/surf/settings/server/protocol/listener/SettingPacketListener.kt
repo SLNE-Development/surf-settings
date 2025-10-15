@@ -1,8 +1,8 @@
 package dev.slne.surf.settings.server.protocol.listener
 
 import dev.slne.surf.cloud.api.common.meta.SurfNettyPacketHandler
-import dev.slne.surf.settings.core.netty.protocol.clientbound.*
-import dev.slne.surf.settings.core.netty.protocol.serverbound.*
+import dev.slne.surf.settings.core.netty.protocol.clientbound.setting.*
+import dev.slne.surf.settings.core.netty.protocol.serverbound.setting.*
 import dev.slne.surf.settings.server.service.SettingService
 import org.springframework.stereotype.Component
 

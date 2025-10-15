@@ -1,9 +1,9 @@
 package dev.slne.surf.settings.server.bridge
 
-import dev.slne.surf.settings.api.common.setting.Setting
-import dev.slne.surf.settings.api.common.setting.entry.SettingEntry
+import dev.slne.surf.settings.api.common.Setting
+import dev.slne.surf.settings.api.common.SettingEntry
 import dev.slne.surf.settings.api.common.util.InternalSettingsApi
-import dev.slne.surf.settings.core.setting.entry.CommonSettingEntryBridge
+import dev.slne.surf.settings.core.bridge.CommonSettingEntryBridge
 import dev.slne.surf.settings.server.service.SettingEntryService
 import org.springframework.stereotype.Component
 import java.util.*

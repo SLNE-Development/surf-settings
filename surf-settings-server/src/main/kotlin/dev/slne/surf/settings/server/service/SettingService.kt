@@ -1,10 +1,10 @@
 package dev.slne.surf.settings.server.service
 
-import dev.slne.surf.settings.api.common.result.SettingCreateIgnoringResult
-import dev.slne.surf.settings.api.common.result.SettingCreateResult
-import dev.slne.surf.settings.api.common.result.SettingDeleteResult
-import dev.slne.surf.settings.api.common.result.SettingQueryResult
-import dev.slne.surf.settings.api.common.setting.Setting
+import dev.slne.surf.settings.api.common.Setting
+import dev.slne.surf.settings.api.common.result.setting.SettingCreateIgnoringResult
+import dev.slne.surf.settings.api.common.result.setting.SettingCreateResult
+import dev.slne.surf.settings.api.common.result.setting.SettingDeleteResult
+import dev.slne.surf.settings.api.common.result.setting.SettingQueryResult
 import dev.slne.surf.settings.server.repository.SettingRepository
 import it.unimi.dsi.fastutil.objects.ObjectSet
 import org.springframework.stereotype.Service

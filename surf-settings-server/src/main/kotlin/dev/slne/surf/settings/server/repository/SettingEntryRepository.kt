@@ -2,8 +2,8 @@ package dev.slne.surf.settings.server.repository
 
 import dev.slne.surf.cloud.api.common.util.toObjectSet
 import dev.slne.surf.cloud.api.server.plugin.CoroutineTransactional
-import dev.slne.surf.settings.api.common.setting.Setting
-import dev.slne.surf.settings.api.common.setting.entry.SettingEntry
+import dev.slne.surf.settings.api.common.Setting
+import dev.slne.surf.settings.api.common.SettingEntry
 import dev.slne.surf.settings.server.database.entity.SettingEntryEntity
 import dev.slne.surf.settings.server.database.table.SettingsEntryTable
 import it.unimi.dsi.fastutil.objects.ObjectSet

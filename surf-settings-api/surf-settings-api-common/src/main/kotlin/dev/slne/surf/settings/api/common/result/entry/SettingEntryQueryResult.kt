@@ -1,6 +1,6 @@
 package dev.slne.surf.settings.api.common.result.entry
 
-import dev.slne.surf.settings.api.common.setting.entry.SettingEntry
+import dev.slne.surf.settings.api.common.SettingEntry
 import kotlinx.serialization.Serializable
 
 @Serializable

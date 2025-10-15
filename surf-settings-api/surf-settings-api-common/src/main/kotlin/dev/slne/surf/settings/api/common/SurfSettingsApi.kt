@@ -1,22 +1,34 @@
 package dev.slne.surf.settings.api.common
 
-import dev.slne.surf.settings.api.common.result.SettingCreateIgnoringResult
-import dev.slne.surf.settings.api.common.result.SettingCreateResult
-import dev.slne.surf.settings.api.common.result.SettingDeleteResult
-import dev.slne.surf.settings.api.common.result.SettingQueryResult
 import dev.slne.surf.settings.api.common.result.entry.SettingEntryModifyResult
 import dev.slne.surf.settings.api.common.result.entry.SettingEntryQueryResult
 import dev.slne.surf.settings.api.common.result.entry.SettingEntryResetResult
-import dev.slne.surf.settings.api.common.setting.Setting
-import dev.slne.surf.settings.api.common.setting.entry.SettingEntry
+import dev.slne.surf.settings.api.common.result.setting.SettingCreateIgnoringResult
+import dev.slne.surf.settings.api.common.result.setting.SettingCreateResult
+import dev.slne.surf.settings.api.common.result.setting.SettingDeleteResult
+import dev.slne.surf.settings.api.common.result.setting.SettingQueryResult
 import dev.slne.surf.settings.api.common.util.InternalSettingsApi
 import it.unimi.dsi.fastutil.objects.ObjectSet
 import org.springframework.beans.factory.getBean
 import java.util.*
 
 interface SurfSettingsApi {
-    suspend fun createSetting(setting: Setting): SettingCreateResult
-    suspend fun createSettingIfNotExists(setting: Setting): SettingCreateIgnoringResult
+    suspend fun createSetting(
+        identifier: String,
+        category: String,
+        displayName: String,
+        description: String,
+        defaultValue: String
+    ): SettingCreateResult
+
+    suspend fun createSettingIfNotExists(
+        identifier: String,
+        category: String,
+        displayName: String,
+        description: String,
+        defaultValue: String
+    ): SettingCreateIgnoringResult
+
     suspend fun deleteSetting(identifier: String): SettingDeleteResult
     suspend fun querySetting(identifier: String): SettingQueryResult
     suspend fun queryAllSettings(): ObjectSet<Setting>

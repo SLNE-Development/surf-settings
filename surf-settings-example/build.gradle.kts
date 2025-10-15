@@ -3,7 +3,7 @@ plugins {
 }
 
 dependencies {
-    compileOnly(":surf-settings-api:surf-settings-api-common")
+    compileOnly(project(":surf-settings-api:surf-settings-api-common"))
 }
 
 surfPaperPluginApi {
