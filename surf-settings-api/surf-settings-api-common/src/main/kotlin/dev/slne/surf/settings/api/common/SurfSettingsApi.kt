@@ -1,5 +1,8 @@
 package dev.slne.surf.settings.api.common
 
+import dev.slne.surf.settings.api.common.result.category.SettingCategoryCreateResult
+import dev.slne.surf.settings.api.common.result.category.SettingCategoryDeleteResult
+import dev.slne.surf.settings.api.common.result.category.SettingCategoryQueryResult
 import dev.slne.surf.settings.api.common.result.entry.SettingEntryModifyResult
 import dev.slne.surf.settings.api.common.result.entry.SettingEntryQueryResult
 import dev.slne.surf.settings.api.common.result.entry.SettingEntryResetResult
@@ -15,7 +18,7 @@ import java.util.*
 interface SurfSettingsApi {
     suspend fun createSetting(
         identifier: String,
-        category: String,
+        category: SettingCategory,
         displayName: String,
         description: String,
         defaultValue: String
@@ -23,7 +26,7 @@ interface SurfSettingsApi {
 
     suspend fun createSettingIfNotExists(
         identifier: String,
-        category: String,
+        category: SettingCategory,
         displayName: String,
         description: String,
         defaultValue: String
@@ -39,6 +42,16 @@ interface SurfSettingsApi {
     suspend fun allEntries(playerUuid: UUID): ObjectSet<SettingEntry>
     suspend fun allEntries(): ObjectSet<SettingEntry>
     suspend fun queryEntry(playerUuid: UUID, setting: Setting): SettingEntryQueryResult
+
+    suspend fun createCategory(
+        identifier: String,
+        displayName: String,
+        description: String
+    ): SettingCategoryCreateResult
+
+    suspend fun queryAllCategories(): ObjectSet<SettingCategory>
+    suspend fun queryCategory(identifier: String): SettingCategoryQueryResult
+    suspend fun deleteCategory(category: SettingCategory): SettingCategoryDeleteResult
 
     companion object {
         @OptIn(InternalSettingsApi::class)

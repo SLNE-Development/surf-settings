@@ -1,37 +1,54 @@
 package dev.slne.surf.settings.example
 
 import com.github.shynixn.mccoroutine.folia.SuspendingJavaPlugin
-import dev.slne.surf.settings.api.common.surfSettingApi
+import dev.slne.surf.settings.api.common.dsl.settings
 import org.bukkit.plugin.java.JavaPlugin
 
 val plugin get() = JavaPlugin.getPlugin(ExampleMain::class.java)
 
 class ExampleMain : SuspendingJavaPlugin() {
     override suspend fun onEnableAsync() {
-        val boolResult = surfSettingApi.createSettingIfNotExists(
-            "example-setting-boolean",
-            "Examples",
-            "Example Boolean Setting",
-            "This is an example boolean setting",
-            "true"
-        )
+        logger.warning("The server is running the example surf settings plugin. This is only for demonstration purposes and should not be used in production!")
 
-        val intResult = surfSettingApi.createSettingIfNotExists(
-            "example-setting-int",
-            "Examples",
-            "Example Int Setting",
-            "This is an example int setting",
-            "2"
-        )
+        settings {
+            category {
+                identifier = CATEGORY_ID
+                displayName = "Beispiel Einstellungen"
+                description = "Eine Kategorie mit Beispiel Einstellungen"
+            }
 
-        println("Bool result: $boolResult")
-        println("Int result: $intResult")
+            setting {
+                identifier = ID_BOOLEAN
+                withCategory(CATEGORY_ID)
+                displayName = "Beispiel Boolean"
+                description = "Eine Beispiel Boolean Einstellung"
+                defaultValue = "true"
+            }
+
+            setting {
+                identifier = ID_INT
+                withCategory(CATEGORY_ID)
+                displayName = "Beispiel Integer"
+                description = "Eine Beispiel Integer Einstellung"
+                defaultValue = "5"
+            }
+
+            setting {
+                identifier = ID_TEXT
+                withCategory(CATEGORY_ID)
+                displayName = "Beispiel Text"
+                description = "Eine Beispiel Text Einstellung"
+                defaultValue = "Hallo Welt!"
+            }
+        }
+
+        logger.info("Successfully registered example settings & category")
     }
 
     companion object {
         const val ID_BOOLEAN = "example-setting-boolean"
         const val ID_INT = "example-setting-int"
         const val ID_TEXT = "example-setting-text"
-        const val CATEGORY = "Examples"
+        const val CATEGORY_ID = "example"
     }
 }

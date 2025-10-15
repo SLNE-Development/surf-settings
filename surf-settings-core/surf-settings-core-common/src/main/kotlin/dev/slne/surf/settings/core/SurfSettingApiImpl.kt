@@ -1,13 +1,16 @@
 package dev.slne.surf.settings.core
 
 import dev.slne.surf.settings.api.common.Setting
+import dev.slne.surf.settings.api.common.SettingCategory
 import dev.slne.surf.settings.api.common.SettingEntry
 import dev.slne.surf.settings.api.common.SurfSettingsApi
+import dev.slne.surf.settings.api.common.bridge.settingCategoryBridge
 import dev.slne.surf.settings.api.common.bridge.settingsBridge
 import dev.slne.surf.settings.api.common.bridge.settingsEntryBridge
 import dev.slne.surf.settings.api.common.result.setting.SettingCreateIgnoringResult
 import dev.slne.surf.settings.api.common.result.setting.SettingCreateResult
 import dev.slne.surf.settings.api.common.util.InternalSettingsApi
+import dev.slne.surf.settings.core.impl.SettingCategoryImpl
 import dev.slne.surf.settings.core.impl.SettingImpl
 import dev.slne.surf.surfapi.core.api.util.random
 import org.springframework.stereotype.Service
@@ -18,7 +21,7 @@ import java.util.*
 class SurfSettingApiImpl : SurfSettingsApi {
     override suspend fun createSetting(
         identifier: String,
-        category: String,
+        category: SettingCategory,
         displayName: String,
         description: String,
         defaultValue: String
@@ -35,7 +38,7 @@ class SurfSettingApiImpl : SurfSettingsApi {
 
     override suspend fun createSettingIfNotExists(
         identifier: String,
-        category: String,
+        category: SettingCategory,
         displayName: String,
         description: String,
         defaultValue: String
@@ -73,4 +76,23 @@ class SurfSettingApiImpl : SurfSettingsApi {
         playerUuid: UUID,
         setting: Setting
     ) = settingsEntryBridge.query(playerUuid, setting)
+
+    override suspend fun createCategory(
+        identifier: String,
+        displayName: String,
+        description: String
+    ) = settingCategoryBridge.createCategory(
+        SettingCategoryImpl(
+            identifier,
+            displayName,
+            description
+        )
+    )
+
+    override suspend fun queryAllCategories() = settingCategoryBridge.queryAll()
+    override suspend fun queryCategory(identifier: String) =
+        settingCategoryBridge.queryCategory(identifier)
+
+    override suspend fun deleteCategory(category: SettingCategory) =
+        settingCategoryBridge.deleteCategory(category)
 }
