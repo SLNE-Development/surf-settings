@@ -14,4 +14,6 @@ sealed class SettingQueryResult {
 
     fun isFailure() = this is Failure
     fun isSuccess() = this is Success
+
+    fun getOrNull(): Setting? = if (this is Success) this.setting else null
 }

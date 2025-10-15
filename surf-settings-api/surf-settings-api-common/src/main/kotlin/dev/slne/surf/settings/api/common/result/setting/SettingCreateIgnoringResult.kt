@@ -12,4 +12,6 @@ sealed class SettingCreateIgnoringResult {
     enum class SettingCreateIgnoringFailureReason {
         INTERNAL_ERROR
     }
+
+    fun getOrNull() = if (this is Success) this.setting else null
 }

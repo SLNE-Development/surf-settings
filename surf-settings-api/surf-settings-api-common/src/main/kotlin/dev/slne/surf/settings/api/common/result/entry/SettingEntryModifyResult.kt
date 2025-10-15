@@ -14,4 +14,6 @@ sealed class SettingEntryModifyResult {
 
     fun isFailure() = this is Failure
     fun isSuccess() = this is Success
+
+    fun getOrNull(): SettingEntry? = if (this is Success) this.setting else null
 }

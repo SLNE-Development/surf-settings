@@ -9,9 +9,12 @@ sealed class SettingCreateResult {
     data class Failure(val failureReason: SettingCreateFailureReason) : SettingCreateResult()
 
     enum class SettingCreateFailureReason {
-        SETTING_ALREADY_EXISTS
+        SETTING_ALREADY_EXISTS,
+        CATEGORY_NOT_FOUND
     }
 
     fun isFailure() = this is Failure
     fun isSuccess() = this is Success
+
+    fun getOrNull() = if (this is Success) this.setting else null
 }

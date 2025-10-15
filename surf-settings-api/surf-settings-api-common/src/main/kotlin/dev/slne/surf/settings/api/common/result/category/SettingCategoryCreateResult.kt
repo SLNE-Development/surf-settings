@@ -15,4 +15,6 @@ sealed class SettingCategoryCreateResult {
 
     fun isFailure() = this is Failure
     fun isSuccess() = this is Success
+
+    fun getOrNull() = if (this is Success) category else null
 }
