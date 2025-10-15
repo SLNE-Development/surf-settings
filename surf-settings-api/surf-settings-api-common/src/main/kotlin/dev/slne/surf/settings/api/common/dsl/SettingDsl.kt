@@ -2,14 +2,14 @@ package dev.slne.surf.settings.api.common.dsl
 
 import dev.slne.surf.settings.api.common.result.category.SettingCategoryCreateResult
 import dev.slne.surf.settings.api.common.result.category.SettingCategoryQueryResult
-import dev.slne.surf.settings.api.common.result.setting.SettingCreateResult
+import dev.slne.surf.settings.api.common.result.setting.SettingCreateIgnoringResult
 import dev.slne.surf.settings.api.common.surfSettingApi
 
 suspend fun settings(block: suspend SettingsRoot.() -> Unit) {
     SettingsRoot().block()
 }
 
-suspend fun setting(block: SingleSettingBuilder.() -> Unit): SettingCreateResult {
+suspend fun setting(block: SingleSettingBuilder.() -> Unit): SettingCreateIgnoringResult {
     val builder = SingleSettingBuilder().apply(block)
     return builder.build()
 }
@@ -59,14 +59,14 @@ class SingleSettingBuilder {
         this.categoryId = identifier
     }
 
-    suspend fun build(): SettingCreateResult {
+    suspend fun build(): SettingCreateIgnoringResult {
         val categoryResult = surfSettingApi.queryCategory(categoryId)
 
         if (categoryResult.isFailure()) {
-            return SettingCreateResult.Failure(SettingCreateResult.SettingCreateFailureReason.CATEGORY_NOT_FOUND)
+            return SettingCreateIgnoringResult.Failure(SettingCreateIgnoringResult.SettingCreateIgnoringFailureReason.CATEGORY_NOT_FOUND)
         }
 
-        return surfSettingApi.createSetting(
+        return surfSettingApi.createSettingIfNotExists(
             identifier = identifier,
             category = (categoryResult as SettingCategoryQueryResult.Success).category,
             displayName = displayName,

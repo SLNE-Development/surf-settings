@@ -10,7 +10,8 @@ sealed class SettingCreateIgnoringResult {
         SettingCreateIgnoringResult()
 
     enum class SettingCreateIgnoringFailureReason {
-        INTERNAL_ERROR
+        INTERNAL_ERROR,
+        CATEGORY_NOT_FOUND
     }
 
     fun getOrNull() = if (this is Success) this.setting else null
