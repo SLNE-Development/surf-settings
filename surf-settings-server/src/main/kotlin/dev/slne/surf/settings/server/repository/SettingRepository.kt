@@ -11,12 +11,18 @@ import org.springframework.stereotype.Repository
 
 @Repository
 @CoroutineTransactional
-class SettingRepository {
+class SettingRepository(
+    val settingCategoryRepository: SettingCategoryRepository
+) {
     suspend fun query(identifier: String): Setting? =
         SettingEntity.find(SettingsTable.identifier eq identifier).firstOrNull()?.toDto()
 
-    suspend fun queryByCategory(category: String): ObjectSet<Setting> =
-        SettingEntity.find(SettingsTable.category eq category).map { it.toDto() }.toObjectSet()
+    suspend fun queryByCategory(category: String): ObjectSet<Setting> {
+        val category = settingCategoryRepository.queryInternal(category) ?: return ObjectSet.of()
+
+        return SettingEntity.find(SettingsTable.category eq category.id).map { it.toDto() }
+            .toObjectSet()
+    }
 
     suspend fun queryInternal(identifier: String) =
         SettingEntity.find(SettingsTable.identifier eq identifier).firstOrNull()
@@ -25,14 +31,18 @@ class SettingRepository {
     suspend fun delete(identifier: String) =
         SettingEntity.find(SettingsTable.identifier eq identifier).firstOrNull()?.delete() != null
 
-    suspend fun create(setting: Setting) =
-        if (query(setting.identifier) == null) SettingEntity.new {
+    suspend fun create(setting: Setting): Setting? {
+        val categoryEntity = settingCategoryRepository.queryInternal(setting.category.identifier)
+            ?: return null
+
+        return if (query(setting.identifier) == null) SettingEntity.new {
             this.displayName = setting.displayName
             this.identifier = setting.identifier
-            this.category = setting.category
+            this.category = categoryEntity
             this.description = setting.description
             this.defaultValue = setting.defaultValue
         }.toDto() else null
+    }
 
     suspend fun createIfNotExists(setting: Setting) =
         query(setting.identifier) ?: create(setting)
