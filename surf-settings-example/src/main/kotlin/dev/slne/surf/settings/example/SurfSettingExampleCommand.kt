@@ -5,7 +5,7 @@ import dev.jorel.commandapi.kotlindsl.*
 import dev.slne.surf.settings.api.common.surfSettingApi
 import dev.slne.surf.surfapi.core.api.messages.adventure.sendText
 
-fun toggleExampleBooleanSettingCommand() = commandTree("surfsettingsexample") {
+fun surfSettingExampleCommand() = commandTree("surfsettingsexample") {
     literalArgument("toggleboolean") {
         playerExecutor { player, _ ->
             plugin.launch {

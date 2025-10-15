@@ -8,6 +8,8 @@ val plugin get() = JavaPlugin.getPlugin(ExampleMain::class.java)
 
 class ExampleMain : SuspendingJavaPlugin() {
     override suspend fun onEnableAsync() {
+        surfSettingExampleCommand()
+
         logger.warning("The server is running the example surf settings plugin. This is only for demonstration purposes and should not be used in production!")
 
         settings {
