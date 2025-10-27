@@ -12,3 +12,15 @@ allprojects {
     group = "dev.slne.surf.settings"
     version = findProperty("version") as String
 }
+
+subprojects {
+    afterEvaluate {
+        plugins.withType<PublishingPlugin> {
+            configure<PublishingExtension> {
+                repositories {
+                    slneReleases()
+                }
+            }
+        }
+    }
+}
