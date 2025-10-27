@@ -1,3 +1,5 @@
+import dev.slne.surf.surfapi.gradle.util.slneReleases
+
 buildscript {
     repositories {
         gradlePluginPortal()
