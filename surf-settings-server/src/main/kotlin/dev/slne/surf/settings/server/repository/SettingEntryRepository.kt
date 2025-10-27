@@ -27,9 +27,10 @@ class SettingEntryRepository(
 
     suspend fun modify(playerUUID: UUID, settingEntry: SettingEntry): SettingEntry? {
         val setting =
-            settingRepository.queryInternal(settingEntry.setting.identifier) ?: return null
+            settingRepository.queryInternal(settingEntry.settingIdentifier)
+                ?: return null
 
-        val updated = query(playerUUID, settingEntry.setting)?.apply {
+        val updated = query(playerUUID, setting.toDto())?.apply {
             value = settingEntry.value
         } ?: SettingEntryEntity.new {
             player = playerUUID

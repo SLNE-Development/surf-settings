@@ -5,9 +5,13 @@ import kotlinx.serialization.Serializable
 
 @Serializable
 sealed class SettingQueryResult {
+    @Serializable
     data class Success(val setting: Setting) : SettingQueryResult()
+
+    @Serializable
     data class Failure(val failureReason: SettingQueryFailureReason) : SettingQueryResult()
 
+    @Serializable
     enum class SettingQueryFailureReason {
         SETTING_NOT_FOUND
     }

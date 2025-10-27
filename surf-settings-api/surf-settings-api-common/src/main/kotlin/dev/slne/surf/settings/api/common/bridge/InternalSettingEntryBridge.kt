@@ -17,6 +17,12 @@ import java.util.*
 @InternalSettingsApi
 interface InternalSettingEntryBridge {
     suspend fun modify(playerUuid: UUID, settingEntry: SettingEntry): SettingEntryModifyResult
+    suspend fun modify(
+        playerUuid: UUID,
+        setting: Setting,
+        value: String
+    ): SettingEntryModifyResult
+
     suspend fun reset(playerUUID: UUID, setting: Setting): SettingEntryResetResult
     suspend fun all(playerUuid: UUID): ObjectSet<SettingEntry>
     suspend fun all(): ObjectSet<SettingEntry>

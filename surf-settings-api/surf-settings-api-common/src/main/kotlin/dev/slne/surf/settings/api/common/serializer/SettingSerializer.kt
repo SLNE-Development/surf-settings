@@ -24,6 +24,10 @@ object SettingSerializer : KSerializer<Setting> {
         return decode(decoder.decodeString())
     }
 
+    fun encode(value: Setting): String {
+        return "${value.id}:${value.identifier}:${value.category.identifier}:${value.category.displayName}:${value.category.description}:${value.displayName}:${value.description}:${value.defaultValue}"
+    }
+
     fun decode(value: String): Setting {
         val parts = value.split(":")
         return object : Setting {

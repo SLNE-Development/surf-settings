@@ -8,10 +8,7 @@ import kotlinx.serialization.Serializable
 @OptIn(InternalSettingsApi::class)
 @Serializable(with = SettingEntrySerializer::class)
 interface SettingEntry {
-    val id: Long
     val player: OfflineCloudPlayer
-    val setting: Setting
+    val settingIdentifier: String
     var value: String
-    val addedAt: Long
-    val updatedAt: Long
 }

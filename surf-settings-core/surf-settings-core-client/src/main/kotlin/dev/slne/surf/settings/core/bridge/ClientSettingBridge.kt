@@ -1,6 +1,7 @@
 package dev.slne.surf.settings.core.bridge
 
 import dev.slne.surf.cloud.api.client.netty.packet.fireAndAwaitOrThrow
+import dev.slne.surf.cloud.api.common.util.toObjectSet
 import dev.slne.surf.settings.api.common.Setting
 import dev.slne.surf.settings.api.common.result.setting.SettingCreateIgnoringResult
 import dev.slne.surf.settings.api.common.result.setting.SettingCreateResult
@@ -35,8 +36,8 @@ class ClientSettingBridge : CommonSettingBridge() {
         ).fireAndAwaitOrThrow().result
 
     override suspend fun queryAll(): ObjectSet<Setting> =
-        ServerboundSettingQueryAllPacket().fireAndAwaitOrThrow().queries
+        ServerboundSettingQueryAllPacket().fireAndAwaitOrThrow().queries.toObjectSet()
 
     override suspend fun queryByCategory(category: String): ObjectSet<Setting> =
-        ServerboundSettingQueryByCategoryPacket(category).fireAndAwaitOrThrow().queries
+        ServerboundSettingQueryByCategoryPacket(category).fireAndAwaitOrThrow().queries.toObjectSet()
 }

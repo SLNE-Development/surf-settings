@@ -1,6 +1,7 @@
 package dev.slne.surf.settings.core.bridge
 
 import dev.slne.surf.cloud.api.client.netty.packet.fireAndAwaitOrThrow
+import dev.slne.surf.cloud.api.common.util.toObjectSet
 import dev.slne.surf.settings.api.common.SettingCategory
 import dev.slne.surf.settings.api.common.result.category.SettingCategoryCreateResult
 import dev.slne.surf.settings.api.common.result.category.SettingCategoryDeleteResult
@@ -26,5 +27,5 @@ class ClientSettingCategoryBridge : CommonSettingCategoryBridge() {
         ServerboundSettingCategoryQueryPacket(identifier).fireAndAwaitOrThrow().result
 
     override suspend fun queryAll(): ObjectSet<SettingCategory> =
-        ServerboundSettingCategoryQueryAllPacket().fireAndAwaitOrThrow().queries
+        ServerboundSettingCategoryQueryAllPacket().fireAndAwaitOrThrow().queries.toObjectSet()
 }

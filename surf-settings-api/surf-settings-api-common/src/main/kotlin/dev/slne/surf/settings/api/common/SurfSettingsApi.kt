@@ -37,6 +37,12 @@ interface SurfSettingsApi {
     suspend fun queryAllSettings(): ObjectSet<Setting>
     suspend fun querySettingByCategory(category: String): ObjectSet<Setting>
 
+    suspend fun modifyEntry(
+        playerUuid: UUID,
+        setting: Setting,
+        value: String
+    ): SettingEntryModifyResult
+
     suspend fun modifyEntry(playerUuid: UUID, settingEntry: SettingEntry): SettingEntryModifyResult
     suspend fun resetEntry(playerUuid: UUID, setting: Setting): SettingEntryResetResult
     suspend fun allEntries(playerUuid: UUID): ObjectSet<SettingEntry>

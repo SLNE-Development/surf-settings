@@ -1,9 +1,11 @@
 package dev.slne.surf.settings.server.bridge
 
+import dev.slne.surf.cloud.api.common.player.OfflineCloudPlayer
 import dev.slne.surf.settings.api.common.Setting
 import dev.slne.surf.settings.api.common.SettingEntry
 import dev.slne.surf.settings.api.common.util.InternalSettingsApi
 import dev.slne.surf.settings.core.bridge.CommonSettingEntryBridge
+import dev.slne.surf.settings.core.impl.SettingEntryImpl
 import dev.slne.surf.settings.server.service.SettingEntryService
 import org.springframework.stereotype.Component
 import java.util.*
@@ -17,6 +19,18 @@ class ServerSettingEntryBridge(
         playerUuid: UUID,
         settingEntry: SettingEntry
     ) = settingsEntryService.modify(playerUuid, settingEntry)
+
+    override suspend fun modify(
+        playerUuid: UUID,
+        setting: Setting,
+        value: String
+    ) = settingsEntryService.modify(
+        playerUuid, SettingEntryImpl(
+            OfflineCloudPlayer[playerUuid],
+            setting.identifier,
+            value
+        )
+    )
 
     override suspend fun reset(
         playerUUID: UUID,

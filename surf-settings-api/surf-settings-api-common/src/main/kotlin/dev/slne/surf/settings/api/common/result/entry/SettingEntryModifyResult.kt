@@ -5,9 +5,13 @@ import kotlinx.serialization.Serializable
 
 @Serializable
 sealed class SettingEntryModifyResult {
+    @Serializable
     data class Success(val setting: SettingEntry) : SettingEntryModifyResult()
+
+    @Serializable
     data class Failure(val failureReason: SettingModifyResultFailure) : SettingEntryModifyResult()
 
+    @Serializable
     enum class SettingModifyResultFailure {
         SETTING_NOT_FOUND
     }

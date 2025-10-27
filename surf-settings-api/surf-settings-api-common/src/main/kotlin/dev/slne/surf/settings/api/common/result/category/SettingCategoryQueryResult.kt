@@ -5,10 +5,14 @@ import kotlinx.serialization.Serializable
 
 @Serializable
 sealed class SettingCategoryQueryResult {
+    @Serializable
     data class Success(val category: SettingCategory) : SettingCategoryQueryResult()
+
+    @Serializable
     data class Failure(val failureReason: SettingCategoryQueryFailureReason) :
         SettingCategoryQueryResult()
 
+    @Serializable
     enum class SettingCategoryQueryFailureReason {
         CATEGORY_NOT_FOUND
     }

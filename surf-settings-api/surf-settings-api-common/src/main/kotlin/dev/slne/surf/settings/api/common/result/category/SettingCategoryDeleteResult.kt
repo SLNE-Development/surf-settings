@@ -4,10 +4,14 @@ import kotlinx.serialization.Serializable
 
 @Serializable
 sealed class SettingCategoryDeleteResult {
+    @Serializable
     class Success() : SettingCategoryDeleteResult()
+
+    @Serializable
     data class Failure(val failureReason: SettingCategoryDeleteFailureReason) :
         SettingCategoryDeleteResult()
 
+    @Serializable
     enum class SettingCategoryDeleteFailureReason {
         CATEGORY_NOT_FOUND
     }

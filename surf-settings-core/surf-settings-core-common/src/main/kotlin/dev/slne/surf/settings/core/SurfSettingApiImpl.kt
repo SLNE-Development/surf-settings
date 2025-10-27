@@ -7,6 +7,7 @@ import dev.slne.surf.settings.api.common.SurfSettingsApi
 import dev.slne.surf.settings.api.common.bridge.settingCategoryBridge
 import dev.slne.surf.settings.api.common.bridge.settingsBridge
 import dev.slne.surf.settings.api.common.bridge.settingsEntryBridge
+import dev.slne.surf.settings.api.common.result.entry.SettingEntryModifyResult
 import dev.slne.surf.settings.api.common.result.setting.SettingCreateIgnoringResult
 import dev.slne.surf.settings.api.common.result.setting.SettingCreateResult
 import dev.slne.surf.settings.api.common.util.InternalSettingsApi
@@ -59,6 +60,18 @@ class SurfSettingApiImpl : SurfSettingsApi {
     override suspend fun queryAllSettings() = settingsBridge.queryAll()
     override suspend fun querySettingByCategory(category: String) =
         settingsBridge.queryByCategory(category)
+
+    override suspend fun modifyEntry(
+        playerUuid: UUID,
+        setting: Setting,
+        value: String
+    ): SettingEntryModifyResult {
+        return settingsEntryBridge.modify(
+            playerUuid,
+            setting,
+            value
+        )
+    }
 
     override suspend fun modifyEntry(
         playerUuid: UUID,

@@ -18,20 +18,12 @@ fun surfSettingExampleCommand() = commandTree("surfsettingsexample") {
                         return@launch
                     }
 
-                val entry = surfSettingApi.queryEntry(player.uniqueId, setting).getOrNull() ?: run {
-                    player.sendText {
-                        appendPrefix()
-                        error("Die Einstellungseintrag wurde nicht gefunden!")
-                    }
-                    return@launch
-                }
+                val entry = surfSettingApi.queryEntry(player.uniqueId, setting).getOrNull()
 
-                val currentValue = entry.value
+                val currentValue = entry?.value ?: setting.defaultValue
                 val newValue = (currentValue.toBoolean().not()).toString()
 
-                surfSettingApi.modifyEntry(player.uniqueId, entry.apply {
-                    value = newValue
-                })
+                surfSettingApi.modifyEntry(player.uniqueId, setting, newValue)
 
                 player.sendText {
                     appendPrefix()
@@ -56,25 +48,13 @@ fun surfSettingExampleCommand() = commandTree("surfsettingsexample") {
                             return@launch
                         }
 
-                    val entry =
-                        surfSettingApi.queryEntry(player.uniqueId, setting).getOrNull() ?: run {
-                            player.sendText {
-                                appendPrefix()
-                                error("Die Einstellungseintrag wurde nicht gefunden!")
-                            }
-                            return@launch
-                        }
-
-                    val currentValue = entry.value
                     val newValue = value.toString()
 
-                    surfSettingApi.modifyEntry(player.uniqueId, entry.apply {
-                        this.value = newValue
-                    })
+                    surfSettingApi.modifyEntry(player.uniqueId, setting, newValue)
 
                     player.sendText {
                         appendPrefix()
-                        success("Die Einstellung wurde von $currentValue auf $newValue geändert.")
+                        success("Die Einstellung wurde auf $newValue geändert.")
                     }
                 }
             }
@@ -96,25 +76,13 @@ fun surfSettingExampleCommand() = commandTree("surfsettingsexample") {
                             return@launch
                         }
 
-                    val entry =
-                        surfSettingApi.queryEntry(player.uniqueId, setting).getOrNull() ?: run {
-                            player.sendText {
-                                appendPrefix()
-                                error("Die Einstellungseintrag wurde nicht gefunden!")
-                            }
-                            return@launch
-                        }
-
-                    val currentValue = entry.value
                     val newValue = text
 
-                    surfSettingApi.modifyEntry(player.uniqueId, entry.apply {
-                        this.value = newValue
-                    })
+                    surfSettingApi.modifyEntry(player.uniqueId, setting, newValue)
 
                     player.sendText {
                         appendPrefix()
-                        success("Die Einstellung wurde von $currentValue auf $newValue geändert.")
+                        success("Die Einstellung wurde auf $newValue geändert.")
                     }
                 }
             }
@@ -139,7 +107,7 @@ fun surfSettingExampleCommand() = commandTree("surfsettingsexample") {
                     info("Deine Einstellungen:")
                     entries.forEach { entry ->
                         appendNewline {
-                            info(" - ${entry.setting.displayName} (${entry.setting.identifier}): ${entry.value}")
+                            info(" - ${entry.settingIdentifier}: ${entry.value}")
                         }
                     }
                 }

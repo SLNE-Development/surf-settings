@@ -14,12 +14,9 @@ class SettingEntryEntity(id: EntityID<Long>) : AuditableLongEntity(id, SettingsE
     var value by SettingsEntryTable.value
     var setting by SettingEntity referencedOn SettingsEntryTable.setting
 
-    fun toDto() = SettingEntryImpl(
-        id = id.value,
+    fun toDto(settingIdentifier: String) = SettingEntryImpl(
         player = OfflineCloudPlayer[player],
-        setting = setting.toDto(),
-        value = value,
-        addedAt = createdAt.toEpochSecond() * 1_000,
-        updatedAt = updatedAt.toEpochSecond() + 1_000,
+        settingIdentifier = settingIdentifier,
+        value = value
     )
 }

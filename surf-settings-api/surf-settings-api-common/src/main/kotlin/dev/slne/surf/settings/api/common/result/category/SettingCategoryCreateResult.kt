@@ -5,10 +5,14 @@ import kotlinx.serialization.Serializable
 
 @Serializable
 sealed class SettingCategoryCreateResult {
+    @Serializable
     data class Success(val category: SettingCategory) : SettingCategoryCreateResult()
+
+    @Serializable
     data class Failure(val failureReason: SettingCategoryCreateFailureReason) :
         SettingCategoryCreateResult()
 
+    @Serializable
     enum class SettingCategoryCreateFailureReason {
         CATEGORY_ALREADY_EXISTS
     }
