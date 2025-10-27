@@ -1,48 +1,48 @@
 package dev.slne.surf.settings.server.protocol.listener
 
 import dev.slne.surf.cloud.api.common.meta.SurfNettyPacketHandler
-import dev.slne.surf.settings.core.netty.protocol.clientbound.setting.*
-import dev.slne.surf.settings.core.netty.protocol.serverbound.setting.*
-import dev.slne.surf.settings.server.service.SettingService
+import dev.slne.surf.settings.core.netty.protocol.clientbound.setting.ClientboundSettingCreateResultPacket
+import dev.slne.surf.settings.core.netty.protocol.clientbound.setting.ClientboundSettingDeleteResultPacket
+import dev.slne.surf.settings.core.netty.protocol.clientbound.setting.ClientboundSettingQueryManyPacket
+import dev.slne.surf.settings.core.netty.protocol.clientbound.setting.ClientboundSettingQueryResultPacket
+import dev.slne.surf.settings.core.netty.protocol.serverbound.setting.ServerboundSettingCreatePacket
+import dev.slne.surf.settings.core.netty.protocol.serverbound.setting.ServerboundSettingDeletePacket
+import dev.slne.surf.settings.core.netty.protocol.serverbound.setting.ServerboundSettingQueryAllPacket
+import dev.slne.surf.settings.core.netty.protocol.serverbound.setting.ServerboundSettingQueryPacket
+import dev.slne.surf.settings.server.repository.SettingRepository
 import org.springframework.stereotype.Component
 
 @Component
 class SettingPacketListener(
-    private val settingService: SettingService
+    private val settingRepository: SettingRepository
 ) {
     @SurfNettyPacketHandler
-    suspend fun handleSettingCreatePacketIgnoring(packet: ServerboundSettingCreateIgnoringPacket) {
+    suspend fun handleSettingCreatePacket(packet: ServerboundSettingCreatePacket) {
         packet.respond(
-            ClientboundSettingCreateIgnoringResultPacket(
-                settingService.createIfNotExists(
-                    packet.setting
+            ClientboundSettingCreateResultPacket(
+                settingRepository.createSetting(
+                    packet.identifier,
+                    packet.category,
+                    packet.displayName,
+                    packet.description,
+                    packet.defaultValue
                 )
             )
         )
     }
 
     @SurfNettyPacketHandler
-    suspend fun handleSettingCreatePacket(packet: ServerboundSettingCreatePacket) {
-        packet.respond(ClientboundSettingCreateResultPacket(settingService.createSetting(packet.setting)))
-    }
-
-    @SurfNettyPacketHandler
     suspend fun handleSettingDeletePacket(packet: ServerboundSettingDeletePacket) {
-        packet.respond(ClientboundSettingDeleteResultPacket(settingService.delete(packet.identifier)))
+        packet.respond(ClientboundSettingDeleteResultPacket(settingRepository.delete(packet.identifier)))
     }
 
     @SurfNettyPacketHandler
     suspend fun handleSettingQueryAllPacket(packet: ServerboundSettingQueryAllPacket) {
-        packet.respond(ClientboundSettingQueryManyPacket(settingService.queryAll()))
+        packet.respond(ClientboundSettingQueryManyPacket(settingRepository.all()))
     }
 
     @SurfNettyPacketHandler
     suspend fun handleSettingQueryPacket(packet: ServerboundSettingQueryPacket) {
-        packet.respond(ClientboundSettingQueryResultPacket(settingService.query(packet.identifier)))
-    }
-
-    @SurfNettyPacketHandler
-    suspend fun handleSettingQueryByCategoryPacket(packet: ServerboundSettingQueryByCategoryPacket) {
-        packet.respond(ClientboundSettingQueryManyPacket(settingService.queryByCategory(packet.category)))
+        packet.respond(ClientboundSettingQueryResultPacket(settingRepository.getSetting(packet.identifier)))
     }
 }

@@ -1,25 +1,32 @@
 package dev.slne.surf.settings.server.bridge
 
-import dev.slne.surf.settings.api.common.Setting
+import dev.slne.surf.settings.api.common.SettingCategory
+import dev.slne.surf.settings.api.common.bridge.InternalSettingBridge
 import dev.slne.surf.settings.api.common.util.InternalSettingsApi
-import dev.slne.surf.settings.core.bridge.CommonSettingBridge
-import dev.slne.surf.settings.server.service.SettingService
+import dev.slne.surf.settings.server.repository.SettingRepository
 import org.springframework.stereotype.Component
 
 @InternalSettingsApi
 @Component
 class ServerSettingBridge(
-    private val settingService: SettingService
-) : CommonSettingBridge() {
-    override suspend fun createSetting(setting: Setting) =
-        settingService.createSetting(setting)
+    private val settingRepository: SettingRepository
+) : InternalSettingBridge {
+    override suspend fun createSetting(
+        identifier: String,
+        category: SettingCategory,
+        displayName: String,
+        description: String,
+        defaultValue: String
+    ) = settingRepository.createSetting(
+        identifier,
+        category,
+        displayName,
+        description,
+        defaultValue
+    )
 
-    override suspend fun createIfNotExists(setting: Setting) =
-        settingService.createIfNotExists(setting)
+    override suspend fun delete(identifier: String) = settingRepository.delete(identifier)
+    override suspend fun getSetting(identifier: String) = settingRepository.getSetting(identifier)
+    override suspend fun all() = settingRepository.all()
 
-    override suspend fun delete(identifier: String) = settingService.delete(identifier)
-    override suspend fun query(identifier: String) = settingService.query(identifier)
-    override suspend fun queryAll() = settingService.queryAll()
-    override suspend fun queryByCategory(category: String) =
-        settingService.queryByCategory(category)
 }

@@ -3,41 +3,43 @@ package dev.slne.surf.settings.core.bridge
 import dev.slne.surf.cloud.api.client.netty.packet.fireAndAwaitOrThrow
 import dev.slne.surf.cloud.api.common.util.toObjectSet
 import dev.slne.surf.settings.api.common.Setting
-import dev.slne.surf.settings.api.common.result.setting.SettingCreateIgnoringResult
-import dev.slne.surf.settings.api.common.result.setting.SettingCreateResult
-import dev.slne.surf.settings.api.common.result.setting.SettingDeleteResult
-import dev.slne.surf.settings.api.common.result.setting.SettingQueryResult
+import dev.slne.surf.settings.api.common.SettingCategory
+import dev.slne.surf.settings.api.common.bridge.InternalSettingBridge
 import dev.slne.surf.settings.api.common.util.InternalSettingsApi
-import dev.slne.surf.settings.core.netty.protocol.serverbound.setting.*
+import dev.slne.surf.settings.core.netty.protocol.serverbound.setting.ServerboundSettingCreatePacket
+import dev.slne.surf.settings.core.netty.protocol.serverbound.setting.ServerboundSettingDeletePacket
+import dev.slne.surf.settings.core.netty.protocol.serverbound.setting.ServerboundSettingQueryAllPacket
+import dev.slne.surf.settings.core.netty.protocol.serverbound.setting.ServerboundSettingQueryPacket
 import it.unimi.dsi.fastutil.objects.ObjectSet
 import org.springframework.stereotype.Component
 
 @InternalSettingsApi
 @Component
-class ClientSettingBridge : CommonSettingBridge() {
-    override suspend fun createSetting(setting: Setting): SettingCreateResult =
-        ServerboundSettingCreatePacket(
-            setting
-        ).fireAndAwaitOrThrow().result
+class ClientSettingBridge : InternalSettingBridge {
+    override suspend fun createSetting(
+        identifier: String,
+        category: SettingCategory,
+        displayName: String,
+        description: String,
+        defaultValue: String
+    ): Setting? = ServerboundSettingCreatePacket(
+        identifier,
+        category,
+        displayName,
+        description,
+        defaultValue
+    ).fireAndAwaitOrThrow().result
 
-    override suspend fun createIfNotExists(setting: Setting): SettingCreateIgnoringResult =
-        ServerboundSettingCreateIgnoringPacket(
-            setting
-        ).fireAndAwaitOrThrow().result
-
-    override suspend fun delete(identifier: String): SettingDeleteResult =
+    override suspend fun delete(identifier: String): Boolean =
         ServerboundSettingDeletePacket(
             identifier
         ).fireAndAwaitOrThrow().result
 
-    override suspend fun query(identifier: String): SettingQueryResult =
+    override suspend fun getSetting(identifier: String): Setting? =
         ServerboundSettingQueryPacket(
             identifier
         ).fireAndAwaitOrThrow().result
 
-    override suspend fun queryAll(): ObjectSet<Setting> =
-        ServerboundSettingQueryAllPacket().fireAndAwaitOrThrow().queries.toObjectSet()
-
-    override suspend fun queryByCategory(category: String): ObjectSet<Setting> =
-        ServerboundSettingQueryByCategoryPacket(category).fireAndAwaitOrThrow().queries.toObjectSet()
+    override suspend fun all(): ObjectSet<Setting> =
+        ServerboundSettingQueryAllPacket().fireAndAwaitOrThrow().result.toObjectSet()
 }

@@ -3,9 +3,7 @@ package dev.slne.surf.settings.core.bridge
 import dev.slne.surf.cloud.api.client.netty.packet.fireAndAwaitOrThrow
 import dev.slne.surf.cloud.api.common.util.toObjectSet
 import dev.slne.surf.settings.api.common.SettingCategory
-import dev.slne.surf.settings.api.common.result.category.SettingCategoryCreateResult
-import dev.slne.surf.settings.api.common.result.category.SettingCategoryDeleteResult
-import dev.slne.surf.settings.api.common.result.category.SettingCategoryQueryResult
+import dev.slne.surf.settings.api.common.bridge.InternalSettingCategoryBridge
 import dev.slne.surf.settings.api.common.util.InternalSettingsApi
 import dev.slne.surf.settings.core.netty.protocol.serverbound.category.ServerboundSettingCategoryCreatePacket
 import dev.slne.surf.settings.core.netty.protocol.serverbound.category.ServerboundSettingCategoryDeletePacket
@@ -16,16 +14,23 @@ import org.springframework.stereotype.Component
 
 @InternalSettingsApi
 @Component
-class ClientSettingCategoryBridge : CommonSettingCategoryBridge() {
-    override suspend fun createCategory(category: SettingCategory): SettingCategoryCreateResult =
-        ServerboundSettingCategoryCreatePacket(category).fireAndAwaitOrThrow().result
+class ClientSettingCategoryBridge : InternalSettingCategoryBridge {
+    override suspend fun createCategory(
+        identifier: String,
+        displayName: String,
+        description: String
+    ): SettingCategory? = ServerboundSettingCategoryCreatePacket(
+        identifier,
+        displayName,
+        description
+    ).fireAndAwaitOrThrow().result
 
-    override suspend fun deleteCategory(category: SettingCategory): SettingCategoryDeleteResult =
+    override suspend fun deleteCategory(category: SettingCategory): Boolean =
         ServerboundSettingCategoryDeletePacket(category).fireAndAwaitOrThrow().result
 
-    override suspend fun queryCategory(identifier: String): SettingCategoryQueryResult =
+    override suspend fun getCategory(identifier: String): SettingCategory? =
         ServerboundSettingCategoryQueryPacket(identifier).fireAndAwaitOrThrow().result
 
-    override suspend fun queryAll(): ObjectSet<SettingCategory> =
-        ServerboundSettingCategoryQueryAllPacket().fireAndAwaitOrThrow().queries.toObjectSet()
+    override suspend fun all(): ObjectSet<SettingCategory> =
+        ServerboundSettingCategoryQueryAllPacket().fireAndAwaitOrThrow().result.toObjectSet()
 }

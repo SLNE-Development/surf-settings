@@ -3,40 +3,51 @@ package dev.slne.surf.settings.server.repository
 import dev.slne.surf.cloud.api.common.util.toObjectSet
 import dev.slne.surf.cloud.api.server.plugin.CoroutineTransactional
 import dev.slne.surf.settings.api.common.SettingCategory
-import dev.slne.surf.settings.server.database.entity.SettingCategoryEntity
+import dev.slne.surf.settings.core.impl.SettingCategoryImpl
 import dev.slne.surf.settings.server.database.table.SettingCategoryTable
-import dev.slne.surf.settings.server.database.table.SettingsTable
 import it.unimi.dsi.fastutil.objects.ObjectSet
 import org.jetbrains.exposed.sql.SqlExpressionBuilder.eq
+import org.jetbrains.exposed.sql.deleteWhere
+import org.jetbrains.exposed.sql.insert
+import org.jetbrains.exposed.sql.selectAll
 import org.springframework.stereotype.Repository
 
 @Repository
 @CoroutineTransactional
 class SettingCategoryRepository {
-    suspend fun query(identifier: String): SettingCategory? = SettingCategoryEntity.find(
-        SettingCategoryTable.identifier eq identifier
-    ).firstOrNull()?.toDto()
+    suspend fun createCategory(
+        identifier: String,
+        displayName: String,
+        description: String
+    ): SettingCategory? = getCategory(identifier) ?: run {
+        SettingCategoryTable.insert {
+            it[SettingCategoryTable.identifier] = identifier
+            it[SettingCategoryTable.displayName] = displayName
+            it[SettingCategoryTable.description] = description
+        }
+        getCategory(identifier)
+    }
 
-    suspend fun queryInternal(identifier: String): SettingCategoryEntity? =
-        SettingCategoryEntity.find(
-            SettingCategoryTable.identifier eq identifier
-        ).firstOrNull()
+    suspend fun deleteCategory(category: SettingCategory): Boolean =
+        SettingCategoryTable.deleteWhere {
+            SettingCategoryTable.identifier eq category.identifier
+        } > 0
 
-    suspend fun all(): ObjectSet<SettingCategory> =
-        SettingCategoryEntity.all().map { it.toDto() }.toObjectSet()
+    suspend fun getCategory(identifier: String): SettingCategory? =
+        SettingCategoryTable.selectAll().where(SettingCategoryTable.identifier eq identifier)
+            .firstOrNull()?.let {
+                SettingCategoryImpl(
+                    identifier = it[SettingCategoryTable.identifier],
+                    displayName = it[SettingCategoryTable.displayName],
+                    description = it[SettingCategoryTable.description]
+                )
+            }
 
-    suspend fun create(category: SettingCategory) =
-        if (query(category.identifier) == null) SettingCategoryEntity.new {
-            this.displayName = category.displayName
-            this.identifier = category.identifier
-            this.description = category.description
-        }.toDto() else null
-
-    suspend fun delete(identifier: String) =
-        SettingCategoryEntity.find(SettingsTable.identifier eq identifier).firstOrNull()
-            ?.delete() != null
-
-    suspend fun delete(category: SettingCategory) =
-        SettingCategoryEntity.find(SettingsTable.identifier eq category.identifier).firstOrNull()
-            ?.delete() != null
+    suspend fun all(): ObjectSet<SettingCategory> = SettingCategoryTable.selectAll().map {
+        SettingCategoryImpl(
+            identifier = it[SettingCategoryTable.identifier],
+            displayName = it[SettingCategoryTable.displayName],
+            description = it[SettingCategoryTable.description]
+        )
+    }.toObjectSet()
 }

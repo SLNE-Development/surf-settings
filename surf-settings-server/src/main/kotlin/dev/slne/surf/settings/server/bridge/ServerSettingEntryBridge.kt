@@ -1,46 +1,42 @@
 package dev.slne.surf.settings.server.bridge
 
-import dev.slne.surf.cloud.api.common.player.OfflineCloudPlayer
 import dev.slne.surf.settings.api.common.Setting
-import dev.slne.surf.settings.api.common.SettingEntry
+import dev.slne.surf.settings.api.common.bridge.InternalSettingEntryBridge
 import dev.slne.surf.settings.api.common.util.InternalSettingsApi
-import dev.slne.surf.settings.core.bridge.CommonSettingEntryBridge
-import dev.slne.surf.settings.core.impl.SettingEntryImpl
-import dev.slne.surf.settings.server.service.SettingEntryService
+import dev.slne.surf.settings.server.repository.SettingEntryRepository
 import org.springframework.stereotype.Component
 import java.util.*
 
 @InternalSettingsApi
 @Component
 class ServerSettingEntryBridge(
-    private val settingsEntryService: SettingEntryService
-) : CommonSettingEntryBridge() {
-    override suspend fun modify(
-        playerUuid: UUID,
-        settingEntry: SettingEntry
-    ) = settingsEntryService.modify(playerUuid, settingEntry)
-
+    private val settingEntryRepository: SettingEntryRepository
+) : InternalSettingEntryBridge {
     override suspend fun modify(
         playerUuid: UUID,
         setting: Setting,
         value: String
-    ) = settingsEntryService.modify(
-        playerUuid, SettingEntryImpl(
-            OfflineCloudPlayer[playerUuid],
-            setting.identifier,
-            value
-        )
+    ) = settingEntryRepository.modify(
+        playerUuid,
+        setting,
+        value
     )
 
     override suspend fun reset(
         playerUUID: UUID,
         setting: Setting
-    ) = settingsEntryService.reset(playerUUID, setting)
+    ) = settingEntryRepository.reset(
+        playerUUID,
+        setting
+    )
 
-    override suspend fun all(playerUuid: UUID) = settingsEntryService.all(playerUuid)
-    override suspend fun all() = settingsEntryService.all()
-    override suspend fun query(
+    override suspend fun getAll(playerUuid: UUID) = settingEntryRepository.getAll(playerUuid)
+    override suspend fun getAll() = settingEntryRepository.getAll()
+    override suspend fun getEntry(
         playerUUID: UUID,
         setting: Setting
-    ) = settingsEntryService.query(playerUUID, setting)
+    ) = settingEntryRepository.getEntry(
+        playerUUID,
+        setting
+    )
 }

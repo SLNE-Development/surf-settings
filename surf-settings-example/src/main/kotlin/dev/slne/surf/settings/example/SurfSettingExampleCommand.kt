@@ -10,7 +10,7 @@ fun surfSettingExampleCommand() = commandTree("surfsettingsexample") {
         playerExecutor { player, _ ->
             plugin.launch {
                 val setting =
-                    surfSettingApi.querySetting(ExampleMain.ID_BOOLEAN).getOrNull() ?: run {
+                    surfSettingApi.getSetting(ExampleMain.ID_BOOLEAN) ?: run {
                         player.sendText {
                             appendPrefix()
                             error("Die Einstellung wurde nicht gefunden!")
@@ -18,7 +18,7 @@ fun surfSettingExampleCommand() = commandTree("surfsettingsexample") {
                         return@launch
                     }
 
-                val entry = surfSettingApi.queryEntry(player.uniqueId, setting).getOrNull()
+                val entry = surfSettingApi.getEntry(player.uniqueId, setting)
 
                 val currentValue = entry?.value ?: setting.defaultValue
                 val newValue = (currentValue.toBoolean().not()).toString()
@@ -40,7 +40,7 @@ fun surfSettingExampleCommand() = commandTree("surfsettingsexample") {
 
                 plugin.launch {
                     val setting =
-                        surfSettingApi.querySetting(ExampleMain.ID_INT).getOrNull() ?: run {
+                        surfSettingApi.getSetting(ExampleMain.ID_INT) ?: run {
                             player.sendText {
                                 appendPrefix()
                                 error("Die Einstellung wurde nicht gefunden!")
@@ -68,7 +68,7 @@ fun surfSettingExampleCommand() = commandTree("surfsettingsexample") {
 
                 plugin.launch {
                     val setting =
-                        surfSettingApi.querySetting(ExampleMain.ID_TEXT).getOrNull() ?: run {
+                        surfSettingApi.getSetting(ExampleMain.ID_TEXT) ?: run {
                             player.sendText {
                                 appendPrefix()
                                 error("Die Einstellung wurde nicht gefunden!")
@@ -92,7 +92,7 @@ fun surfSettingExampleCommand() = commandTree("surfsettingsexample") {
     literalArgument("getAllFromMe") {
         playerExecutor { player, _ ->
             plugin.launch {
-                val entries = surfSettingApi.allEntries(player.uniqueId)
+                val entries = surfSettingApi.getEntries(player.uniqueId)
 
                 if (entries.isEmpty()) {
                     player.sendText {

@@ -4,47 +4,63 @@ import dev.slne.surf.cloud.api.common.util.toObjectSet
 import dev.slne.surf.cloud.api.server.plugin.CoroutineTransactional
 import dev.slne.surf.settings.api.common.Setting
 import dev.slne.surf.settings.api.common.SettingEntry
-import dev.slne.surf.settings.server.database.entity.SettingEntryEntity
+import dev.slne.surf.settings.core.impl.SettingEntryImpl
 import dev.slne.surf.settings.server.database.table.SettingsEntryTable
 import it.unimi.dsi.fastutil.objects.ObjectSet
 import org.jetbrains.exposed.sql.SqlExpressionBuilder.eq
 import org.jetbrains.exposed.sql.and
+import org.jetbrains.exposed.sql.deleteWhere
+import org.jetbrains.exposed.sql.selectAll
+import org.jetbrains.exposed.sql.upsert
 import org.springframework.stereotype.Repository
 import java.util.*
 
 @Repository
 @CoroutineTransactional
-class SettingEntryRepository(
-    private val settingRepository: SettingRepository
-) {
-    suspend fun all(playerUuid: UUID): ObjectSet<SettingEntry> =
-        SettingEntryEntity.find(SettingsEntryTable.player eq playerUuid).map { it.toDto() }
-            .toObjectSet()
+class SettingEntryRepository {
+    suspend fun modify(
+        playerUuid: UUID,
+        setting: Setting,
+        value: String
+    ): Boolean = SettingsEntryTable.upsert {
+        it[SettingsEntryTable.player] = playerUuid
+        it[SettingsEntryTable.setting] = setting.identifier
+        it[SettingsEntryTable.value] = value
+    }.let {
+        true
+    }
 
-    suspend fun query(playerUuid: UUID, setting: Setting) = SettingEntryEntity
-        .find((SettingsEntryTable.player eq playerUuid) and (SettingsEntryTable.setting eq setting.id))
-        .firstOrNull()
+    suspend fun reset(
+        playerUUID: UUID,
+        setting: Setting
+    ): Boolean = SettingsEntryTable.deleteWhere {
+        (SettingsEntryTable.player eq playerUUID) and (SettingsEntryTable.setting eq setting.identifier)
+    } > 0
 
-    suspend fun modify(playerUUID: UUID, settingEntry: SettingEntry): SettingEntry? {
-        val setting =
-            settingRepository.queryInternal(settingEntry.settingIdentifier)
-                ?: return null
+    suspend fun getAll(playerUuid: UUID): ObjectSet<SettingEntry> =
+        SettingsEntryTable.selectAll().where(SettingsEntryTable.player eq playerUuid).map {
+            SettingEntryImpl(
+                settingIdentifier = it[SettingsEntryTable.setting],
+                value = it[SettingsEntryTable.value]
+            )
+        }.toObjectSet()
 
-        val updated = query(playerUUID, setting.toDto())?.apply {
-            value = settingEntry.value
-        } ?: SettingEntryEntity.new {
-            player = playerUUID
-            value = settingEntry.value
-            this.setting = setting
+    suspend fun getAll(): ObjectSet<SettingEntry> = SettingsEntryTable.selectAll().map {
+        SettingEntryImpl(
+            settingIdentifier = it[SettingsEntryTable.setting],
+            value = it[SettingsEntryTable.value]
+        )
+    }.toObjectSet()
+
+    suspend fun getEntry(
+        playerUuid: UUID,
+        setting: Setting
+    ): SettingEntry? = SettingsEntryTable.selectAll()
+        .where((SettingsEntryTable.player eq playerUuid) and (SettingsEntryTable.setting eq setting.identifier))
+        .firstOrNull()?.let {
+            SettingEntryImpl(
+                settingIdentifier = it[SettingsEntryTable.setting],
+                value = it[SettingsEntryTable.value]
+            )
         }
-
-        return updated.toDto()
-    }
-
-    suspend fun all(): ObjectSet<SettingEntry> =
-        SettingEntryEntity.all().map { it.toDto() }.toObjectSet()
-
-    suspend fun reset(playerUuid: UUID, setting: Setting) = query(playerUuid, setting)?.apply {
-        value = setting.defaultValue
-    }
 }

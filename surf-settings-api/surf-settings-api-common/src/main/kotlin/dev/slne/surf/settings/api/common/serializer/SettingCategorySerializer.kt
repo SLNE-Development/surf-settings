@@ -1,6 +1,7 @@
 package dev.slne.surf.settings.api.common.serializer
 
 import dev.slne.surf.settings.api.common.SettingCategory
+import dev.slne.surf.settings.api.common.surfSettingApi
 import dev.slne.surf.settings.api.common.util.InternalSettingsApi
 import kotlinx.serialization.KSerializer
 import kotlinx.serialization.descriptors.PrimitiveKind
@@ -25,13 +26,6 @@ object SettingCategorySerializer : KSerializer<SettingCategory> {
 
     fun decode(value: String): SettingCategory {
         val parts = value.split(":")
-        return object : SettingCategory {
-            override val identifier: String
-                get() = parts[0]
-            override val displayName: String
-                get() = parts[1]
-            override val description: String
-                get() = parts[2]
-        }
+        return surfSettingApi.buildCategory(parts[0], parts[1], parts[2])
     }
 }

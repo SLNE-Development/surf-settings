@@ -1,24 +1,27 @@
 package dev.slne.surf.settings.server.bridge
 
 import dev.slne.surf.settings.api.common.SettingCategory
+import dev.slne.surf.settings.api.common.bridge.InternalSettingCategoryBridge
 import dev.slne.surf.settings.api.common.util.InternalSettingsApi
-import dev.slne.surf.settings.core.bridge.CommonSettingCategoryBridge
-import dev.slne.surf.settings.server.service.SettingCategoryService
+import dev.slne.surf.settings.server.repository.SettingCategoryRepository
 import org.springframework.stereotype.Component
 
 @InternalSettingsApi
 @Component
 class ServerSettingCategoryBridge(
-    private val settingCategoryService: SettingCategoryService
-) : CommonSettingCategoryBridge() {
-    override suspend fun createCategory(category: SettingCategory) =
-        settingCategoryService.create(category)
+    private val settingCategoryRepository: SettingCategoryRepository
+) : InternalSettingCategoryBridge {
+    override suspend fun createCategory(
+        identifier: String,
+        displayName: String,
+        description: String
+    ) = settingCategoryRepository.createCategory(identifier, displayName, description)
 
     override suspend fun deleteCategory(category: SettingCategory) =
-        settingCategoryService.delete(category)
+        settingCategoryRepository.deleteCategory(category)
 
-    override suspend fun queryCategory(identifier: String) =
-        settingCategoryService.query(identifier)
+    override suspend fun getCategory(identifier: String) =
+        settingCategoryRepository.getCategory(identifier)
 
-    override suspend fun queryAll() = settingCategoryService.all()
+    override suspend fun all() = settingCategoryRepository.all()
 }

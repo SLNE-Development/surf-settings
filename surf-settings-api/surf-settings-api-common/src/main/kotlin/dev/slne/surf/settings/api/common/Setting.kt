@@ -7,9 +7,8 @@ import kotlinx.serialization.Serializable
 @OptIn(InternalSettingsApi::class)
 @Serializable(with = SettingSerializer::class)
 interface Setting {
-    val id: Long
     val identifier: String
-    val category: SettingCategory
+    val category: String
     val displayName: String
     val description: String
     val defaultValue: String

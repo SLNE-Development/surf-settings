@@ -1,7 +1,7 @@
 package dev.slne.surf.settings.api.common.serializer
 
 import dev.slne.surf.settings.api.common.Setting
-import dev.slne.surf.settings.api.common.SettingCategory
+import dev.slne.surf.settings.api.common.surfSettingApi
 import dev.slne.surf.settings.api.common.util.InternalSettingsApi
 import kotlinx.serialization.KSerializer
 import kotlinx.serialization.descriptors.PrimitiveKind
@@ -17,7 +17,7 @@ object SettingSerializer : KSerializer<Setting> {
         encoder: Encoder,
         value: Setting
     ) {
-        encoder.encodeString("${value.id}:${value.identifier}:${value.category.identifier}:${value.category.displayName}:${value.category.description}:${value.displayName}:${value.description}:${value.defaultValue}")
+        encoder.encodeString("${value.identifier}:${value.category}:${value.displayName}:${value.description}:${value.defaultValue}")
     }
 
     override fun deserialize(decoder: Decoder): Setting {
@@ -25,31 +25,11 @@ object SettingSerializer : KSerializer<Setting> {
     }
 
     fun encode(value: Setting): String {
-        return "${value.id}:${value.identifier}:${value.category.identifier}:${value.category.displayName}:${value.category.description}:${value.displayName}:${value.description}:${value.defaultValue}"
+        return "${value.identifier}:${value.category}:${value.displayName}:${value.description}:${value.defaultValue}"
     }
 
     fun decode(value: String): Setting {
         val parts = value.split(":")
-        return object : Setting {
-            override val id: Long
-                get() = parts[0].toLong()
-            override val identifier: String
-                get() = parts[1]
-            override val category: SettingCategory
-                get() = object : SettingCategory {
-                    override val identifier: String
-                        get() = parts[2]
-                    override val displayName: String
-                        get() = parts[3]
-                    override val description: String
-                        get() = parts[4]
-                }
-            override val displayName: String
-                get() = parts[5]
-            override val description: String
-                get() = parts[6]
-            override val defaultValue: String
-                get() = parts[7]
-        }
+        return surfSettingApi.buildSetting(parts[0], parts[1], parts[2], parts[3], parts[4])
     }
 }

@@ -7,13 +7,12 @@ import dev.slne.surf.settings.api.common.SurfSettingsApi
 import dev.slne.surf.settings.api.common.bridge.settingCategoryBridge
 import dev.slne.surf.settings.api.common.bridge.settingsBridge
 import dev.slne.surf.settings.api.common.bridge.settingsEntryBridge
-import dev.slne.surf.settings.api.common.result.entry.SettingEntryModifyResult
-import dev.slne.surf.settings.api.common.result.setting.SettingCreateIgnoringResult
-import dev.slne.surf.settings.api.common.result.setting.SettingCreateResult
 import dev.slne.surf.settings.api.common.util.InternalSettingsApi
 import dev.slne.surf.settings.core.impl.SettingCategoryImpl
+import dev.slne.surf.settings.core.impl.SettingEntryImpl
 import dev.slne.surf.settings.core.impl.SettingImpl
-import dev.slne.surf.surfapi.core.api.util.random
+import dev.slne.surf.surfapi.core.api.util.toMutableObjectSet
+import it.unimi.dsi.fastutil.objects.ObjectSet
 import org.springframework.stereotype.Service
 import java.util.*
 
@@ -26,86 +25,89 @@ class SurfSettingApiImpl : SurfSettingsApi {
         displayName: String,
         description: String,
         defaultValue: String
-    ): SettingCreateResult = settingsBridge.createSetting(
-        SettingImpl(
-            random.nextLong(),
-            identifier,
-            category,
-            displayName,
-            description,
-            defaultValue
-        )
-    )
-
-    override suspend fun createSettingIfNotExists(
-        identifier: String,
-        category: SettingCategory,
-        displayName: String,
-        description: String,
-        defaultValue: String
-    ): SettingCreateIgnoringResult =
-        settingsBridge.createIfNotExists(
-            SettingImpl(
-                random.nextLong(),
-                identifier,
-                category,
-                displayName,
-                description,
-                defaultValue
-            )
-        )
+    ) = settingsBridge.createSetting(identifier, category, displayName, description, defaultValue)
 
     override suspend fun deleteSetting(identifier: String) = settingsBridge.delete(identifier)
-    override suspend fun querySetting(identifier: String) = settingsBridge.query(identifier)
-    override suspend fun queryAllSettings() = settingsBridge.queryAll()
-    override suspend fun querySettingByCategory(category: String) =
-        settingsBridge.queryByCategory(category)
+    override suspend fun getSetting(identifier: String) = settingsBridge.getSetting(identifier)
+    override suspend fun getSettings() = settingsBridge.all()
 
     override suspend fun modifyEntry(
         playerUuid: UUID,
         setting: Setting,
         value: String
-    ): SettingEntryModifyResult {
-        return settingsEntryBridge.modify(
-            playerUuid,
-            setting,
-            value
-        )
-    }
-
-    override suspend fun modifyEntry(
-        playerUuid: UUID,
-        settingEntry: SettingEntry
-    ) = settingsEntryBridge.modify(playerUuid, settingEntry)
+    ) = settingsEntryBridge.modify(playerUuid, setting, value)
 
     override suspend fun resetEntry(
         playerUuid: UUID,
         setting: Setting
     ) = settingsEntryBridge.reset(playerUuid, setting)
 
-    override suspend fun allEntries(playerUuid: UUID) = settingsEntryBridge.all(playerUuid)
-    override suspend fun allEntries() = settingsEntryBridge.all()
-    override suspend fun queryEntry(
+    override suspend fun getEntries(playerUuid: UUID, defaults: Boolean): ObjectSet<SettingEntry> =
+        settingsEntryBridge.getAll(playerUuid).let {
+            val modifiedEntries = it.toMutableObjectSet()
+            if (defaults) {
+                val allSettings = settingsBridge.all().associateBy { assBy -> assBy.identifier }
+                for (setting in allSettings.values) {
+                    if (modifiedEntries.none { entry -> entry.settingIdentifier == setting.identifier }) {
+                        modifiedEntries.add(
+                            SettingEntryImpl(
+                                setting.identifier,
+                                setting.defaultValue
+                            )
+                        )
+                    }
+                }
+            }
+            modifiedEntries
+        }
+
+    override suspend fun getEntries(): ObjectSet<SettingEntry> =
+        settingsEntryBridge.getAll()
+
+    override suspend fun getEntry(
         playerUuid: UUID,
-        setting: Setting
-    ) = settingsEntryBridge.query(playerUuid, setting)
+        setting: Setting,
+        defaults: Boolean
+    ): SettingEntry? =
+        if (defaults) settingsEntryBridge.getEntry(playerUuid, setting) ?: SettingEntryImpl(
+            setting.identifier,
+            setting.defaultValue
+        ) else settingsEntryBridge.getEntry(playerUuid, setting)
 
     override suspend fun createCategory(
         identifier: String,
         displayName: String,
         description: String
-    ) = settingCategoryBridge.createCategory(
-        SettingCategoryImpl(
-            identifier,
-            displayName,
-            description
-        )
-    )
+    ) = settingCategoryBridge.createCategory(identifier, displayName, description)
 
-    override suspend fun queryAllCategories() = settingCategoryBridge.queryAll()
-    override suspend fun queryCategory(identifier: String) =
-        settingCategoryBridge.queryCategory(identifier)
+    override suspend fun getCategories() = settingCategoryBridge.all()
+    override suspend fun getCategory(identifier: String) =
+        settingCategoryBridge.getCategory(identifier)
 
     override suspend fun deleteCategory(category: SettingCategory) =
         settingCategoryBridge.deleteCategory(category)
+
+    override fun buildSetting(
+        identifier: String,
+        category: String,
+        displayName: String,
+        description: String,
+        defaultValue: String
+    ) = SettingImpl(
+        identifier = identifier,
+        category = category,
+        displayName = displayName,
+        description = description,
+        defaultValue = defaultValue
+    )
+
+    override fun buildCategory(
+        identifier: String,
+        displayName: String,
+        description: String
+    ) = SettingCategoryImpl(
+        identifier = identifier,
+        displayName = displayName,
+        description = description
+    )
 }

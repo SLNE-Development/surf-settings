@@ -6,20 +6,21 @@ import dev.slne.surf.settings.core.netty.protocol.clientbound.entry.ClientboundS
 import dev.slne.surf.settings.core.netty.protocol.clientbound.entry.ClientboundSettingEntryQueryResultPacket
 import dev.slne.surf.settings.core.netty.protocol.clientbound.entry.ClientboundSettingEntryResetResultPacket
 import dev.slne.surf.settings.core.netty.protocol.serverbound.entry.*
-import dev.slne.surf.settings.server.service.SettingEntryService
+import dev.slne.surf.settings.server.repository.SettingEntryRepository
 import org.springframework.stereotype.Component
 
 @Component
 class SettingEntryPacketListener(
-    private val settingEntryService: SettingEntryService
+    private val settingEntryRepository: SettingEntryRepository
 ) {
     @SurfNettyPacketHandler
     suspend fun handleModifyPacket(packet: ServerboundSettingEntryModifyPacket) {
         packet.respond(
             ClientboundSettingEntryModifyResultPacket(
-                settingEntryService.modify(
+                settingEntryRepository.modify(
                     packet.player,
-                    packet.setting
+                    packet.setting,
+                    packet.value
                 )
             )
         )
@@ -27,19 +28,19 @@ class SettingEntryPacketListener(
 
     @SurfNettyPacketHandler
     suspend fun handleQueryAllByPlayerPacket(packet: ServerboundSettingEntryQueryAllByPlayerPacket) {
-        packet.respond(ClientboundSettingEntryQueryManyPacket(settingEntryService.all(packet.playerUuid)))
+        packet.respond(ClientboundSettingEntryQueryManyPacket(settingEntryRepository.getAll(packet.playerUuid)))
     }
 
     @SurfNettyPacketHandler
     suspend fun handleQueryAllPacket(packet: ServerboundSettingEntryQueryAllPacket) {
-        packet.respond(ClientboundSettingEntryQueryManyPacket(settingEntryService.all()))
+        packet.respond(ClientboundSettingEntryQueryManyPacket(settingEntryRepository.getAll()))
     }
 
     @SurfNettyPacketHandler
     suspend fun handleQueryPacket(packet: ServerboundSettingEntryQueryPacket) {
         packet.respond(
             ClientboundSettingEntryQueryResultPacket(
-                settingEntryService.query(
+                settingEntryRepository.getEntry(
                     packet.player,
                     packet.setting
                 )
@@ -51,7 +52,7 @@ class SettingEntryPacketListener(
     suspend fun handleResetPacket(packet: ServerboundSettingEntryResetPacket) {
         packet.respond(
             ClientboundSettingEntryResetResultPacket(
-                settingEntryService.reset(
+                settingEntryRepository.reset(
                     packet.player,
                     packet.setting
                 )

@@ -9,5 +9,5 @@ import kotlinx.serialization.Serializable
 @Serializable
 @SurfNettyPacket("setting:clientbound:setting_category_query_many", PacketFlow.CLIENTBOUND)
 data class ClientboundSettingCategoryQueryManyPacket(
-    val queries: Set<SettingCategory>
+    val result: Set<SettingCategory>
 ) : ResponseNettyPacket()

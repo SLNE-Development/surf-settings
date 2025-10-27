@@ -1,20 +1,19 @@
 package dev.slne.surf.settings.api.common.dsl
 
-import dev.slne.surf.settings.api.common.result.category.SettingCategoryCreateResult
-import dev.slne.surf.settings.api.common.result.category.SettingCategoryQueryResult
-import dev.slne.surf.settings.api.common.result.setting.SettingCreateIgnoringResult
+import dev.slne.surf.settings.api.common.Setting
+import dev.slne.surf.settings.api.common.SettingCategory
 import dev.slne.surf.settings.api.common.surfSettingApi
 
 suspend fun settings(block: suspend SettingsRoot.() -> Unit) {
     SettingsRoot().block()
 }
 
-suspend fun setting(block: SingleSettingBuilder.() -> Unit): SettingCreateIgnoringResult {
+suspend fun setting(block: SingleSettingBuilder.() -> Unit): Setting? {
     val builder = SingleSettingBuilder().apply(block)
     return builder.build()
 }
 
-suspend fun category(block: SingleCategoryBuilder.() -> Unit): SettingCategoryCreateResult {
+suspend fun category(block: SingleCategoryBuilder.() -> Unit): SettingCategory? {
     val builder = SingleCategoryBuilder().apply(block)
     return builder.build()
 }
@@ -39,7 +38,7 @@ class SingleCategoryBuilder {
     var displayName: String = ""
     var description: String = ""
 
-    suspend fun build(): SettingCategoryCreateResult {
+    suspend fun build(): SettingCategory? {
         return surfSettingApi.createCategory(
             identifier = identifier,
             displayName = displayName,
@@ -59,16 +58,12 @@ class SingleSettingBuilder {
         this.categoryId = identifier
     }
 
-    suspend fun build(): SettingCreateIgnoringResult {
-        val categoryResult = surfSettingApi.queryCategory(categoryId)
+    suspend fun build(): Setting? {
+        val category = surfSettingApi.getCategory(categoryId) ?: return null
 
-        if (categoryResult.isFailure()) {
-            return SettingCreateIgnoringResult.Failure(SettingCreateIgnoringResult.SettingCreateIgnoringFailureReason.CATEGORY_NOT_FOUND)
-        }
-
-        return surfSettingApi.createSettingIfNotExists(
+        return surfSettingApi.createSetting(
             identifier = identifier,
-            category = (categoryResult as SettingCategoryQueryResult.Success).category,
+            category = category,
             displayName = displayName,
             description = description,
             defaultValue = defaultValue

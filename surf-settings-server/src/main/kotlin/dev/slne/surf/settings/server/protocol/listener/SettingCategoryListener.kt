@@ -9,19 +9,19 @@ import dev.slne.surf.settings.core.netty.protocol.serverbound.category.Serverbou
 import dev.slne.surf.settings.core.netty.protocol.serverbound.category.ServerboundSettingCategoryDeletePacket
 import dev.slne.surf.settings.core.netty.protocol.serverbound.category.ServerboundSettingCategoryQueryAllPacket
 import dev.slne.surf.settings.core.netty.protocol.serverbound.category.ServerboundSettingCategoryQueryPacket
-import dev.slne.surf.settings.server.service.SettingCategoryService
+import dev.slne.surf.settings.server.repository.SettingCategoryRepository
 import org.springframework.stereotype.Component
 
 @Component
 class SettingCategoryListener(
-    private val settingCategoryService: SettingCategoryService
+    private val settingCategoryRepository: SettingCategoryRepository
 ) {
     @SurfNettyPacketHandler
     suspend fun handleCreatePacket(packet: ServerboundSettingCategoryCreatePacket) {
         packet.respond(
             ClientboundSettingCategoryCreateResultPacket(
-                settingCategoryService.create(
-                    packet.category
+                settingCategoryRepository.createCategory(
+                    packet.identifier, packet.displayName, packet.description
                 )
             )
         )
@@ -31,7 +31,7 @@ class SettingCategoryListener(
     suspend fun handleDeletePacket(packet: ServerboundSettingCategoryDeletePacket) {
         packet.respond(
             ClientboundSettingCategoryDeleteResultPacket(
-                settingCategoryService.delete(
+                settingCategoryRepository.deleteCategory(
                     packet.category
                 )
             )
@@ -42,7 +42,7 @@ class SettingCategoryListener(
     suspend fun handleQueryPacket(packet: ServerboundSettingCategoryQueryPacket) {
         packet.respond(
             ClientboundSettingCategoryQueryResultPacket(
-                settingCategoryService.query(
+                settingCategoryRepository.getCategory(
                     packet.identifier
                 )
             )
@@ -51,6 +51,6 @@ class SettingCategoryListener(
 
     @SurfNettyPacketHandler
     suspend fun handleQueryAllPacket(packet: ServerboundSettingCategoryQueryAllPacket) {
-        packet.respond(ClientboundSettingCategoryQueryManyPacket(settingCategoryService.all()))
+        packet.respond(ClientboundSettingCategoryQueryManyPacket(settingCategoryRepository.all()))
     }
 }
