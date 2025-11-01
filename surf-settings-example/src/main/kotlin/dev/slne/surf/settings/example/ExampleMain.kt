@@ -13,33 +13,24 @@ class ExampleMain : SuspendingJavaPlugin() {
         logger.warning("The server is running the example surf settings plugin. This is only for demonstration purposes and should not be used in production!")
 
         settings {
-            category {
-                identifier = CATEGORY_ID
-                displayName = "Beispiel Einstellungen"
-                description = "Eine Kategorie mit Beispiel Einstellungen"
-            }
-
             setting {
-                identifier = ID_BOOLEAN
-                withCategory(CATEGORY_ID)
                 displayName = "Beispiel Boolean"
                 description = "Eine Beispiel Boolean Einstellung"
+                category = CATEGORY_ID
                 defaultValue = "true"
             }
 
             setting {
-                identifier = ID_INT
-                withCategory(CATEGORY_ID)
                 displayName = "Beispiel Integer"
                 description = "Eine Beispiel Integer Einstellung"
+                category = CATEGORY_ID
                 defaultValue = "5"
             }
 
             setting {
-                identifier = ID_TEXT
-                withCategory(CATEGORY_ID)
                 displayName = "Beispiel Text"
                 description = "Eine Beispiel Text Einstellung"
+                category = CATEGORY_ID
                 defaultValue = "Hallo Welt!"
             }
         }

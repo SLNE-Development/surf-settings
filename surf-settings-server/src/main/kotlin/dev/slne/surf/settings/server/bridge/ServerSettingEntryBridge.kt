@@ -2,6 +2,7 @@ package dev.slne.surf.settings.server.bridge
 
 import dev.slne.surf.settings.api.common.Setting
 import dev.slne.surf.settings.api.common.bridge.InternalSettingEntryBridge
+import dev.slne.surf.settings.api.common.bridge.settingsEntryBridge
 import dev.slne.surf.settings.api.common.util.InternalSettingsApi
 import dev.slne.surf.settings.server.repository.SettingEntryRepository
 import org.springframework.stereotype.Component
@@ -39,4 +40,10 @@ class ServerSettingEntryBridge(
         playerUUID,
         setting
     )
+
+    override suspend fun getEntries(
+        playerUuid: UUID,
+        category: String,
+        defaults: Boolean
+    ) = settingsEntryBridge.getEntries(playerUuid, category, defaults)
 }

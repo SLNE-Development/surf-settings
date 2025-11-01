@@ -7,6 +7,6 @@ import kotlinx.serialization.Serializable
 @OptIn(InternalSettingsApi::class)
 @Serializable(with = SettingEntrySerializer::class)
 interface SettingEntry {
-    val settingIdentifier: String
+    val setting: Setting
     var value: String
 }

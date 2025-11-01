@@ -107,7 +107,7 @@ fun surfSettingExampleCommand() = commandTree("surfsettingsexample") {
                     info("Deine Einstellungen:")
                     entries.forEach { entry ->
                         appendNewline {
-                            info(" - ${entry.settingIdentifier}: ${entry.value}")
+                            info(" - ${entry.setting.identifier}: ${entry.value}")
                         }
                     }
                 }

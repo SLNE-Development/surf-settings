@@ -59,4 +59,13 @@ class SettingEntryPacketListener(
             )
         )
     }
+
+    @SurfNettyPacketHandler
+    suspend fun handleQueryByCategoryPacket(packet: ServerboundSettingEntryQueryByCategoryPacket) {
+        packet.respond(
+            ClientboundSettingEntryQueryManyPacket(
+                settingEntryRepository.getAllByCategoryPlayer(packet.player, packet.category)
+            )
+        )
+    }
 }

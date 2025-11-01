@@ -20,6 +20,11 @@ interface InternalSettingEntryBridge {
     suspend fun getAll(playerUuid: UUID): ObjectSet<SettingEntry>
     suspend fun getAll(): ObjectSet<SettingEntry>
     suspend fun getEntry(playerUUID: UUID, setting: Setting): SettingEntry?
+    suspend fun getEntries(
+        playerUuid: UUID,
+        category: String,
+        defaults: Boolean
+    ): ObjectSet<SettingEntry>
 
     companion object {
         val instance get() = InternalSettingsContextHolder.instance.context.getBean<InternalSettingEntryBridge>()

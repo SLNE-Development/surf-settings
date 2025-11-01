@@ -8,6 +8,7 @@ import kotlinx.serialization.descriptors.PrimitiveKind
 import kotlinx.serialization.descriptors.PrimitiveSerialDescriptor
 import kotlinx.serialization.encoding.Decoder
 import kotlinx.serialization.encoding.Encoder
+import java.util.*
 
 @InternalSettingsApi
 object SettingSerializer : KSerializer<Setting> {
@@ -17,7 +18,7 @@ object SettingSerializer : KSerializer<Setting> {
         encoder: Encoder,
         value: Setting
     ) {
-        encoder.encodeString("${value.identifier}:${value.category}:${value.displayName}:${value.description}:${value.defaultValue}")
+        encoder.encodeString("${value.uid}:${value.identifier}:${value.category}:${value.displayName}:${value.description}:${value.defaultValue}")
     }
 
     override fun deserialize(decoder: Decoder): Setting {
@@ -25,11 +26,18 @@ object SettingSerializer : KSerializer<Setting> {
     }
 
     fun encode(value: Setting): String {
-        return "${value.identifier}:${value.category}:${value.displayName}:${value.description}:${value.defaultValue}"
+        return "${value.uid}:${value.identifier}:${value.category}:${value.displayName}:${value.description}:${value.defaultValue}"
     }
 
     fun decode(value: String): Setting {
         val parts = value.split(":")
-        return surfSettingApi.buildSetting(parts[0], parts[1], parts[2], parts[3], parts[4])
+        return surfSettingApi.buildSetting(
+            UUID.fromString(parts[0]),
+            parts[1],
+            parts[2],
+            parts[3],
+            parts[4],
+            parts[5]
+        )
     }
 }

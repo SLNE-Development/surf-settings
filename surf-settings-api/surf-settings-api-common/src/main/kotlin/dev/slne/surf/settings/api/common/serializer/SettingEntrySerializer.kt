@@ -1,5 +1,6 @@
 package dev.slne.surf.settings.api.common.serializer
 
+import dev.slne.surf.settings.api.common.Setting
 import dev.slne.surf.settings.api.common.SettingEntry
 import dev.slne.surf.settings.api.common.util.InternalSettingsApi
 import kotlinx.serialization.KSerializer
@@ -13,7 +14,7 @@ object SettingEntrySerializer : KSerializer<SettingEntry> {
     override val descriptor = PrimitiveSerialDescriptor("SettingEntry", PrimitiveKind.STRING)
 
     override fun serialize(encoder: Encoder, value: SettingEntry) {
-        encoder.encodeString("${value.settingIdentifier}|${value.value}")
+        encoder.encodeString("${SettingSerializer.encode(value.setting)}|${value.value}")
     }
 
     override fun deserialize(decoder: Decoder): SettingEntry {
@@ -24,7 +25,7 @@ object SettingEntrySerializer : KSerializer<SettingEntry> {
         val value = parts[1]
 
         return object : SettingEntry {
-            override val settingIdentifier: String = setting
+            override val setting: Setting = SettingSerializer.decode(setting)
             override var value: String = value
         }
     }

@@ -1,4 +1,4 @@
-package dev.slne.surf.settings.core.netty.protocol.clientbound.category
+package dev.slne.surf.settings.core.netty.protocol.clientbound.setting
 
 import dev.slne.surf.cloud.api.common.meta.SurfNettyPacket
 import dev.slne.surf.cloud.api.common.netty.network.protocol.PacketFlow
@@ -6,7 +6,7 @@ import dev.slne.surf.cloud.api.common.netty.packet.ResponseNettyPacket
 import kotlinx.serialization.Serializable
 
 @Serializable
-@SurfNettyPacket("setting:clientbound:setting_category_delete_result", PacketFlow.CLIENTBOUND)
-data class ClientboundSettingCategoryDeleteResultPacket(
-    val result: Boolean
+@SurfNettyPacket("setting:clientbound:categories_get_result", PacketFlow.CLIENTBOUND)
+data class ClientboundCategoriesResultPacket(
+    val result: Set<String>
 ) : ResponseNettyPacket()

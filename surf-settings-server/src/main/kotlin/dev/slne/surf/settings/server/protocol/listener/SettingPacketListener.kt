@@ -1,14 +1,8 @@
 package dev.slne.surf.settings.server.protocol.listener
 
 import dev.slne.surf.cloud.api.common.meta.SurfNettyPacketHandler
-import dev.slne.surf.settings.core.netty.protocol.clientbound.setting.ClientboundSettingCreateResultPacket
-import dev.slne.surf.settings.core.netty.protocol.clientbound.setting.ClientboundSettingDeleteResultPacket
-import dev.slne.surf.settings.core.netty.protocol.clientbound.setting.ClientboundSettingQueryManyPacket
-import dev.slne.surf.settings.core.netty.protocol.clientbound.setting.ClientboundSettingQueryResultPacket
-import dev.slne.surf.settings.core.netty.protocol.serverbound.setting.ServerboundSettingCreatePacket
-import dev.slne.surf.settings.core.netty.protocol.serverbound.setting.ServerboundSettingDeletePacket
-import dev.slne.surf.settings.core.netty.protocol.serverbound.setting.ServerboundSettingQueryAllPacket
-import dev.slne.surf.settings.core.netty.protocol.serverbound.setting.ServerboundSettingQueryPacket
+import dev.slne.surf.settings.core.netty.protocol.clientbound.setting.*
+import dev.slne.surf.settings.core.netty.protocol.serverbound.setting.*
 import dev.slne.surf.settings.server.repository.SettingRepository
 import org.springframework.stereotype.Component
 
@@ -21,10 +15,11 @@ class SettingPacketListener(
         packet.respond(
             ClientboundSettingCreateResultPacket(
                 settingRepository.createSetting(
+                    packet.uid,
                     packet.identifier,
-                    packet.category,
                     packet.displayName,
                     packet.description,
+                    packet.category,
                     packet.defaultValue
                 )
             )
@@ -33,7 +28,7 @@ class SettingPacketListener(
 
     @SurfNettyPacketHandler
     suspend fun handleSettingDeletePacket(packet: ServerboundSettingDeletePacket) {
-        packet.respond(ClientboundSettingDeleteResultPacket(settingRepository.delete(packet.identifier)))
+        packet.respond(ClientboundSettingDeleteResultPacket(settingRepository.delete(packet.uid)))
     }
 
     @SurfNettyPacketHandler
@@ -43,6 +38,16 @@ class SettingPacketListener(
 
     @SurfNettyPacketHandler
     suspend fun handleSettingQueryPacket(packet: ServerboundSettingQueryPacket) {
+        packet.respond(ClientboundSettingQueryResultPacket(settingRepository.getSetting(packet.uid)))
+    }
+
+    @SurfNettyPacketHandler
+    suspend fun handleSettingQueryByIdPacket(packet: ServerboundSettingQueryByIdPacket) {
         packet.respond(ClientboundSettingQueryResultPacket(settingRepository.getSetting(packet.identifier)))
+    }
+
+    @SurfNettyPacketHandler
+    suspend fun handleCategoriesGetPacket(packet: ServerboundGetCategoriesPacket) {
+        packet.respond(ClientboundCategoriesResultPacket(settingRepository.getCategories()))
     }
 }

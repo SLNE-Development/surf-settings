@@ -40,4 +40,12 @@ class ClientSettingEntryBridge : InternalSettingEntryBridge {
         setting: Setting
     ): SettingEntry? =
         ServerboundSettingEntryQueryPacket(playerUUID, setting).fireAndAwaitOrThrow().result
+
+    override suspend fun getEntries(
+        playerUuid: UUID,
+        category: String,
+        defaults: Boolean
+    ): ObjectSet<SettingEntry> = ServerboundSettingEntryQueryByCategoryPacket(
+        playerUuid, category
+    ).fireAndAwaitOrThrow().result.toObjectSet()
 }
