@@ -23,7 +23,7 @@ class SettingRepository {
         displayName: String,
         description: String,
         defaultValue: String
-    ): Setting? = getSetting(uid) ?: run {
+    ): Setting? = getSetting(identifier) ?: run {
         SettingsTable.insert {
             it[SettingsTable.uid] = uid
             it[SettingsTable.identifier] = identifier
@@ -32,7 +32,7 @@ class SettingRepository {
             it[SettingsTable.category] = category
             it[SettingsTable.defaultValue] = defaultValue
         }
-        getSetting(uid)
+        getSetting(identifier)
     }
 
     suspend fun getCategories() =
