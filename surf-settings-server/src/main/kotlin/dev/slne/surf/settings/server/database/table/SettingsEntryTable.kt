@@ -1,8 +1,8 @@
 package dev.slne.surf.settings.server.database.table
 
-import dev.slne.surf.cloud.api.server.exposed.table.AuditableLongIdTable
+import org.jetbrains.exposed.dao.id.LongIdTable
 
-object SettingsEntryTable : AuditableLongIdTable("setting_entries") {
+object SettingsEntryTable : LongIdTable("setting_entries") {
     val player = uuid("player_uuid")
     val settingUid = uuid("setting_uid").references(SettingsTable.uid)
     val value = varchar("value", 256)

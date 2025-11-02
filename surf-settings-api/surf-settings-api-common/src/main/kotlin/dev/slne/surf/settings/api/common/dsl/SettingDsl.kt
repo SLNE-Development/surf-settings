@@ -22,7 +22,7 @@ class SettingsRoot {
 }
 
 class SingleSettingBuilder {
-    var identifier: String = ""
+    lateinit var identifier: String
     var category: String = ""
     var displayName: String = ""
     var description: String = ""

@@ -14,6 +14,7 @@ class ExampleMain : SuspendingJavaPlugin() {
 
         settings {
             setting {
+                identifier = ID_BOOLEAN
                 displayName = "Beispiel Boolean"
                 description = "Eine Beispiel Boolean Einstellung"
                 category = CATEGORY_ID
@@ -21,6 +22,7 @@ class ExampleMain : SuspendingJavaPlugin() {
             }
 
             setting {
+                identifier = ID_INT
                 displayName = "Beispiel Integer"
                 description = "Eine Beispiel Integer Einstellung"
                 category = CATEGORY_ID
@@ -28,6 +30,7 @@ class ExampleMain : SuspendingJavaPlugin() {
             }
 
             setting {
+                identifier = ID_TEXT
                 displayName = "Beispiel Text"
                 description = "Eine Beispiel Text Einstellung"
                 category = CATEGORY_ID
