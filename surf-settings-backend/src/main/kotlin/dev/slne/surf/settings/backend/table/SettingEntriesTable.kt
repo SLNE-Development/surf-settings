@@ -4,7 +4,7 @@ import dev.slne.surf.database.table.AuditableLongIdTable
 
 object SettingEntriesTable : AuditableLongIdTable("settings_entries") {
     val settingId = ulong("setting_id").references(SettingsTable.id)
-    val playerUuid = uuid("player_id")
+    val playerId = long("player_id").references(SettingPlayerTable.id)
     val value = text("value")
 
     init {
