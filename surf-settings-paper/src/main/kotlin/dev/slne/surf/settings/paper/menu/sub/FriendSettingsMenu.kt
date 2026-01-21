@@ -43,38 +43,39 @@ import org.bukkit.entity.HumanEntity
 private const val height = 5
 private const val width = 9
 
-fun openChatSettingsMenu(player: HumanEntity) =
-    menu(buildText { spacer("Chat Einstellungen") }, height) {
+fun openFriendSettingsMenu(player: HumanEntity) =
+    menu(buildText { spacer("Freundes Einstellungen") }, height) {
         withOutline(width, height)
         withOutClicks()
         withBackButton(height)
 
-        var chatPingsEnabled =
-            surfSettingsApi.getPlayerSetting(player.uniqueId, "chat_pings")?.getBoolean() ?: true
-        var directMessagesEnabled =
-            surfSettingsApi.getPlayerSetting(player.uniqueId, "direct_messages")?.getBoolean()
+        var friendRequestsEnabled =
+            surfSettingsApi.getPlayerSetting(player.uniqueId, "friend_requests")?.getBoolean()
+                ?: true
+        var friendJumpsEnabled =
+            surfSettingsApi.getPlayerSetting(player.uniqueId, "friend_jumps")?.getBoolean()
                 ?: true
 
         addPane(
             ToggleButton(
-                2, 2, 1, 1, chatPingsEnabled
+                2, 2, 1, 1, friendRequestsEnabled
             ).apply {
-                setDisabledItem(GuiItem(chatPingsItem(false)) {
-                    chatPingsEnabled = true
+                setDisabledItem(GuiItem(friendRequestsItem(false)) {
+                    friendRequestsEnabled = true
                     it.whoClicked.sendText {
                         appendPrefix()
-                        success("Du hast Chat Pings nun ")
+                        success("Du hast Freundschaftsanfragen nun ")
                         variableValue("aktiviert")
                         success(".")
                     }
                     it.whoClicked.playClickSound()
                 })
 
-                setEnabledItem(GuiItem(chatPingsItem(true)) {
-                    chatPingsEnabled = false
+                setEnabledItem(GuiItem(friendRequestsItem(true)) {
+                    friendRequestsEnabled = false
                     it.whoClicked.sendText {
                         appendPrefix()
-                        success("Du hast Chat Pings nun ")
+                        success("Du hast Freundschaftsanfragen nun ")
                         variableValue("deaktiviert")
                         success(".")
                     }
@@ -84,25 +85,25 @@ fun openChatSettingsMenu(player: HumanEntity) =
 
         addPane(
             ToggleButton(
-                6, 2, 1, 1, directMessagesEnabled
+                6, 2, 1, 1, friendJumpsEnabled
             ).apply {
-                setDisabledItem(GuiItem(directMessagesItem(false)) {
-                    directMessagesEnabled = true
+                setDisabledItem(GuiItem(friendJumpItem(false)) {
+                    friendJumpsEnabled = true
                     it.whoClicked.sendText {
                         appendPrefix()
-                        success("Du hast Direktnachrichten nun ")
+                        success("Du hast Nachspringen von Freunden nun ")
                         variableValue("aktiviert")
                         success(".")
                     }
                     it.whoClicked.playClickSound()
                 })
 
-                setEnabledItem(GuiItem(directMessagesItem(true)) {
-                    directMessagesEnabled = false
+                setEnabledItem(GuiItem(friendJumpItem(true)) {
+                    friendJumpsEnabled = false
 
                     it.whoClicked.sendText {
                         appendPrefix()
-                        success("Du hast Direktnachrichten nun ")
+                        success("Du hast Nachspringen von Freunden nun ")
                         variableValue("deaktiviert")
                         success(".")
                     }
@@ -116,13 +117,13 @@ fun openChatSettingsMenu(player: HumanEntity) =
             plugin.launch {
                 surfSettingsApi.saveSetting(
                     it.player.uniqueId,
-                    "chat_pings",
-                    chatPingsEnabled.toString()
+                    "friend_requests",
+                    friendRequestsEnabled.toString()
                 )
                 surfSettingsApi.saveSetting(
                     it.player.uniqueId,
-                    "direct_messages",
-                    directMessagesEnabled.toString()
+                    "friend_jumps",
+                    friendJumpsEnabled.toString()
                 )
             }
         }
@@ -134,9 +135,9 @@ private fun HumanEntity.playClickSound() {
     }
 }
 
-private fun chatPingsItem(currentState: Boolean) = buildItem(Material.BELL) {
+private fun friendRequestsItem(currentState: Boolean) = buildItem(Material.BELL) {
     displayName {
-        localColored("Chat Pings".toSmallCaps(), TextDecoration.BOLD)
+        localColored("Freundschaftsanfragen".toSmallCaps(), TextDecoration.BOLD)
     }
 
     buildLore {
@@ -146,7 +147,7 @@ private fun chatPingsItem(currentState: Boolean) = buildItem(Material.BELL) {
         }
 
         line {
-            localColored("Passe deine Chat Einstellungen an.")
+            localColored("Passe deine Freundes Einstellungen an.")
         }
 
         emptyLine()
@@ -163,14 +164,14 @@ private fun chatPingsItem(currentState: Boolean) = buildItem(Material.BELL) {
         emptyLine()
 
         line {
-            spacer("Klicke, um die Chat Ping Einstellung zu ändern")
+            spacer("Klicke, um die Freundschaftsanfragen Einstellung zu ändern")
         }
     }
 }
 
-private fun directMessagesItem(currentState: Boolean) = buildItem(Material.RED_DYE) {
+private fun friendJumpItem(currentState: Boolean) = buildItem(Material.RED_DYE) {
     displayName {
-        localColored("Direktnachrichten".toSmallCaps(), TextDecoration.BOLD)
+        localColored("Nachspringen von Freunden".toSmallCaps(), TextDecoration.BOLD)
     }
 
     buildLore {
@@ -180,7 +181,7 @@ private fun directMessagesItem(currentState: Boolean) = buildItem(Material.RED_D
         }
 
         line {
-            localColored("Passe deine Chat Einstellungen an.")
+            localColored("Passe deine Freundes Einstellungen an.")
         }
 
         emptyLine()
@@ -197,7 +198,7 @@ private fun directMessagesItem(currentState: Boolean) = buildItem(Material.RED_D
         emptyLine()
 
         line {
-            spacer("Klicke, um die Direktnachrichten Einstellung zu ändern")
+            spacer("Klicke, um die Nachspringen Einstellung zu ändern")
         }
     }
 }

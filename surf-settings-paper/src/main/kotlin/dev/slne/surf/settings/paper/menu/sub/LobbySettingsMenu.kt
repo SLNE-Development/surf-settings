@@ -43,66 +43,36 @@ import org.bukkit.entity.HumanEntity
 private const val height = 5
 private const val width = 9
 
-fun openChatSettingsMenu(player: HumanEntity) =
-    menu(buildText { spacer("Chat Einstellungen") }, height) {
+fun openLobbySettingsMenu(player: HumanEntity) =
+    menu(buildText { spacer("Lobby Einstellungen") }, height) {
         withOutline(width, height)
         withOutClicks()
         withBackButton(height)
 
-        var chatPingsEnabled =
-            surfSettingsApi.getPlayerSetting(player.uniqueId, "chat_pings")?.getBoolean() ?: true
-        var directMessagesEnabled =
-            surfSettingsApi.getPlayerSetting(player.uniqueId, "direct_messages")?.getBoolean()
-                ?: true
+        var hotbarScrollSounds =
+            surfSettingsApi.getPlayerSetting(player.uniqueId, "lobby_scroll_sound")?.getBoolean()
+                ?: false
 
         addPane(
             ToggleButton(
-                2, 2, 1, 1, chatPingsEnabled
+                4, 2, 1, 1, hotbarScrollSounds
             ).apply {
-                setDisabledItem(GuiItem(chatPingsItem(false)) {
-                    chatPingsEnabled = true
+                setDisabledItem(GuiItem(lobbyScrollSoundsItem(false)) {
+                    hotbarScrollSounds = true
                     it.whoClicked.sendText {
                         appendPrefix()
-                        success("Du hast Chat Pings nun ")
+                        success("Du hast Scroll Sounds nun ")
                         variableValue("aktiviert")
                         success(".")
                     }
                     it.whoClicked.playClickSound()
                 })
 
-                setEnabledItem(GuiItem(chatPingsItem(true)) {
-                    chatPingsEnabled = false
+                setEnabledItem(GuiItem(lobbyScrollSoundsItem(true)) {
+                    hotbarScrollSounds = false
                     it.whoClicked.sendText {
                         appendPrefix()
-                        success("Du hast Chat Pings nun ")
-                        variableValue("deaktiviert")
-                        success(".")
-                    }
-                    it.whoClicked.playClickSound()
-                })
-            })
-
-        addPane(
-            ToggleButton(
-                6, 2, 1, 1, directMessagesEnabled
-            ).apply {
-                setDisabledItem(GuiItem(directMessagesItem(false)) {
-                    directMessagesEnabled = true
-                    it.whoClicked.sendText {
-                        appendPrefix()
-                        success("Du hast Direktnachrichten nun ")
-                        variableValue("aktiviert")
-                        success(".")
-                    }
-                    it.whoClicked.playClickSound()
-                })
-
-                setEnabledItem(GuiItem(directMessagesItem(true)) {
-                    directMessagesEnabled = false
-
-                    it.whoClicked.sendText {
-                        appendPrefix()
-                        success("Du hast Direktnachrichten nun ")
+                        success("Du hast Scroll Sounds nun ")
                         variableValue("deaktiviert")
                         success(".")
                     }
@@ -116,13 +86,8 @@ fun openChatSettingsMenu(player: HumanEntity) =
             plugin.launch {
                 surfSettingsApi.saveSetting(
                     it.player.uniqueId,
-                    "chat_pings",
-                    chatPingsEnabled.toString()
-                )
-                surfSettingsApi.saveSetting(
-                    it.player.uniqueId,
-                    "direct_messages",
-                    directMessagesEnabled.toString()
+                    "lobby_scroll_sound",
+                    hotbarScrollSounds.toString()
                 )
             }
         }
@@ -134,9 +99,9 @@ private fun HumanEntity.playClickSound() {
     }
 }
 
-private fun chatPingsItem(currentState: Boolean) = buildItem(Material.BELL) {
+private fun lobbyScrollSoundsItem(currentState: Boolean) = buildItem(Material.BELL) {
     displayName {
-        localColored("Chat Pings".toSmallCaps(), TextDecoration.BOLD)
+        localColored("Lobby Hotbar Scroll Sounds".toSmallCaps(), TextDecoration.BOLD)
     }
 
     buildLore {
@@ -146,7 +111,7 @@ private fun chatPingsItem(currentState: Boolean) = buildItem(Material.BELL) {
         }
 
         line {
-            localColored("Passe deine Chat Einstellungen an.")
+            localColored("Passe deine Lobby Einstellungen an.")
         }
 
         emptyLine()
@@ -163,41 +128,7 @@ private fun chatPingsItem(currentState: Boolean) = buildItem(Material.BELL) {
         emptyLine()
 
         line {
-            spacer("Klicke, um die Chat Ping Einstellung zu ändern")
-        }
-    }
-}
-
-private fun directMessagesItem(currentState: Boolean) = buildItem(Material.RED_DYE) {
-    displayName {
-        localColored("Direktnachrichten".toSmallCaps(), TextDecoration.BOLD)
-    }
-
-    buildLore {
-        emptyLine()
-        line {
-            variableValue("Beschreibung:".toSmallCaps())
-        }
-
-        line {
-            localColored("Passe deine Chat Einstellungen an.")
-        }
-
-        emptyLine()
-        line {
-            variableValue("Status:".toSmallCaps())
-        }
-
-        line {
-            spacer("-")
-            appendSpace()
-            localColored(if (currentState) "Aktiviert" else "Deaktiviert")
-        }
-
-        emptyLine()
-
-        line {
-            spacer("Klicke, um die Direktnachrichten Einstellung zu ändern")
+            spacer("Klicke, um die Lobby Hotbar Scroll Sounds Einstellung zu ändern")
         }
     }
 }

@@ -3,6 +3,9 @@ package dev.slne.surf.settings.paper.menu
 import com.github.stefvanschie.inventoryframework.gui.GuiItem
 import com.github.stefvanschie.inventoryframework.pane.StaticPane
 import dev.slne.surf.settings.paper.menu.sub.openChatSettingsMenu
+import dev.slne.surf.settings.paper.menu.sub.openClanSettingsMenu
+import dev.slne.surf.settings.paper.menu.sub.openFriendSettingsMenu
+import dev.slne.surf.settings.paper.menu.sub.openLobbySettingsMenu
 import dev.slne.surf.surfapi.bukkit.api.builder.buildItem
 import dev.slne.surf.surfapi.bukkit.api.builder.buildLore
 import dev.slne.surf.surfapi.bukkit.api.builder.displayName
@@ -45,9 +48,15 @@ fun openSettingsMenu(player: HumanEntity) = menu(buildText { spacer("Einstellung
             addItem(GuiItem(chatSettingsItem) {
                 openChatSettingsMenu(it.whoClicked)
             }, 1, 1)
-            addItem(GuiItem(lobbySettingsItem), 2, 1)
-            addItem(GuiItem(friendSettingsItem), 4, 1)
-            addItem(GuiItem(clanSettingsItem), 5, 1)
+            addItem(GuiItem(lobbySettingsItem) {
+                openLobbySettingsMenu(it.whoClicked)
+            }, 2, 1)
+            addItem(GuiItem(friendSettingsItem) {
+                openFriendSettingsMenu(it.whoClicked)
+            }, 4, 1)
+            addItem(GuiItem(clanSettingsItem) {
+                openClanSettingsMenu(it.whoClicked)
+            }, 5, 1)
         }
     )
 
@@ -106,6 +115,10 @@ private val clanSettingsItem = buildItem(Material.PINK_HARNESS) {
     buildLore {
         emptyLine()
         line {
+            error("Achtung: Diese Funktion ist noch in Arbeit!".toSmallCaps(), TextDecoration.BOLD)
+        }
+        emptyLine()
+        line {
             variableValue("Beschreibung:".toSmallCaps())
         }
 
@@ -126,6 +139,10 @@ private val friendSettingsItem = buildItem(Material.POPPY) {
     }
 
     buildLore {
+        emptyLine()
+        line {
+            error("Achtung: Diese Funktion ist noch in Arbeit!".toSmallCaps(), TextDecoration.BOLD)
+        }
         emptyLine()
         line {
             variableValue("Beschreibung:".toSmallCaps())

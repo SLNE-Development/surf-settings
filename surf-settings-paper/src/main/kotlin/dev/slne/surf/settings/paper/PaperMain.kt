@@ -29,6 +29,11 @@ class PaperMain : SuspendingJavaPlugin() {
             surfSettingsApi.createSetting("example_setting", true.toString())
             surfSettingsApi.createSetting("chat_pings", true.toString())
             surfSettingsApi.createSetting("direct_messages", true.toString())
+            surfSettingsApi.createSetting("lobby_scroll_sound", false.toString())
+            surfSettingsApi.createSetting("clan_invites", true.toString())
+            surfSettingsApi.createSetting("clan_chat_messages", true.toString())
+            surfSettingsApi.createSetting("friend_requests", true.toString())
+            surfSettingsApi.createSetting("friend_jumps", true.toString())
         }
     }
 
