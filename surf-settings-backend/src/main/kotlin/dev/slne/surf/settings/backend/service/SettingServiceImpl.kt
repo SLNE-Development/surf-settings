@@ -29,7 +29,29 @@ class SettingServiceImpl : SettingsService, Services.Fallback {
         playerUuid: UUID,
         settingName: String
     ): PlayerSetting? =
-        getSettingsForPlayer(playerUuid).firstOrNull { it.setting.name == settingName }
+        getSettingsForPlayer(playerUuid).firstOrNull { it.setting.name == settingName } ?: run {
+            val setting = getSettingByName(settingName) ?: return null
+            PlayerSetting(
+                setting = setting,
+                settingValue = setting.defaultValue
+            )
+        }
+
+    override fun cachePlayerSetting(
+        playerUuid: UUID,
+        playerSetting: PlayerSetting
+    ) {
+        val playerSettings = _playerSettings.getOrPut(playerUUID) { mutableObjectSetOf() }
+        playerSettings.removeIf { it.setting.name == playerSetting.setting.name }
+        playerSettings.add(playerSetting)
+    }
+
+    override suspend fun savePlayerSetting(
+        playerUuid: UUID,
+        playerSetting: PlayerSetting
+    ) {
+        playerSettingsRepository.savePlayerSetting(playerUuid, playerSetting)
+    }
 
     override suspend fun cachePlayerSettings(playerUuid: UUID) {
         _playerSettings[playerUuid] = playerSettingsRepository.loadSettingsByPlayerUuid(playerUuid)

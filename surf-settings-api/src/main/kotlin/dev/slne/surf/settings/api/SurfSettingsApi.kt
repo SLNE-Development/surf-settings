@@ -10,6 +10,7 @@ val surfSettingsApi = requiredService<SurfSettingsApi>()
 
 interface SurfSettingsApi {
     fun getPlayerSettings(playerUuid: UUID): ObjectSet<PlayerSetting>
+    fun getPlayerSetting(playerUuid: UUID, settingName: String): PlayerSetting?
 
     suspend fun createSetting(name: String, defaultValue: String): Setting
     fun getSetting(name: String): Setting?
