@@ -9,4 +9,5 @@ object PermissionRegistry : PermissionRegistry() {
     val COMMAND_SETTINGS = create("$BASE_COMMAND.settings")
     val COMMAND_SURF_SETTINGS = create("$BASE_COMMAND.surfsettings")
     val COMMAND_SURF_SETTINGS_REFRESH = create("$BASE_COMMAND.surfsettings.refresh")
+    val COMMAND_SURF_SETTINGS_LIST = create("$BASE_COMMAND.surfsettings.list")
 }

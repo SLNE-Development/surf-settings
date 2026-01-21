@@ -27,4 +27,30 @@ fun surfSettingsCommand() = commandTree("surfSettings") {
             }
         }
     }
+
+    literalArgument("list") {
+        withPermission(PermissionRegistry.COMMAND_SURF_SETTINGS_LIST)
+        anyExecutor { executor, _ ->
+            if (settingsService.settings.isEmpty()) {
+                executor.sendText {
+                    appendPrefix()
+                    error("Es sind keine Einstellungen verfügbar.")
+                }
+                return@anyExecutor
+            }
+
+            executor.sendText {
+                appendPrefix()
+                info("Verfügbare Einstellungen: ")
+                variableValue(buildString {
+                    settingsService.settings.forEachIndexed { index, setting ->
+                        append(setting.name)
+                        if (index < settingsService.settings.size - 1) {
+                            append(", ")
+                        }
+                    }
+                })
+            }
+        }
+    }
 }
