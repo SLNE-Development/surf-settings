@@ -24,8 +24,8 @@ class PlayerSettingsRepository {
                     setting,
                     it[SettingEntriesTable.value]
                 )
-            }
-    }.toSet().toObjectSet()
+            }.toSet().toObjectSet()
+    }
 
     suspend fun savePlayerSetting(
         playerUuid: UUID,

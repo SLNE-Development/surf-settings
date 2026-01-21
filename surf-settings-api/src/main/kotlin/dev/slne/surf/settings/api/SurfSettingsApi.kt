@@ -13,6 +13,8 @@ interface SurfSettingsApi {
     fun getPlayerSetting(playerUuid: UUID, settingName: String): PlayerSetting?
 
     suspend fun createSetting(name: String, defaultValue: String): Setting
+    suspend fun saveSetting(playerUuid: UUID, playerSetting: PlayerSetting)
+    suspend fun saveSetting(playerUuid: UUID, settingName: String, settingValue: String)
     fun getSetting(name: String): Setting?
     fun getSettings(): ObjectSet<Setting>
 }

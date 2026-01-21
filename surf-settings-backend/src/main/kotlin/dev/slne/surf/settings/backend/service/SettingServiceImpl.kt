@@ -8,6 +8,7 @@ import dev.slne.surf.settings.backend.repository.settingRepository
 import dev.slne.surf.settings.core.service.SettingsService
 import dev.slne.surf.surfapi.core.api.util.mutableObject2ObjectMapOf
 import dev.slne.surf.surfapi.core.api.util.mutableObjectSetOf
+import dev.slne.surf.surfapi.core.api.util.toMutableObjectSet
 import dev.slne.surf.surfapi.core.api.util.toObjectSet
 import it.unimi.dsi.fastutil.objects.ObjectSet
 import net.kyori.adventure.util.Services
@@ -41,9 +42,12 @@ class SettingServiceImpl : SettingsService, Services.Fallback {
         playerUuid: UUID,
         playerSetting: PlayerSetting
     ) {
-        val playerSettings = _playerSettings.getOrPut(playerUuid) { mutableObjectSetOf() }
+        val playerSettings =
+            _playerSettings.getOrPut(playerUuid) { mutableObjectSetOf() }.toMutableObjectSet()
         playerSettings.removeIf { it.setting.name == playerSetting.setting.name }
         playerSettings.add(playerSetting)
+
+        _playerSettings[playerUuid] = playerSettings
     }
 
     override suspend fun savePlayerSetting(
@@ -69,9 +73,20 @@ class SettingServiceImpl : SettingsService, Services.Fallback {
     override suspend fun createSetting(
         name: String,
         defaultValue: String
-    ): Setting = settingRepository.createSetting(name, defaultValue)
+    ): Setting {
+        val existing = getSettingByName(name)
+        if (existing != null) {
+            return existing
+        }
+
+        return settingRepository.createSetting(name, defaultValue).also {
+            settings.add(it)
+        }
+    }
 
     override suspend fun deleteSetting(name: String) {
-        settingRepository.deleteSetting(name)
+        settingRepository.deleteSetting(name).also {
+            settings.removeIf { it.name == name }
+        }
     }
 }

@@ -22,6 +22,30 @@ class SurfSettingsApiImpl : SurfSettingsApi, Services.Fallback {
     override suspend fun createSetting(name: String, defaultValue: String) =
         settingsService.createSetting(name, defaultValue)
 
+    override suspend fun saveSetting(
+        playerUuid: UUID,
+        playerSetting: PlayerSetting
+    ) {
+        settingsService.cachePlayerSetting(playerUuid, playerSetting)
+        settingsService.savePlayerSetting(playerUuid, playerSetting)
+    }
+
+    override suspend fun saveSetting(
+        playerUuid: UUID,
+        settingName: String,
+        settingValue: String
+    ) {
+        val setting = settingsService.getSettingByName(settingName)
+            ?: return
+        val playerSetting = PlayerSetting(
+            setting = setting,
+            settingValue = settingValue
+        )
+
+        settingsService.cachePlayerSetting(playerUuid, playerSetting)
+        settingsService.savePlayerSetting(playerUuid, playerSetting)
+    }
+
     override fun getSetting(name: String): Setting? = settingsService.getSettingByName(name)
     override fun getSettings(): ObjectSet<Setting> = settingsService.settings
 }
