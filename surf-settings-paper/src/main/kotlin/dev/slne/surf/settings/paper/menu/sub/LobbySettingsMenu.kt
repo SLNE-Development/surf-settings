@@ -12,6 +12,7 @@ import dev.slne.surf.surfapi.bukkit.api.builder.buildItem
 import dev.slne.surf.surfapi.bukkit.api.builder.buildLore
 import dev.slne.surf.surfapi.bukkit.api.builder.displayName
 import dev.slne.surf.surfapi.bukkit.api.inventory.dsl.menu
+import dev.slne.surf.surfapi.bukkit.api.inventory.types.SurfChestGui
 import dev.slne.surf.surfapi.core.api.font.toSmallCaps
 import dev.slne.surf.surfapi.core.api.messages.adventure.buildText
 import dev.slne.surf.surfapi.core.api.messages.adventure.playSound
@@ -43,7 +44,7 @@ import org.bukkit.entity.HumanEntity
 private const val height = 5
 private const val width = 9
 
-fun openLobbySettingsMenu(player: HumanEntity) =
+fun openLobbySettingsMenu(player: HumanEntity): SurfChestGui =
     menu(buildText { spacer("Lobby Einstellungen") }, height) {
         withOutline(width, height)
         withOutClicks()

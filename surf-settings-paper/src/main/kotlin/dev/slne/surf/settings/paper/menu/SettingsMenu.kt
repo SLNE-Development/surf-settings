@@ -10,6 +10,7 @@ import dev.slne.surf.surfapi.bukkit.api.builder.buildItem
 import dev.slne.surf.surfapi.bukkit.api.builder.buildLore
 import dev.slne.surf.surfapi.bukkit.api.builder.displayName
 import dev.slne.surf.surfapi.bukkit.api.inventory.dsl.menu
+import dev.slne.surf.surfapi.bukkit.api.inventory.types.SurfChestGui
 import dev.slne.surf.surfapi.core.api.font.toSmallCaps
 import dev.slne.surf.surfapi.core.api.messages.adventure.buildText
 import dev.slne.surf.surfapi.core.api.messages.builder.SurfComponentBuilder
@@ -38,30 +39,31 @@ import org.bukkit.entity.HumanEntity
 private const val height = 5
 private const val width = 9
 
-fun openSettingsMenu(player: HumanEntity) = menu(buildText { spacer("Einstellungen") }, height) {
-    withOutline(width, height)
-    withOutClicks()
-    addPane(
-        StaticPane(
-            1, 1, width - 2, height - 2
-        ).apply {
-            addItem(GuiItem(chatSettingsItem) {
-                openChatSettingsMenu(it.whoClicked)
-            }, 1, 1)
-            addItem(GuiItem(lobbySettingsItem) {
-                openLobbySettingsMenu(it.whoClicked)
-            }, 2, 1)
-            addItem(GuiItem(friendSettingsItem) {
-                openFriendSettingsMenu(it.whoClicked)
-            }, 4, 1)
-            addItem(GuiItem(clanSettingsItem) {
-                openClanSettingsMenu(it.whoClicked)
-            }, 5, 1)
-        }
-    )
+fun openSettingsMenu(player: HumanEntity): SurfChestGui =
+    menu(buildText { spacer("Einstellungen") }, height) {
+        withOutline(width, height)
+        withOutClicks()
+        addPane(
+            StaticPane(
+                1, 1, width - 2, height - 2
+            ).apply {
+                addItem(GuiItem(chatSettingsItem) {
+                    openChatSettingsMenu(it.whoClicked)
+                }, 1, 1)
+                addItem(GuiItem(lobbySettingsItem) {
+                    openLobbySettingsMenu(it.whoClicked)
+                }, 2, 1)
+                addItem(GuiItem(friendSettingsItem) {
+                    openFriendSettingsMenu(it.whoClicked)
+                }, 4, 1)
+                addItem(GuiItem(clanSettingsItem) {
+                    openClanSettingsMenu(it.whoClicked)
+                }, 5, 1)
+            }
+        )
 
-    show(player)
-}
+        show(player)
+    }
 
 private val chatSettingsItem = buildItem(Material.RED_CANDLE) {
     displayName {
