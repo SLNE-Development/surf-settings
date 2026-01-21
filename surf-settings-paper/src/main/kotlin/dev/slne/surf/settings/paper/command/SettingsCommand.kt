@@ -3,11 +3,13 @@ package dev.slne.surf.settings.paper.command
 import com.github.shynixn.mccoroutine.folia.launch
 import dev.jorel.commandapi.kotlindsl.commandTree
 import dev.jorel.commandapi.kotlindsl.getValue
+import dev.jorel.commandapi.kotlindsl.literalArgument
 import dev.jorel.commandapi.kotlindsl.playerExecutor
 import dev.slne.surf.settings.api.setting.Setting
 import dev.slne.surf.settings.core.service.settingsService
 import dev.slne.surf.settings.paper.command.argument.niceToggleArgument
 import dev.slne.surf.settings.paper.command.argument.settingArgument
+import dev.slne.surf.settings.paper.menu.openSettingsMenu
 import dev.slne.surf.settings.paper.permission.PermissionRegistry
 import dev.slne.surf.settings.paper.plugin
 import dev.slne.surf.surfapi.core.api.messages.adventure.sendText
@@ -24,7 +26,7 @@ fun settingsCommand() = commandTree("settings") {
             return@playerExecutor
         }
 
-        // TODO: Open settings menu GUI
+        openSettingsMenu(player)
     }
 
     settingArgument("setting") {
@@ -92,6 +94,25 @@ fun settingsCommand() = commandTree("settings") {
                     success(" wurde auf ")
                     variableValue(playerSetting.getString())
                     success(" gesetzt.")
+                }
+            }
+        }
+
+        literalArgument("info") {
+            playerExecutor { player, args ->
+                val setting: Setting by args
+
+                val playerSetting =
+                    settingsService.getSettingForPlayer(player.uniqueId, setting.name)
+                        ?: error("Setting not found")
+
+                player.sendText {
+                    appendPrefix()
+                    info("Die Einstellung ")
+                    variableValue(playerSetting.setting.name)
+                    info(" hat den Wert ")
+                    variableValue(playerSetting.getString())
+                    info(".")
                 }
             }
         }
