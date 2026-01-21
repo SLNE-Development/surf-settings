@@ -53,6 +53,7 @@ fun openLobbySettingsMenu(player: HumanEntity): SurfChestGui =
         var hotbarScrollSounds =
             surfSettingsApi.getPlayerSetting(player.uniqueId, "lobby_scroll_sound")?.getBoolean()
                 ?: false
+        val originalHotbarScrollSounds = hotbarScrollSounds
 
         addPane(
             ToggleButton(
@@ -85,11 +86,13 @@ fun openLobbySettingsMenu(player: HumanEntity): SurfChestGui =
 
         setOnClose {
             plugin.launch {
-                surfSettingsApi.saveSetting(
-                    it.player.uniqueId,
-                    "lobby_scroll_sound",
-                    hotbarScrollSounds.toString()
-                )
+                if (hotbarScrollSounds != originalHotbarScrollSounds) {
+                    surfSettingsApi.saveSetting(
+                        it.player.uniqueId,
+                        "lobby_scroll_sound",
+                        hotbarScrollSounds.toString()
+                    )
+                }
             }
         }
     }

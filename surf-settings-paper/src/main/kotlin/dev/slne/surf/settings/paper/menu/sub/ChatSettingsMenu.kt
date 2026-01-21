@@ -56,6 +56,9 @@ fun openChatSettingsMenu(player: HumanEntity): SurfChestGui =
             surfSettingsApi.getPlayerSetting(player.uniqueId, "direct_messages")?.getBoolean()
                 ?: true
 
+        val originalChatPingsEnabled = chatPingsEnabled
+        val originalDirectMessagesEnabled = directMessagesEnabled
+
         addPane(
             ToggleButton(
                 2, 2, 1, 1, chatPingsEnabled
@@ -115,16 +118,21 @@ fun openChatSettingsMenu(player: HumanEntity): SurfChestGui =
 
         setOnClose {
             plugin.launch {
-                surfSettingsApi.saveSetting(
-                    it.player.uniqueId,
-                    "chat_pings",
-                    chatPingsEnabled.toString()
-                )
-                surfSettingsApi.saveSetting(
-                    it.player.uniqueId,
-                    "direct_messages",
-                    directMessagesEnabled.toString()
-                )
+                if (chatPingsEnabled != originalChatPingsEnabled) {
+                    surfSettingsApi.saveSetting(
+                        it.player.uniqueId,
+                        "chat_pings",
+                        chatPingsEnabled.toString()
+                    )
+                }
+
+                if (directMessagesEnabled != originalDirectMessagesEnabled) {
+                    surfSettingsApi.saveSetting(
+                        it.player.uniqueId,
+                        "direct_messages",
+                        directMessagesEnabled.toString()
+                    )
+                }
             }
         }
     }

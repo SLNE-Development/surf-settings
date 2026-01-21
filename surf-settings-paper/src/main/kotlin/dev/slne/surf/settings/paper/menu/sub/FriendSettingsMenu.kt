@@ -57,6 +57,9 @@ fun openFriendSettingsMenu(player: HumanEntity): SurfChestGui =
             surfSettingsApi.getPlayerSetting(player.uniqueId, "friend_jumps")?.getBoolean()
                 ?: true
 
+        val originalFriendRequestsEnabled = friendRequestsEnabled
+        val originalFriendJumpsEnabled = friendJumpsEnabled
+
         addPane(
             ToggleButton(
                 2, 2, 1, 1, friendRequestsEnabled
@@ -116,16 +119,21 @@ fun openFriendSettingsMenu(player: HumanEntity): SurfChestGui =
 
         setOnClose {
             plugin.launch {
-                surfSettingsApi.saveSetting(
-                    it.player.uniqueId,
-                    "friend_requests",
-                    friendRequestsEnabled.toString()
-                )
-                surfSettingsApi.saveSetting(
-                    it.player.uniqueId,
-                    "friend_jumps",
-                    friendJumpsEnabled.toString()
-                )
+                if (friendRequestsEnabled != originalFriendRequestsEnabled) {
+                    surfSettingsApi.saveSetting(
+                        it.player.uniqueId,
+                        "friend_requests",
+                        friendRequestsEnabled.toString()
+                    )
+                }
+
+                if (originalFriendJumpsEnabled != friendJumpsEnabled) {
+                    surfSettingsApi.saveSetting(
+                        it.player.uniqueId,
+                        "friend_jumps",
+                        friendJumpsEnabled.toString()
+                    )
+                }
             }
         }
     }

@@ -56,6 +56,9 @@ fun openClanSettingsMenu(player: HumanEntity): SurfChestGui =
             surfSettingsApi.getPlayerSetting(player.uniqueId, "clan_chat_messages")?.getBoolean()
                 ?: true
 
+        val originalClanInvitesEnabled = clanInvitesEnabled
+        val originalClanChatEnabled = clanChatEnabled
+
         addPane(
             ToggleButton(
                 2, 2, 1, 1, clanInvitesEnabled
@@ -115,16 +118,21 @@ fun openClanSettingsMenu(player: HumanEntity): SurfChestGui =
 
         setOnClose {
             plugin.launch {
-                surfSettingsApi.saveSetting(
-                    it.player.uniqueId,
-                    "clan_invites",
-                    clanInvitesEnabled.toString()
-                )
-                surfSettingsApi.saveSetting(
-                    it.player.uniqueId,
-                    "clan_chat_messages",
-                    clanChatEnabled.toString()
-                )
+                if (clanInvitesEnabled != originalClanInvitesEnabled) {
+                    surfSettingsApi.saveSetting(
+                        it.player.uniqueId,
+                        "clan_invites",
+                        clanInvitesEnabled.toString()
+                    )
+                }
+
+                if (clanChatEnabled != originalClanChatEnabled) {
+                    surfSettingsApi.saveSetting(
+                        it.player.uniqueId,
+                        "clan_chat_messages",
+                        clanChatEnabled.toString()
+                    )
+                }
             }
         }
     }
