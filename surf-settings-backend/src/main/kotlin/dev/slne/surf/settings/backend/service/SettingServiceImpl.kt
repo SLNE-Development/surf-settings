@@ -41,7 +41,7 @@ class SettingServiceImpl : SettingsService, Services.Fallback {
         playerUuid: UUID,
         playerSetting: PlayerSetting
     ) {
-        val playerSettings = _playerSettings.getOrPut(playerUUID) { mutableObjectSetOf() }
+        val playerSettings = _playerSettings.getOrPut(playerUuid) { mutableObjectSetOf() }
         playerSettings.removeIf { it.setting.name == playerSetting.setting.name }
         playerSettings.add(playerSetting)
     }
