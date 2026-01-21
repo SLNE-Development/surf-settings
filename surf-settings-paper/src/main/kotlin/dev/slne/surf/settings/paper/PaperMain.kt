@@ -26,7 +26,6 @@ class PaperMain : SuspendingJavaPlugin() {
         settingsCommand()
 
         runBlocking {
-            surfSettingsApi.createSetting("example_setting", true.toString())
             surfSettingsApi.createSetting("chat_pings", true.toString())
             surfSettingsApi.createSetting("direct_messages", true.toString())
             surfSettingsApi.createSetting("lobby_scroll_sound", false.toString())
