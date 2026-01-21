@@ -135,7 +135,7 @@ private fun HumanEntity.playClickSound() {
     }
 }
 
-private fun friendRequestsItem(currentState: Boolean) = buildItem(Material.BELL) {
+private fun friendRequestsItem(currentState: Boolean) = buildItem(Material.POPPY) {
     displayName {
         localColored("Freundschaftsanfragen".toSmallCaps(), TextDecoration.BOLD)
     }
@@ -169,7 +169,7 @@ private fun friendRequestsItem(currentState: Boolean) = buildItem(Material.BELL)
     }
 }
 
-private fun friendJumpItem(currentState: Boolean) = buildItem(Material.RED_DYE) {
+private fun friendJumpItem(currentState: Boolean) = buildItem(Material.RABBIT_FOOT) {
     displayName {
         localColored("Nachspringen von Freunden".toSmallCaps(), TextDecoration.BOLD)
     }

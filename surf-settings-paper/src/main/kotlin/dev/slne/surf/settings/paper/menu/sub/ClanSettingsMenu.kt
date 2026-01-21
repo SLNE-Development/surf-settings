@@ -134,7 +134,7 @@ private fun HumanEntity.playClickSound() {
     }
 }
 
-private fun clanInvitesItem(currentState: Boolean) = buildItem(Material.BELL) {
+private fun clanInvitesItem(currentState: Boolean) = buildItem(Material.FIREWORK_ROCKET) {
     displayName {
         localColored("Clan Einladungen".toSmallCaps(), TextDecoration.BOLD)
     }
@@ -168,7 +168,7 @@ private fun clanInvitesItem(currentState: Boolean) = buildItem(Material.BELL) {
     }
 }
 
-private fun clanChatItem(currentState: Boolean) = buildItem(Material.RED_DYE) {
+private fun clanChatItem(currentState: Boolean) = buildItem(Material.CLOCK) {
     displayName {
         localColored("Clan Chat".toSmallCaps(), TextDecoration.BOLD)
     }

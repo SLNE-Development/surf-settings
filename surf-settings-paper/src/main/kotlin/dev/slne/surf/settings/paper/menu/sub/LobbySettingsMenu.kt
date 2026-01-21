@@ -99,7 +99,7 @@ private fun HumanEntity.playClickSound() {
     }
 }
 
-private fun lobbyScrollSoundsItem(currentState: Boolean) = buildItem(Material.BELL) {
+private fun lobbyScrollSoundsItem(currentState: Boolean) = buildItem(Material.STONE_BUTTON) {
     displayName {
         localColored("Lobby Hotbar Scroll Sounds".toSmallCaps(), TextDecoration.BOLD)
     }

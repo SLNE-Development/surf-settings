@@ -17,4 +17,6 @@ interface SurfSettingsApi {
     suspend fun saveSetting(playerUuid: UUID, settingName: String, settingValue: String)
     fun getSetting(name: String): Setting?
     fun getSettings(): ObjectSet<Setting>
+
+    fun openSettingsGui(playerUuid: UUID)
 }
