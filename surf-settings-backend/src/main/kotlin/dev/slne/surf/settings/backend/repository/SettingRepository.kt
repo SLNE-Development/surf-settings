@@ -9,7 +9,6 @@ import dev.slne.surf.settings.api.setting.Setting
 import dev.slne.surf.settings.backend.table.SettingsTable
 import dev.slne.surf.surfapi.core.api.util.toObjectSet
 import it.unimi.dsi.fastutil.objects.ObjectSet
-import kotlinx.coroutines.flow.firstOrNull
 import kotlinx.coroutines.flow.map
 import kotlinx.coroutines.flow.toSet
 
@@ -36,14 +35,5 @@ class SettingRepository {
 
     suspend fun deleteSetting(name: String) = suspendTransaction {
         SettingsTable.deleteWhere { SettingsTable.name eq name }
-    }
-
-    suspend fun loadSettingById(settingId: ULong) = suspendTransaction {
-        SettingsTable.selectAll().where(SettingsTable.id eq settingId).firstOrNull()?.let {
-            Setting(
-                name = it[SettingsTable.name],
-                defaultValue = it[SettingsTable.defaultValue]
-            )
-        }
     }
 }
