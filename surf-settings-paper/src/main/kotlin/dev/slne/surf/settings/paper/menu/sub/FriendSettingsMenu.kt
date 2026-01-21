@@ -173,7 +173,7 @@ private fun friendRequestsItem(currentState: Boolean) = buildItem(Material.POPPY
         emptyLine()
 
         line {
-            spacer("Klicke, um die Freundschaftsanfragen Einstellung zu ändern")
+            spacer("Klicke, um die Einstellung zu ändern")
         }
     }
 }
@@ -207,7 +207,7 @@ private fun friendJumpItem(currentState: Boolean) = buildItem(Material.RABBIT_FO
         emptyLine()
 
         line {
-            spacer("Klicke, um die Nachspringen Einstellung zu ändern")
+            spacer("Klicke, um die Einstellung zu ändern")
         }
     }
 }

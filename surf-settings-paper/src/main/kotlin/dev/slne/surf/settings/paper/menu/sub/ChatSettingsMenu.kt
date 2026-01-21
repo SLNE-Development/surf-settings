@@ -172,7 +172,7 @@ private fun chatPingsItem(currentState: Boolean) = buildItem(Material.BELL) {
         emptyLine()
 
         line {
-            spacer("Klicke, um die Chat Ping Einstellung zu ändern")
+            spacer("Klicke, um die Einstellung zu ändern")
         }
     }
 }
@@ -206,7 +206,7 @@ private fun directMessagesItem(currentState: Boolean) = buildItem(Material.RED_D
         emptyLine()
 
         line {
-            spacer("Klicke, um die Direktnachrichten Einstellung zu ändern")
+            spacer("Klicke, um die Einstellung zu ändern")
         }
     }
 }

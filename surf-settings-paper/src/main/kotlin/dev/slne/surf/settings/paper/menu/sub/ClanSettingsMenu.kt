@@ -172,7 +172,7 @@ private fun clanInvitesItem(currentState: Boolean) = buildItem(Material.FIREWORK
         emptyLine()
 
         line {
-            spacer("Klicke, um die Clan Einladungen Einstellung zu ändern")
+            spacer("Klicke, um die Einstellung zu ändern")
         }
     }
 }
@@ -206,7 +206,7 @@ private fun clanChatItem(currentState: Boolean) = buildItem(Material.CLOCK) {
         emptyLine()
 
         line {
-            spacer("Klicke, um die Clan Chat Einstellung zu ändern")
+            spacer("Klicke, um die Einstellung zu ändern")
         }
     }
 }

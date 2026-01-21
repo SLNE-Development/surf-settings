@@ -132,7 +132,7 @@ private fun lobbyScrollSoundsItem(currentState: Boolean) = buildItem(Material.ST
         emptyLine()
 
         line {
-            spacer("Klicke, um die Lobby Hotbar Scroll Sounds Einstellung zu ändern")
+            spacer("Klicke, um die Einstellung zu ändern")
         }
     }
 }
