@@ -1,5 +1,6 @@
 package dev.slne.surf.settings.paper.command
 
+import com.github.shynixn.mccoroutine.folia.launch
 import dev.jorel.commandapi.kotlindsl.commandTree
 import dev.jorel.commandapi.kotlindsl.getValue
 import dev.jorel.commandapi.kotlindsl.playerExecutor
@@ -41,10 +42,58 @@ fun settingsCommand() = commandTree("settings") {
             val playerSetting = settingsService.getSettingForPlayer(player.uniqueId, setting.name)
                 ?: error("Setting not found")
 
+            playerSetting.toggle()
+
+            settingsService.cachePlayerSetting(player.uniqueId, playerSetting)
+            plugin.launch {
+                settingsService.savePlayerSetting(player.uniqueId, playerSetting)
+            }
+
+            player.sendText {
+                appendPrefix()
+                success("Die Einstellung ")
+                variableValue(setting.name)
+                success(" wurde auf ")
+                variableValue(playerSetting.getString())
+                success(" gesetzt.")
+            }
         }
 
 
         niceToggleArgument("state") {
+            playerExecutor { player, args ->
+                val setting: Setting by args
+                val state: Boolean by args
+
+                if (!setting.isBoolean()) {
+                    player.sendText {
+                        appendPrefix()
+                        error("Nur Boolean Einstellungen können über den Befehl geändert werden.")
+                    }
+                    return@playerExecutor
+                }
+
+                val playerSetting =
+                    settingsService.getSettingForPlayer(player.uniqueId, setting.name)
+                        ?: error("Setting not found")
+
+                playerSetting.settingValue = state.toString()
+
+                settingsService.cachePlayerSetting(player.uniqueId, playerSetting)
+
+                plugin.launch {
+                    settingsService.savePlayerSetting(player.uniqueId, playerSetting)
+                }
+
+                player.sendText {
+                    appendPrefix()
+                    success("Die Einstellung ")
+                    variableValue(setting.name)
+                    success(" wurde auf ")
+                    variableValue(playerSetting.getString())
+                    success(" gesetzt.")
+                }
+            }
         }
     }
 }
