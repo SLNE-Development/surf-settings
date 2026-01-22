@@ -66,7 +66,7 @@ fun openChatSettingsMenu(player: HumanEntity): SurfChestGui =
                 setDisabledItem(GuiItem(chatPingsItem(false)) {
                     chatPingsEnabled = true
                     it.whoClicked.sendText {
-                        appendPrefix()
+                        appendSuccessPrefix()
                         success("Du hast Chat Pings nun ")
                         variableValue("aktiviert")
                         success(".")
@@ -77,7 +77,7 @@ fun openChatSettingsMenu(player: HumanEntity): SurfChestGui =
                 setEnabledItem(GuiItem(chatPingsItem(true)) {
                     chatPingsEnabled = false
                     it.whoClicked.sendText {
-                        appendPrefix()
+                        appendSuccessPrefix()
                         success("Du hast Chat Pings nun ")
                         variableValue("deaktiviert")
                         success(".")
@@ -93,7 +93,7 @@ fun openChatSettingsMenu(player: HumanEntity): SurfChestGui =
                 setDisabledItem(GuiItem(directMessagesItem(false)) {
                     directMessagesEnabled = true
                     it.whoClicked.sendText {
-                        appendPrefix()
+                        appendSuccessPrefix()
                         success("Du hast Direktnachrichten nun ")
                         variableValue("aktiviert")
                         success(".")
@@ -105,7 +105,7 @@ fun openChatSettingsMenu(player: HumanEntity): SurfChestGui =
                     directMessagesEnabled = false
 
                     it.whoClicked.sendText {
-                        appendPrefix()
+                        appendSuccessPrefix()
                         success("Du hast Direktnachrichten nun ")
                         variableValue("deaktiviert")
                         success(".")

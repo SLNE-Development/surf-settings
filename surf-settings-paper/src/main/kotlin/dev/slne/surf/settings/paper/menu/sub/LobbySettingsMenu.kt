@@ -62,7 +62,7 @@ fun openLobbySettingsMenu(player: HumanEntity): SurfChestGui =
                 setDisabledItem(GuiItem(lobbyScrollSoundsItem(false)) {
                     hotbarScrollSounds = true
                     it.whoClicked.sendText {
-                        appendPrefix()
+                        appendSuccessPrefix()
                         success("Du hast Scroll Sounds nun ")
                         variableValue("aktiviert")
                         success(".")
@@ -73,7 +73,7 @@ fun openLobbySettingsMenu(player: HumanEntity): SurfChestGui =
                 setEnabledItem(GuiItem(lobbyScrollSoundsItem(true)) {
                     hotbarScrollSounds = false
                     it.whoClicked.sendText {
-                        appendPrefix()
+                        appendSuccessPrefix()
                         success("Du hast Scroll Sounds nun ")
                         variableValue("deaktiviert")
                         success(".")

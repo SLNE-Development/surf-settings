@@ -15,7 +15,7 @@ class SettingArgument(nodeName: String) :
         settingsService.getSettingByName(info.input)
             ?: throw CustomArgumentException.fromAdventureComponent(
                 buildText {
-                    appendPrefix()
+                    appendErrorPrefix()
                     error("Die Einstellung wurde nicht gefunden.")
                 })
     }) {
