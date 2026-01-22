@@ -21,7 +21,7 @@ fun surfSettingsCommand() = commandTree("surfSettings") {
                 }
 
                 executor.sendText {
-                    appendPrefix()
+                    appendSuccessPrefix()
                     success("Es wurden alle Einstellungen neu geladen (${settingsService.settings.size} in ${ms}ms)!")
                 }
             }
@@ -33,14 +33,14 @@ fun surfSettingsCommand() = commandTree("surfSettings") {
         anyExecutor { executor, _ ->
             if (settingsService.settings.isEmpty()) {
                 executor.sendText {
-                    appendPrefix()
+                    appendErrorPrefix()
                     error("Es sind keine Einstellungen verfügbar.")
                 }
                 return@anyExecutor
             }
 
             executor.sendText {
-                appendPrefix()
+                appendInfoPrefix()
                 info("Verfügbare Einstellungen: ")
                 variableValue(buildString {
                     settingsService.settings.forEachIndexed { index, setting ->

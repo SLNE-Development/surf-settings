@@ -20,7 +20,7 @@ fun settingsCommand() = commandTree("settings") {
     playerExecutor { player, _ ->
         if (plugin.isFolia()) {
             player.sendText {
-                appendPrefix()
+                appendErrorPrefix()
                 error("Das Einstellungsmenu ist auf diesem Server nicht verfügbar.")
             }
             return@playerExecutor
@@ -35,7 +35,7 @@ fun settingsCommand() = commandTree("settings") {
 
             if (!setting.isBoolean()) {
                 player.sendText {
-                    appendPrefix()
+                    appendErrorPrefix()
                     error("Nur Boolean Einstellungen können über den Befehl geändert werden.")
                 }
                 return@playerExecutor
@@ -52,7 +52,7 @@ fun settingsCommand() = commandTree("settings") {
             }
 
             player.sendText {
-                appendPrefix()
+                appendSuccessPrefix()
                 success("Die Einstellung ")
                 variableValue(setting.name)
                 success(" wurde auf ")
@@ -69,7 +69,7 @@ fun settingsCommand() = commandTree("settings") {
 
                 if (!setting.isBoolean()) {
                     player.sendText {
-                        appendPrefix()
+                        appendErrorPrefix()
                         error("Nur Boolean Einstellungen können über den Befehl geändert werden.")
                     }
                     return@playerExecutor
@@ -88,7 +88,7 @@ fun settingsCommand() = commandTree("settings") {
                 }
 
                 player.sendText {
-                    appendPrefix()
+                    appendSuccessPrefix()
                     success("Die Einstellung ")
                     variableValue(setting.name)
                     success(" wurde auf ")
@@ -107,7 +107,7 @@ fun settingsCommand() = commandTree("settings") {
                         ?: error("Setting not found")
 
                 player.sendText {
-                    appendPrefix()
+                    appendInfoPrefix()
                     info("Die Einstellung ")
                     variableValue(playerSetting.setting.name)
                     info(" hat den Wert ")

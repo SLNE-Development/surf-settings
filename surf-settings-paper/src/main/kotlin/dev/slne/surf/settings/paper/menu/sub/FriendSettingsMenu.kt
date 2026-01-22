@@ -67,7 +67,7 @@ fun openFriendSettingsMenu(player: HumanEntity): SurfChestGui =
                 setDisabledItem(GuiItem(friendRequestsItem(false)) {
                     friendRequestsEnabled = true
                     it.whoClicked.sendText {
-                        appendPrefix()
+                        appendSuccessPrefix()
                         success("Du hast Freundschaftsanfragen nun ")
                         variableValue("aktiviert")
                         success(".")
@@ -78,7 +78,7 @@ fun openFriendSettingsMenu(player: HumanEntity): SurfChestGui =
                 setEnabledItem(GuiItem(friendRequestsItem(true)) {
                     friendRequestsEnabled = false
                     it.whoClicked.sendText {
-                        appendPrefix()
+                        appendSuccessPrefix()
                         success("Du hast Freundschaftsanfragen nun ")
                         variableValue("deaktiviert")
                         success(".")
@@ -94,7 +94,7 @@ fun openFriendSettingsMenu(player: HumanEntity): SurfChestGui =
                 setDisabledItem(GuiItem(friendJumpItem(false)) {
                     friendJumpsEnabled = true
                     it.whoClicked.sendText {
-                        appendPrefix()
+                        appendSuccessPrefix()
                         success("Du hast Nachspringen von Freunden nun ")
                         variableValue("aktiviert")
                         success(".")
@@ -106,7 +106,7 @@ fun openFriendSettingsMenu(player: HumanEntity): SurfChestGui =
                     friendJumpsEnabled = false
 
                     it.whoClicked.sendText {
-                        appendPrefix()
+                        appendSuccessPrefix()
                         success("Du hast Nachspringen von Freunden nun ")
                         variableValue("deaktiviert")
                         success(".")

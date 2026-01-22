@@ -66,7 +66,7 @@ fun openClanSettingsMenu(player: HumanEntity): SurfChestGui =
                 setDisabledItem(GuiItem(clanInvitesItem(false)) {
                     clanInvitesEnabled = true
                     it.whoClicked.sendText {
-                        appendPrefix()
+                        appendSuccessPrefix()
                         success("Du hast Clan Einladungen nun ")
                         variableValue("aktiviert")
                         success(".")
@@ -77,7 +77,7 @@ fun openClanSettingsMenu(player: HumanEntity): SurfChestGui =
                 setEnabledItem(GuiItem(clanInvitesItem(true)) {
                     clanInvitesEnabled = false
                     it.whoClicked.sendText {
-                        appendPrefix()
+                        appendSuccessPrefix()
                         success("Du hast Clan Einladungen nun ")
                         variableValue("deaktiviert")
                         success(".")
@@ -93,7 +93,7 @@ fun openClanSettingsMenu(player: HumanEntity): SurfChestGui =
                 setDisabledItem(GuiItem(clanChatItem(false)) {
                     clanChatEnabled = true
                     it.whoClicked.sendText {
-                        appendPrefix()
+                        appendSuccessPrefix()
                         success("Du hast den Clan-Chat für dich ")
                         variableValue("aktiviert")
                         success(".")
@@ -105,7 +105,7 @@ fun openClanSettingsMenu(player: HumanEntity): SurfChestGui =
                     clanChatEnabled = false
 
                     it.whoClicked.sendText {
-                        appendPrefix()
+                        appendSuccessPrefix()
                         success("Du hast Clan-Chat für dich ")
                         variableValue("deaktiviert")
                         success(".")
