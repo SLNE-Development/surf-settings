@@ -23,6 +23,8 @@ import net.kyori.adventure.text.format.TextDecoration
 import org.bukkit.Material
 import org.bukkit.Sound
 import org.bukkit.entity.HumanEntity
+import org.bukkit.inventory.ItemFlag
+import org.bukkit.inventory.meta.FireworkMeta
 
 // TODO: Settings Menu
 /**
@@ -146,6 +148,9 @@ private fun HumanEntity.playClickSound() {
 private fun clanInvitesItem(currentState: Boolean) = buildItem(Material.FIREWORK_ROCKET) {
     displayName {
         localColored("Clan Einladungen".toSmallCaps(), TextDecoration.BOLD)
+    }
+    editMeta(FireworkMeta::class.java) {
+        it.addItemFlags(ItemFlag.HIDE_ADDITIONAL_TOOLTIP)
     }
 
     buildLore {
