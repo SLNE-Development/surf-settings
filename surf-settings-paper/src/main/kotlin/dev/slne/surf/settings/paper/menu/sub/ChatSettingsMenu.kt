@@ -52,12 +52,15 @@ fun openChatSettingsMenu(player: HumanEntity): SurfChestGui =
 
         var chatPingsEnabled =
             surfSettingsApi.getPlayerSetting(player.uniqueId, "chat_pings")?.getBoolean() ?: true
+        var deathMessagesEnabled=
+            surfSettingsApi.getPlayerSetting(player.uniqueId, "chat_deathmessages")?.getBoolean() ?: true
         var directMessagesEnabled =
             surfSettingsApi.getPlayerSetting(player.uniqueId, "direct_messages")?.getBoolean()
                 ?: true
 
         val originalChatPingsEnabled = chatPingsEnabled
         val originalDirectMessagesEnabled = directMessagesEnabled
+        val originalDeathMessagesEnabled = deathMessagesEnabled
 
         addPane(
             ToggleButton(
@@ -79,6 +82,34 @@ fun openChatSettingsMenu(player: HumanEntity): SurfChestGui =
                     it.whoClicked.sendText {
                         appendSuccessPrefix()
                         success("Du hast Chat Pings nun ")
+                        variableValue("deaktiviert")
+                        success(".")
+                    }
+                    it.whoClicked.playClickSound()
+                })
+            })
+
+        addPane(
+            ToggleButton(
+                4, 2, 1, 1, deathMessagesEnabled
+            ).apply {
+                setDisabledItem(GuiItem(deathMessagesItem(false)) {
+                    directMessagesEnabled = true
+                    it.whoClicked.sendText {
+                        appendSuccessPrefix()
+                        success("Du hast Todesnachrichten nun ")
+                        variableValue("aktiviert")
+                        success(".")
+                    }
+                    it.whoClicked.playClickSound()
+                })
+
+                setEnabledItem(GuiItem(directMessagesItem(true)) {
+                    directMessagesEnabled = false
+
+                    it.whoClicked.sendText {
+                        appendSuccessPrefix()
+                        success("Du hast Todesnachrichten nun ")
                         variableValue("deaktiviert")
                         success(".")
                     }
@@ -123,6 +154,14 @@ fun openChatSettingsMenu(player: HumanEntity): SurfChestGui =
                         it.player.uniqueId,
                         "chat_pings",
                         chatPingsEnabled.toString()
+                    )
+                }
+
+                if(deathMessagesEnabled != originalDeathMessagesEnabled) {
+                    surfSettingsApi.saveSetting(
+                        it.player.uniqueId,
+                        "chat_deathmessages",
+                        directMessagesEnabled.toString()
                     )
                 }
 
@@ -180,6 +219,40 @@ private fun chatPingsItem(currentState: Boolean) = buildItem(Material.BELL) {
 private fun directMessagesItem(currentState: Boolean) = buildItem(Material.RED_DYE) {
     displayName {
         localColored("Direktnachrichten".toSmallCaps(), TextDecoration.BOLD)
+    }
+
+    buildLore {
+        emptyLine()
+        line {
+            variableValue("Beschreibung:".toSmallCaps())
+        }
+
+        line {
+            localColored("Passe deine Chat Einstellungen an.")
+        }
+
+        emptyLine()
+        line {
+            variableValue("Status:".toSmallCaps())
+        }
+
+        line {
+            spacer("-")
+            appendSpace()
+            localColored(if (currentState) "Aktiviert" else "Deaktiviert")
+        }
+
+        emptyLine()
+
+        line {
+            spacer("Klicke, um die Einstellung zu ändern")
+        }
+    }
+}
+
+private fun deathMessagesItem(currentState: Boolean) = buildItem(Material.SKELETON_SKULL) {
+    displayName {
+        localColored("Todesnachrichten".toSmallCaps(), TextDecoration.BOLD)
     }
 
     buildLore {

@@ -27,6 +27,7 @@ class PaperMain : SuspendingJavaPlugin() {
 
         runBlocking {
             surfSettingsApi.createSetting("chat_pings", true.toString())
+            surfSettingsApi.createSetting("chat_deathmessages", true.toString())
             surfSettingsApi.createSetting("direct_messages", true.toString())
             surfSettingsApi.createSetting("lobby_scroll_sound", false.toString())
             surfSettingsApi.createSetting("clan_invites", true.toString())
