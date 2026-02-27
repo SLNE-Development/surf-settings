@@ -55,9 +55,14 @@ fun openLobbySettingsMenu(player: HumanEntity): SurfChestGui =
                 ?: false
         val originalHotbarScrollSounds = hotbarScrollSounds
 
+        var parkourSounds =
+            surfSettingsApi.getPlayerSetting(player.uniqueId, "lobby_parkour_sound")?.getBoolean()
+                ?: false
+        val originalParkourSounds = parkourSounds
+
         addPane(
             ToggleButton(
-                4, 2, 1, 1, hotbarScrollSounds
+                3, 2, 1, 1, hotbarScrollSounds
             ).apply {
                 setDisabledItem(GuiItem(lobbyScrollSoundsItem(false)) {
                     hotbarScrollSounds = true
@@ -82,6 +87,33 @@ fun openLobbySettingsMenu(player: HumanEntity): SurfChestGui =
                 })
             })
 
+        addPane(
+            ToggleButton(
+                5, 2, 1, 1, parkourSounds
+            ).apply {
+                setDisabledItem(GuiItem(lobbyParkourSoundsItem(false)) {
+                    parkourSounds = true
+                    it.whoClicked.sendText {
+                        appendSuccessPrefix()
+                        success("Du hast Parkour Sounds nun")
+                        variableValue("aktiviert")
+                        success(".")
+                    }
+                    it.whoClicked.playClickSound()
+                })
+
+                setEnabledItem(GuiItem(lobbyParkourSoundsItem(true)) {
+                    parkourSounds = false
+                    it.whoClicked.sendText {
+                        appendSuccessPrefix()
+                        success("Du hast Parkour Sounds nun")
+                        variableValue("deaktiviert")
+                        success(".")
+                    }
+                    it.whoClicked.playClickSound()
+                })
+            })
+
         show(player)
 
         setOnClose {
@@ -90,7 +122,14 @@ fun openLobbySettingsMenu(player: HumanEntity): SurfChestGui =
                     surfSettingsApi.saveSetting(
                         it.player.uniqueId,
                         "lobby_scroll_sound",
-                        hotbarScrollSounds.toString()
+                        parkourSounds.toString()
+                    )
+                }
+                if (parkourSounds != originalParkourSounds) {
+                    surfSettingsApi.saveSetting(
+                        it.player.uniqueId,
+                        "lobby_parkour_sound",
+                        parkourSounds.toString()
                     )
                 }
             }
@@ -116,6 +155,40 @@ private fun lobbyScrollSoundsItem(currentState: Boolean) = buildItem(Material.ST
 
         line {
             localColored("Passe deine Lobby Einstellungen an.")
+        }
+
+        emptyLine()
+        line {
+            variableValue("Status:".toSmallCaps())
+        }
+
+        line {
+            spacer("-")
+            appendSpace()
+            localColored(if (currentState) "Aktiviert" else "Deaktiviert")
+        }
+
+        emptyLine()
+
+        line {
+            spacer("Klicke, um die Einstellung zu ändern")
+        }
+    }
+}
+
+private fun lobbyParkourSoundsItem(currentState: Boolean) = buildItem(Material.STONE_BUTTON) {
+    displayName {
+        localColored("Parkour Sounds".toSmallCaps(), TextDecoration.BOLD)
+    }
+
+    buildLore {
+        emptyLine()
+        line {
+            variableValue("Beschreibung:".toSmallCaps())
+        }
+
+        line {
+            localColored("Steuert die Sounds während des Parkours in der Lobby.")
         }
 
         emptyLine()
