@@ -1,5 +1,8 @@
 package dev.slne.surf.settings.api.setting
 
+import kotlinx.serialization.Serializable
+
+@Serializable
 data class Setting(
     val name: String,
     val defaultValue: String

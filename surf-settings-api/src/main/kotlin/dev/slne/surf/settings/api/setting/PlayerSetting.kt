@@ -1,5 +1,8 @@
 package dev.slne.surf.settings.api.setting
 
+import kotlinx.serialization.Serializable
+
+@Serializable
 data class PlayerSetting(
     val setting: Setting,
     var settingValue: String
