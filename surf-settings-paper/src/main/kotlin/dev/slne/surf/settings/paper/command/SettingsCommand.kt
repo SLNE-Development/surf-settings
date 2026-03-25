@@ -98,7 +98,7 @@ fun settingsCommand() = commandTree("settings") {
             }
         }
 
-        literalArgument("info") {
+        literalArgument("#info") {
             playerExecutor { player, args ->
                 val setting: Setting by args
 

@@ -5,7 +5,6 @@ import dev.slne.surf.database.libs.org.jetbrains.exposed.v1.r2dbc.selectAll
 import dev.slne.surf.database.libs.org.jetbrains.exposed.v1.r2dbc.transactions.suspendTransaction
 import dev.slne.surf.database.libs.org.jetbrains.exposed.v1.r2dbc.upsert
 import dev.slne.surf.settings.api.setting.PlayerSetting
-import dev.slne.surf.settings.core.common.service.settingsService
 import dev.slne.surf.settings.microservice.table.SettingEntriesTable
 import kotlinx.coroutines.flow.mapNotNull
 import kotlinx.coroutines.flow.toList
@@ -17,12 +16,7 @@ class PlayerSettingsRepository {
     suspend fun loadSettingsByPlayerUuid(playerUuid: UUID) = suspendTransaction {
         SettingEntriesTable.selectAll().where(SettingEntriesTable.playerUuid eq playerUuid)
             .mapNotNull {
-                val setting = settingsService.getSettingByName(it[SettingEntriesTable.settingName])
-                    ?: return@mapNotNull null
-                PlayerSetting(
-                    setting,
-                    it[SettingEntriesTable.value]
-                )
+                it[SettingEntriesTable.settingName] to it[SettingEntriesTable.value]
             }.toList()
     }
 

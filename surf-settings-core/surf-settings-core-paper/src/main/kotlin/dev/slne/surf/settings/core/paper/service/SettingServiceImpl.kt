@@ -65,7 +65,13 @@ class SettingServiceImpl : SettingsService, Services.Fallback {
     override suspend fun cachePlayerSettings(playerUuid: UUID) {
         _playerSettings[playerUuid] = PaperSettingsInstance.rabbitApi.sendRequest(
             LoadPlayerSettingsRequestPacket(playerUuid)
-        ).playerSettings.toObjectSet()
+        ).playerSettings.mapNotNull {
+            val setting = getSettingByName(it.first) ?: return@mapNotNull null
+            PlayerSetting(
+                setting = setting,
+                settingValue = it.second
+            )
+        }.toObjectSet()
     }
 
     override fun invalidatePlayerSettingsCache(playerUuid: UUID) {
