@@ -7,21 +7,19 @@ import dev.slne.surf.database.libs.org.jetbrains.exposed.v1.r2dbc.transactions.s
 import dev.slne.surf.database.libs.org.jetbrains.exposed.v1.r2dbc.upsert
 import dev.slne.surf.settings.api.setting.Setting
 import dev.slne.surf.settings.microservice.table.SettingsTable
-import dev.slne.surf.surfapi.core.api.util.toObjectSet
-import it.unimi.dsi.fastutil.objects.ObjectSet
 import kotlinx.coroutines.flow.map
-import kotlinx.coroutines.flow.toSet
+import kotlinx.coroutines.flow.toList
 
 val settingRepository = SettingRepository()
 
 class SettingRepository {
-    suspend fun loadSettings(): ObjectSet<Setting> = suspendTransaction {
+    suspend fun loadSettings(): List<Setting> = suspendTransaction {
         SettingsTable.selectAll().map {
             Setting(
                 name = it[SettingsTable.name],
                 defaultValue = it[SettingsTable.defaultValue]
             )
-        }.toSet().toObjectSet()
+        }.toList()
     }
 
     suspend fun createSetting(name: String, defaultValue: String): Setting = suspendTransaction {
