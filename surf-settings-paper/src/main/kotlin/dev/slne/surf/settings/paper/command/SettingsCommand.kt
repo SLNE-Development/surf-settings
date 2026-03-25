@@ -6,7 +6,7 @@ import dev.jorel.commandapi.kotlindsl.getValue
 import dev.jorel.commandapi.kotlindsl.literalArgument
 import dev.jorel.commandapi.kotlindsl.playerExecutor
 import dev.slne.surf.settings.api.setting.Setting
-import dev.slne.surf.settings.core.service.settingsService
+import dev.slne.surf.settings.core.common.service.settingsService
 import dev.slne.surf.settings.paper.command.argument.niceToggleArgument
 import dev.slne.surf.settings.paper.command.argument.settingArgument
 import dev.slne.surf.settings.paper.menu.openSettingsMenu

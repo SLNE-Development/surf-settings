@@ -4,7 +4,7 @@ import com.google.auto.service.AutoService
 import dev.slne.surf.settings.api.SurfSettingsApi
 import dev.slne.surf.settings.api.setting.PlayerSetting
 import dev.slne.surf.settings.api.setting.Setting
-import dev.slne.surf.settings.core.service.settingsService
+import dev.slne.surf.settings.core.common.service.settingsService
 import dev.slne.surf.settings.paper.menu.openSettingsMenu
 import it.unimi.dsi.fastutil.objects.ObjectSet
 import net.kyori.adventure.util.Services

@@ -7,7 +7,7 @@ import dev.jorel.commandapi.arguments.ArgumentSuggestions
 import dev.jorel.commandapi.arguments.CustomArgument
 import dev.jorel.commandapi.arguments.StringArgument
 import dev.slne.surf.settings.api.setting.Setting
-import dev.slne.surf.settings.core.service.settingsService
+import dev.slne.surf.settings.core.common.service.settingsService
 import dev.slne.surf.surfapi.core.api.messages.adventure.buildText
 
 class SettingArgument(nodeName: String) :

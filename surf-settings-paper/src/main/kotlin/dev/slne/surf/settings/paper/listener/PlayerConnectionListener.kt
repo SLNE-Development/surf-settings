@@ -1,7 +1,7 @@
 package dev.slne.surf.settings.paper.listener
 
 import com.github.shynixn.mccoroutine.folia.launch
-import dev.slne.surf.settings.core.service.settingsService
+import dev.slne.surf.settings.core.common.service.settingsService
 import dev.slne.surf.settings.paper.plugin
 import org.bukkit.event.EventHandler
 import org.bukkit.event.Listener
