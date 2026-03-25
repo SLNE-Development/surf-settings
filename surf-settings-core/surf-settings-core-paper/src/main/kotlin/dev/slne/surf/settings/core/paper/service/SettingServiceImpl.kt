@@ -3,7 +3,9 @@ package dev.slne.surf.settings.core.paper.service
 import com.google.auto.service.AutoService
 import dev.slne.surf.settings.api.setting.PlayerSetting
 import dev.slne.surf.settings.api.setting.Setting
+import dev.slne.surf.settings.core.common.rabbit.packet.request.*
 import dev.slne.surf.settings.core.common.service.SettingsService
+import dev.slne.surf.settings.core.paper.PaperSettingsInstance
 import dev.slne.surf.surfapi.core.api.util.mutableObject2ObjectMapOf
 import dev.slne.surf.surfapi.core.api.util.mutableObjectSetOf
 import dev.slne.surf.surfapi.core.api.util.toMutableObjectSet
@@ -52,11 +54,18 @@ class SettingServiceImpl : SettingsService, Services.Fallback {
         playerUuid: UUID,
         playerSetting: PlayerSetting
     ) {
-        playerSettingsRepository.savePlayerSetting(playerUuid, playerSetting)
+        PaperSettingsInstance.rabbitApi.sendRequest(
+            SavePlayerSettingRequestPacket(
+                playerUuid,
+                playerSetting
+            )
+        )
     }
 
     override suspend fun cachePlayerSettings(playerUuid: UUID) {
-        _playerSettings[playerUuid] = playerSettingsRepository.loadSettingsByPlayerUuid(playerUuid)
+        _playerSettings[playerUuid] = PaperSettingsInstance.rabbitApi.sendRequest(
+            LoadPlayerSettingsRequestPacket(playerUuid)
+        ).playerSettings.toObjectSet()
     }
 
     override fun invalidatePlayerSettingsCache(playerUuid: UUID) {
@@ -65,7 +74,7 @@ class SettingServiceImpl : SettingsService, Services.Fallback {
 
     override suspend fun refreshSettings() {
         settings.clear()
-        settings.addAll(settingRepository.loadSettings())
+        settings.addAll(PaperSettingsInstance.rabbitApi.sendRequest(LoadSettingsRequestPacket).settings)
     }
 
     override suspend fun createSetting(
@@ -77,13 +86,20 @@ class SettingServiceImpl : SettingsService, Services.Fallback {
             return existing
         }
 
-        return settingRepository.createSetting(name, defaultValue).also {
+        return PaperSettingsInstance.rabbitApi.sendRequest(
+            CreateSettingRequestPacket(
+                name,
+                defaultValue
+            )
+        ).setting.also {
             settings.add(it)
         }
     }
 
     override suspend fun deleteSetting(name: String) {
-        settingRepository.deleteSetting(name).also {
+        PaperSettingsInstance.rabbitApi.sendRequest(
+            DeleteSettingRequestPacket(name)
+        ).also {
             settings.removeIf { it.name == name }
         }
     }
