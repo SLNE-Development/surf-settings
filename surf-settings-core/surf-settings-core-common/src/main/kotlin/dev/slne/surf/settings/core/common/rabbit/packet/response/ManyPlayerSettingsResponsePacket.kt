@@ -5,6 +5,6 @@ import dev.slne.surf.settings.api.setting.PlayerSetting
 import kotlinx.serialization.Serializable
 
 @Serializable
-data class PlayerSettingResponsePacket(
-    val playerSetting: PlayerSetting
+data class ManyPlayerSettingsResponsePacket(
+    val playerSettings: List<PlayerSetting>
 ) : RabbitResponsePacket()
