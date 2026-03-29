@@ -14,8 +14,9 @@ import kotlin.io.path.Path
 
 @AutoService(Microservice::class)
 class SettingsMicroservice : Microservice() {
-    private val databaseApi = DatabaseApi.create(Path("config"))
-    private val rabbitApi = ServerRabbitMQApi.create("surf-settings", Path("config"))
+    override val dataPath = Path("config")
+    private val databaseApi = DatabaseApi.create(dataPath)
+    private val rabbitApi = ServerRabbitMQApi.create("surf-settings", dataPath)
 
     override suspend fun onBootstrap(args: List<String>) {
         suspendTransaction {
