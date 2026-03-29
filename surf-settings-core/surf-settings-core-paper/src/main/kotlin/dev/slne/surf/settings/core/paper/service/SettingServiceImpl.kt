@@ -80,7 +80,7 @@ class SettingServiceImpl : SettingsService, Services.Fallback {
 
     override suspend fun refreshSettings() {
         settings.clear()
-        settings.addAll(PaperSettingsInstance.rabbitApi.sendRequest(LoadSettingsRequestPacket).settings)
+        settings.addAll(PaperSettingsInstance.rabbitApi.sendRequest(LoadSettingsRequestPacket()).settings)
     }
 
     override suspend fun createSetting(
