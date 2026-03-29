@@ -5,4 +5,4 @@ import dev.slne.surf.settings.core.common.rabbit.packet.response.ManySettingsRes
 import kotlinx.serialization.Serializable
 
 @Serializable
-object LoadSettingsRequestPacket : RabbitRequestPacket<ManySettingsResponsePacket>()
+class LoadSettingsRequestPacket : RabbitRequestPacket<ManySettingsResponsePacket>()
