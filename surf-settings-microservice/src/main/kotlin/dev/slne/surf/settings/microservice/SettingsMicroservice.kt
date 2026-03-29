@@ -10,12 +10,14 @@ import dev.slne.surf.settings.microservice.rabbit.handler.PlayerSettingsHandler
 import dev.slne.surf.settings.microservice.rabbit.handler.SettingsHandler
 import dev.slne.surf.settings.microservice.table.SettingEntriesTable
 import dev.slne.surf.settings.microservice.table.SettingsTable
+import java.nio.file.Path
 import kotlin.io.path.Path
 
 @AutoService(Microservice::class)
 class SettingsMicroservice : Microservice() {
-    private val databaseApi = DatabaseApi.create(Path("config"))
-    private val rabbitApi = ServerRabbitMQApi.create("surf-settings", Path("config"))
+    override val dataPath: Path = Path("config")
+    private val databaseApi = DatabaseApi.create(dataPath)
+    private val rabbitApi = ServerRabbitMQApi.create("surf-settings", dataPath)
 
     override suspend fun onBootstrap(args: List<String>) {
         suspendTransaction {
