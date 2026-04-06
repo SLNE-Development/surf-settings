@@ -1,183 +1,138 @@
 package dev.slne.surf.settings.paper.menu.sub
 
 import com.github.shynixn.mccoroutine.folia.launch
-import com.github.stefvanschie.inventoryframework.gui.GuiItem
-import com.github.stefvanschie.inventoryframework.pane.component.ToggleButton
-import dev.slne.surf.settings.api.surfSettingsApi
-import dev.slne.surf.settings.paper.menu.withBackButton
-import dev.slne.surf.settings.paper.menu.withOutClicks
-import dev.slne.surf.settings.paper.menu.withOutline
+import dev.slne.surf.api.core.font.toSmallCaps
+import dev.slne.surf.api.core.messages.adventure.playSound
+import dev.slne.surf.api.core.messages.adventure.sendText
+import dev.slne.surf.api.core.messages.builder.SurfComponentBuilder
+import dev.slne.surf.api.paper.builder.buildItem
+import dev.slne.surf.api.paper.builder.buildLore
+import dev.slne.surf.api.paper.builder.displayName
+import dev.slne.surf.api.paper.inventory.framework.dsl.openForPlayer
+import dev.slne.surf.api.paper.inventory.framework.dsl.slot
+import dev.slne.surf.api.paper.inventory.framework.view.*
+import dev.slne.surf.api.paper.inventory.framework.view.state.get
+import dev.slne.surf.api.paper.inventory.framework.view.state.mutableState
+import dev.slne.surf.api.paper.inventory.framework.view.state.set
+import dev.slne.surf.settings.api.SurfSettingsApi
+import dev.slne.surf.settings.paper.menu.localColored
+import dev.slne.surf.settings.paper.menu.playClickSound
+import dev.slne.surf.settings.paper.menu.settingsMenu
 import dev.slne.surf.settings.paper.plugin
-import dev.slne.surf.surfapi.bukkit.api.builder.buildItem
-import dev.slne.surf.surfapi.bukkit.api.builder.buildLore
-import dev.slne.surf.surfapi.bukkit.api.builder.displayName
-import dev.slne.surf.surfapi.bukkit.api.inventory.dsl.menu
-import dev.slne.surf.surfapi.bukkit.api.inventory.types.SurfChestGui
-import dev.slne.surf.surfapi.core.api.font.toSmallCaps
-import dev.slne.surf.surfapi.core.api.messages.adventure.buildText
-import dev.slne.surf.surfapi.core.api.messages.adventure.playSound
-import dev.slne.surf.surfapi.core.api.messages.adventure.sendText
-import dev.slne.surf.surfapi.core.api.messages.builder.SurfComponentBuilder
+import me.devnatan.inventoryframework.context.SlotClickContext
 import net.kyori.adventure.text.format.TextColor
 import net.kyori.adventure.text.format.TextDecoration
 import org.bukkit.Material
 import org.bukkit.Sound
-import org.bukkit.entity.HumanEntity
 
-// TODO: Settings Menu
-/**
- * - Kategorien:
- * - Chat Settings
- *     - Chat Pings An/Aus
- *     - PMs An/Aus
- * - Lobby Settings
- *      - Hotbar-Scroll-Sounds An/Aus
- * - Friend Settings
- *      - Friend Requests An/Aus
- *      - Friend Nachjumpen An/Aus
- * - Clan Settings
- *      - Clan Einladungen An/Aus
- *      - Clan Chat Nachrichten An/Aus
- */
+fun chatSettingsMenu(): AbstractSurfView = surfView("Chat Einstellungen") {
+    val pingsHolder = mutableState(false)
+    val deathMessageHolder = mutableState(false)
+    val directMessageHolder = mutableState(false)
 
+    settings {
+        rows(5)
+        cancelAllInteractions()
+    }
 
-private const val height = 5
-private const val width = 9
+    onFirstRender {
+        val player = this.player
 
-fun openChatSettingsMenu(player: HumanEntity): SurfChestGui =
-    menu(buildText { spacer("Chat Einstellungen") }, height) {
-        withOutline(width, height)
-        withOutClicks()
-        withBackButton(height)
-
-        var chatPingsEnabled =
-            surfSettingsApi.getPlayerSetting(player.uniqueId, "chat_pings")?.getBoolean() ?: true
-        var deathMessagesEnabled=
-            surfSettingsApi.getPlayerSetting(player.uniqueId, "chat_deathmessages")?.getBoolean() ?: true
-        var directMessagesEnabled =
-            surfSettingsApi.getPlayerSetting(player.uniqueId, "direct_messages")?.getBoolean()
+        pingsHolder[this] =
+            SurfSettingsApi.getPlayerSetting(player.uniqueId, "chat_pings")?.getBoolean() ?: true
+        deathMessageHolder[this] =
+            SurfSettingsApi.getPlayerSetting(player.uniqueId, "chat_deathmessages")?.getBoolean()
+                ?: true
+        directMessageHolder[this] =
+            SurfSettingsApi.getPlayerSetting(player.uniqueId, "direct_messages")?.getBoolean()
                 ?: true
 
-        val originalChatPingsEnabled = chatPingsEnabled
-        val originalDirectMessagesEnabled = directMessagesEnabled
-        val originalDeathMessagesEnabled = deathMessagesEnabled
+        slot(2, 2) {
+            withItem(chatPingsItem(pingsHolder[this@onFirstRender]))
+            onClick { click ->
+                val newValue = !pingsHolder[this@onFirstRender]
+                pingsHolder[this@onFirstRender] = newValue
 
-        addPane(
-            ToggleButton(
-                2, 2, 1, 1, chatPingsEnabled
-            ).apply {
-                setDisabledItem(GuiItem(chatPingsItem(false)) {
-                    chatPingsEnabled = true
-                    it.whoClicked.sendText {
-                        appendSuccessPrefix()
-                        success("Du hast Chat Pings nun ")
-                        variableValue("aktiviert")
-                        success(".")
-                    }
-                    it.whoClicked.playClickSound()
-                })
-
-                setEnabledItem(GuiItem(chatPingsItem(true)) {
-                    chatPingsEnabled = false
-                    it.whoClicked.sendText {
-                        appendSuccessPrefix()
-                        success("Du hast Chat Pings nun ")
-                        variableValue("deaktiviert")
-                        success(".")
-                    }
-                    it.whoClicked.playClickSound()
-                })
-            })
-
-        addPane(
-            ToggleButton(
-                4, 2, 1, 1, deathMessagesEnabled
-            ).apply {
-                setDisabledItem(GuiItem(deathMessagesItem(false)) {
-                    directMessagesEnabled = true
-                    it.whoClicked.sendText {
-                        appendSuccessPrefix()
-                        success("Du hast Todesnachrichten nun ")
-                        variableValue("aktiviert")
-                        success(".")
-                    }
-                    it.whoClicked.playClickSound()
-                })
-
-                setEnabledItem(GuiItem(directMessagesItem(true)) {
-                    directMessagesEnabled = false
-
-                    it.whoClicked.sendText {
-                        appendSuccessPrefix()
-                        success("Du hast Todesnachrichten nun ")
-                        variableValue("deaktiviert")
-                        success(".")
-                    }
-                    it.whoClicked.playClickSound()
-                })
-            })
-
-        addPane(
-            ToggleButton(
-                6, 2, 1, 1, directMessagesEnabled
-            ).apply {
-                setDisabledItem(GuiItem(directMessagesItem(false)) {
-                    directMessagesEnabled = true
-                    it.whoClicked.sendText {
-                        appendSuccessPrefix()
-                        success("Du hast Direktnachrichten nun ")
-                        variableValue("aktiviert")
-                        success(".")
-                    }
-                    it.whoClicked.playClickSound()
-                })
-
-                setEnabledItem(GuiItem(directMessagesItem(true)) {
-                    directMessagesEnabled = false
-
-                    it.whoClicked.sendText {
-                        appendSuccessPrefix()
-                        success("Du hast Direktnachrichten nun ")
-                        variableValue("deaktiviert")
-                        success(".")
-                    }
-                    it.whoClicked.playClickSound()
-                })
-            })
-
-        show(player)
-
-        setOnClose {
-            plugin.launch {
-                if (chatPingsEnabled != originalChatPingsEnabled) {
-                    surfSettingsApi.saveSetting(
-                        it.player.uniqueId,
-                        "chat_pings",
-                        chatPingsEnabled.toString()
-                    )
+                click.player.sendText {
+                    appendSuccessPrefix()
+                    success("Du hast Chat Pings nun ")
+                    variableValue(if (newValue) "aktiviert" else "deaktiviert")
+                    success(".")
                 }
+                click.playClickSound()
+            }
+        }
 
-                if(deathMessagesEnabled != originalDeathMessagesEnabled) {
-                    surfSettingsApi.saveSetting(
-                        it.player.uniqueId,
-                        "chat_deathmessages",
-                        directMessagesEnabled.toString()
-                    )
-                }
+        slot(4, 2) {
+            withItem(deathMessagesItem(deathMessageHolder[this@onFirstRender]))
+            onClick { click ->
+                val newValue = !deathMessageHolder[this@onFirstRender]
+                deathMessageHolder[this@onFirstRender] = newValue
 
-                if (directMessagesEnabled != originalDirectMessagesEnabled) {
-                    surfSettingsApi.saveSetting(
-                        it.player.uniqueId,
-                        "direct_messages",
-                        directMessagesEnabled.toString()
-                    )
+                click.player.sendText {
+                    appendSuccessPrefix()
+                    success("Du hast Todesnachrichten nun ")
+                    variableValue(if (newValue) "aktiviert" else "deaktiviert")
+                    success(".")
                 }
+                click.playClickSound()
+            }
+        }
+
+        slot(6, 2) {
+            withItem(directMessagesItem(directMessageHolder[this@onFirstRender]))
+            onClick { click ->
+                val newValue = !directMessageHolder[this@onFirstRender]
+                directMessageHolder[this@onFirstRender] = newValue
+
+                click.player.sendText {
+                    appendSuccessPrefix()
+                    success("Du hast Direktnachrichten nun ")
+                    variableValue(if (newValue) "aktiviert" else "deaktiviert")
+                    success(".")
+                }
+                click.playClickSound()
+            }
+        }
+
+        slot(5, 5) {
+            withItem(buildItem(Material.BARRIER) {
+                displayName {
+                    localColored("Zurück".toSmallCaps(), TextDecoration.BOLD)
+                }
+            })
+            onClick { click ->
+                click.playClickSound()
+                click.openForPlayer(settingsMenu())
             }
         }
     }
 
-private fun HumanEntity.playClickSound() {
-    this.playSound(true) {
+    onClose {
+        val player = this.player
+
+        plugin.launch {
+            SurfSettingsApi.saveSetting(
+                player.uniqueId,
+                "chat_pings",
+                pingsHolder[this@onClose].toString()
+            )
+            SurfSettingsApi.saveSetting(
+                player.uniqueId,
+                "chat_deathmessages",
+                deathMessageHolder[this@onClose].toString()
+            )
+            SurfSettingsApi.saveSetting(
+                player.uniqueId,
+                "direct_messages",
+                directMessageHolder[this@onClose].toString()
+            )
+        }
+    }
+}
+
+private fun SlotClickContext.playClickSound() {
+    this.player.playSound(true) {
         type(Sound.UI_BUTTON_CLICK)
     }
 }
@@ -250,7 +205,7 @@ private fun directMessagesItem(currentState: Boolean) = buildItem(Material.RED_D
     }
 }
 
-private fun deathMessagesItem(currentState: Boolean) = buildItem(Material.SKELETON_SKULL) {
+private fun deathMessagesItem(state: Boolean) = buildItem(Material.SKELETON_SKULL) {
     displayName {
         localColored("Todesnachrichten".toSmallCaps(), TextDecoration.BOLD)
     }
@@ -273,7 +228,7 @@ private fun deathMessagesItem(currentState: Boolean) = buildItem(Material.SKELET
         line {
             spacer("-")
             appendSpace()
-            localColored(if (currentState) "Aktiviert" else "Deaktiviert")
+            localColored(if (state) "Aktiviert" else "Deaktiviert")
         }
 
         emptyLine()

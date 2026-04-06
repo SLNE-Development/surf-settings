@@ -5,28 +5,21 @@ import dev.jorel.commandapi.kotlindsl.commandTree
 import dev.jorel.commandapi.kotlindsl.getValue
 import dev.jorel.commandapi.kotlindsl.literalArgument
 import dev.jorel.commandapi.kotlindsl.playerExecutor
+import dev.slne.surf.api.core.messages.adventure.sendText
+import dev.slne.surf.api.paper.inventory.framework.open
 import dev.slne.surf.settings.api.setting.Setting
-import dev.slne.surf.settings.core.common.service.settingsService
+import dev.slne.surf.settings.core.common.service.SettingsService
 import dev.slne.surf.settings.paper.command.argument.niceToggleArgument
 import dev.slne.surf.settings.paper.command.argument.settingArgument
-import dev.slne.surf.settings.paper.menu.openSettingsMenu
+import dev.slne.surf.settings.paper.menu.settingsMenu
 import dev.slne.surf.settings.paper.permission.PermissionRegistry
 import dev.slne.surf.settings.paper.plugin
-import dev.slne.surf.surfapi.core.api.messages.adventure.sendText
 
 fun settingsCommand() = commandTree("settings") {
     withPermission(PermissionRegistry.COMMAND_SETTINGS)
 
     playerExecutor { player, _ ->
-        if (plugin.isFolia()) {
-            player.sendText {
-                appendErrorPrefix()
-                error("Das Einstellungsmenu ist auf diesem Server nicht verfügbar.")
-            }
-            return@playerExecutor
-        }
-
-        openSettingsMenu(player)
+        settingsMenu().open(player)
     }
 
     settingArgument("setting") {
@@ -41,14 +34,14 @@ fun settingsCommand() = commandTree("settings") {
                 return@playerExecutor
             }
 
-            val playerSetting = settingsService.getSettingForPlayer(player.uniqueId, setting.name)
+            val playerSetting = SettingsService.getSettingForPlayer(player.uniqueId, setting.name)
                 ?: error("Setting not found")
 
             playerSetting.toggle()
 
-            settingsService.cachePlayerSetting(player.uniqueId, playerSetting)
+            SettingsService.cachePlayerSetting(player.uniqueId, playerSetting)
             plugin.launch {
-                settingsService.savePlayerSetting(player.uniqueId, playerSetting)
+                SettingsService.savePlayerSetting(player.uniqueId, playerSetting)
             }
 
             player.sendText {
@@ -76,15 +69,15 @@ fun settingsCommand() = commandTree("settings") {
                 }
 
                 val playerSetting =
-                    settingsService.getSettingForPlayer(player.uniqueId, setting.name)
+                    SettingsService.getSettingForPlayer(player.uniqueId, setting.name)
                         ?: error("Setting not found")
 
                 playerSetting.settingValue = state.toString()
 
-                settingsService.cachePlayerSetting(player.uniqueId, playerSetting)
+                SettingsService.cachePlayerSetting(player.uniqueId, playerSetting)
 
                 plugin.launch {
-                    settingsService.savePlayerSetting(player.uniqueId, playerSetting)
+                    SettingsService.savePlayerSetting(player.uniqueId, playerSetting)
                 }
 
                 player.sendText {
@@ -103,7 +96,7 @@ fun settingsCommand() = commandTree("settings") {
                 val setting: Setting by args
 
                 val playerSetting =
-                    settingsService.getSettingForPlayer(player.uniqueId, setting.name)
+                    SettingsService.getSettingForPlayer(player.uniqueId, setting.name)
                         ?: error("Setting not found")
 
                 player.sendText {

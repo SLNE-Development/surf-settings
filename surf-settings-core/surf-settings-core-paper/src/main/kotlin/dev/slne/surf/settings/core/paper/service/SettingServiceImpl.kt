@@ -1,15 +1,15 @@
 package dev.slne.surf.settings.core.paper.service
 
 import com.google.auto.service.AutoService
+import dev.slne.surf.api.core.util.mutableObject2ObjectMapOf
+import dev.slne.surf.api.core.util.mutableObjectSetOf
+import dev.slne.surf.api.core.util.toMutableObjectSet
+import dev.slne.surf.api.core.util.toObjectSet
 import dev.slne.surf.settings.api.setting.PlayerSetting
 import dev.slne.surf.settings.api.setting.Setting
 import dev.slne.surf.settings.core.common.rabbit.packet.request.*
 import dev.slne.surf.settings.core.common.service.SettingsService
 import dev.slne.surf.settings.core.paper.PaperSettingsInstance
-import dev.slne.surf.surfapi.core.api.util.mutableObject2ObjectMapOf
-import dev.slne.surf.surfapi.core.api.util.mutableObjectSetOf
-import dev.slne.surf.surfapi.core.api.util.toMutableObjectSet
-import dev.slne.surf.surfapi.core.api.util.toObjectSet
 import it.unimi.dsi.fastutil.objects.ObjectSet
 import net.kyori.adventure.util.Services
 import java.util.*

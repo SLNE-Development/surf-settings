@@ -4,10 +4,10 @@ import com.github.shynixn.mccoroutine.folia.launch
 import dev.jorel.commandapi.kotlindsl.anyExecutor
 import dev.jorel.commandapi.kotlindsl.commandTree
 import dev.jorel.commandapi.kotlindsl.literalArgument
-import dev.slne.surf.settings.core.common.service.settingsService
+import dev.slne.surf.api.core.messages.adventure.sendText
+import dev.slne.surf.settings.core.common.service.SettingsService
 import dev.slne.surf.settings.paper.permission.PermissionRegistry
 import dev.slne.surf.settings.paper.plugin
-import dev.slne.surf.surfapi.core.api.messages.adventure.sendText
 import kotlin.system.measureTimeMillis
 
 fun surfSettingsCommand() = commandTree("surfSettings") {
@@ -17,12 +17,12 @@ fun surfSettingsCommand() = commandTree("surfSettings") {
         anyExecutor { executor, _ ->
             plugin.launch {
                 val ms = measureTimeMillis {
-                    settingsService.refreshSettings()
+                    SettingsService.refreshSettings()
                 }
 
                 executor.sendText {
                     appendSuccessPrefix()
-                    success("Es wurden alle Einstellungen neu geladen (${settingsService.settings.size} in ${ms}ms)!")
+                    success("Es wurden alle Einstellungen neu geladen (${SettingsService.settings.size} in ${ms}ms)!")
                 }
             }
         }
@@ -31,7 +31,7 @@ fun surfSettingsCommand() = commandTree("surfSettings") {
     literalArgument("list") {
         withPermission(PermissionRegistry.COMMAND_SURF_SETTINGS_LIST)
         anyExecutor { executor, _ ->
-            if (settingsService.settings.isEmpty()) {
+            if (SettingsService.settings.isEmpty()) {
                 executor.sendText {
                     appendErrorPrefix()
                     error("Es sind keine Einstellungen verfügbar.")
@@ -43,9 +43,9 @@ fun surfSettingsCommand() = commandTree("surfSettings") {
                 appendInfoPrefix()
                 info("Verfügbare Einstellungen: ")
                 variableValue(buildString {
-                    settingsService.settings.forEachIndexed { index, setting ->
+                    SettingsService.settings.forEachIndexed { index, setting ->
                         append(setting.name)
-                        if (index < settingsService.settings.size - 1) {
+                        if (index < SettingsService.settings.size - 1) {
                             append(", ")
                         }
                     }

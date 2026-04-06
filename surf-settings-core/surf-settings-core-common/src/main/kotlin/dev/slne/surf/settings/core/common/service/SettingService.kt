@@ -1,12 +1,12 @@
 package dev.slne.surf.settings.core.common.service
 
+import dev.slne.surf.api.core.util.requiredService
 import dev.slne.surf.settings.api.setting.PlayerSetting
 import dev.slne.surf.settings.api.setting.Setting
-import dev.slne.surf.surfapi.core.api.util.requiredService
 import it.unimi.dsi.fastutil.objects.ObjectSet
 import java.util.*
 
-val settingsService = requiredService<SettingsService>()
+private val service = requiredService<SettingsService>()
 
 interface SettingsService {
     val settings: ObjectSet<Setting>
@@ -25,4 +25,6 @@ interface SettingsService {
     suspend fun refreshSettings()
     suspend fun createSetting(name: String, defaultValue: String): Setting
     suspend fun deleteSetting(name: String)
+
+    companion object : SettingsService by service
 }

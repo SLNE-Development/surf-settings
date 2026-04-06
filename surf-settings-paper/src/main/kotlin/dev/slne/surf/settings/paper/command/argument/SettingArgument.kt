@@ -6,13 +6,13 @@ import dev.jorel.commandapi.arguments.Argument
 import dev.jorel.commandapi.arguments.ArgumentSuggestions
 import dev.jorel.commandapi.arguments.CustomArgument
 import dev.jorel.commandapi.arguments.StringArgument
+import dev.slne.surf.api.core.messages.adventure.buildText
 import dev.slne.surf.settings.api.setting.Setting
-import dev.slne.surf.settings.core.common.service.settingsService
-import dev.slne.surf.surfapi.core.api.messages.adventure.buildText
+import dev.slne.surf.settings.core.common.service.SettingsService
 
 class SettingArgument(nodeName: String) :
     CustomArgument<Setting, String>(StringArgument(nodeName), { info ->
-        settingsService.getSettingByName(info.input)
+        SettingsService.getSettingByName(info.input)
             ?: throw CustomArgumentException.fromAdventureComponent(
                 buildText {
                     appendErrorPrefix()
@@ -22,7 +22,7 @@ class SettingArgument(nodeName: String) :
     init {
         this.replaceSuggestions(
             ArgumentSuggestions.stringCollection {
-                settingsService.settings.map { it.name }
+                SettingsService.settings.map { it.name }
             }
         )
     }
