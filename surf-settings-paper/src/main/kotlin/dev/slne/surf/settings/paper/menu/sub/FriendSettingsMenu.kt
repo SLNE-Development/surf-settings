@@ -20,9 +20,10 @@ import dev.slne.surf.settings.paper.plugin
 import net.kyori.adventure.text.format.TextDecoration
 import org.bukkit.Material
 
-fun friendSettingsMenu(): AbstractSurfView = surfView("Freundes Einstellungen") {
+fun friendSettingsMenu(): AbstractSurfView = surfView("Freundesystem") {
     val requests = mutableState(false)
-    val jumps = mutableState(false)
+    val notify = mutableState(false)
+    val sounds = mutableState(false)
 
     settings {
         rows(5)
@@ -33,12 +34,20 @@ fun friendSettingsMenu(): AbstractSurfView = surfView("Freundes Einstellungen") 
         val player = this.player
 
         requests[this] =
-            SurfSettingsApi.getPlayerSetting(player.uniqueId, "friend_requests")?.getBoolean()
+            SurfSettingsApi.getPlayerSetting(
+                player.uniqueId,
+                "friend-request-notifications-enabled"
+            )?.getBoolean()
                 ?: true
-        jumps[this] =
-            SurfSettingsApi.getPlayerSetting(player.uniqueId, "friend_jumps")?.getBoolean() ?: true
+        notify[this] =
+            SurfSettingsApi.getPlayerSetting(player.uniqueId, "friend-notifications-enabled")
+                ?.getBoolean() ?: true
 
-        slot(2, 2) {
+        sounds[this] =
+            SurfSettingsApi.getPlayerSetting(player.uniqueId, "friend-sounds-enabled")?.getBoolean()
+                ?: true
+
+        slot(3, 3) {
             withItem(friendRequestsItem(requests[this@onFirstRender]))
             onClick { click ->
                 val new = !requests[this@onFirstRender]
@@ -53,14 +62,29 @@ fun friendSettingsMenu(): AbstractSurfView = surfView("Freundes Einstellungen") 
             }
         }
 
-        slot(6, 2) {
-            withItem(friendJumpItem(jumps[this@onFirstRender]))
+        slot(3, 5) {
+            withItem(friendNotifyItem(notify[this@onFirstRender]))
             onClick { click ->
-                val new = !jumps[this@onFirstRender]
-                jumps[this@onFirstRender] = new
+                val new = !notify[this@onFirstRender]
+                notify[this@onFirstRender] = new
                 click.player.sendText {
                     appendSuccessPrefix()
-                    success("Du hast Nachspringen von Freunden nun ")
+                    success("Du hast Freundesbenachrichtigungen nun ")
+                    variableValue(if (new) "aktiviert" else "deaktiviert")
+                    success(".")
+                }
+                click.playClickSound()
+            }
+        }
+
+        slot(3, 7) {
+            withItem(friendSoundsItem(sounds[this@onFirstRender]))
+            onClick { click ->
+                val new = !sounds[this@onFirstRender]
+                sounds[this@onFirstRender] = new
+                click.player.sendText {
+                    appendSuccessPrefix()
+                    success("Du hast Freundesbenachrichtungstöne nun ")
                     variableValue(if (new) "aktiviert" else "deaktiviert")
                     success(".")
                 }
@@ -87,13 +111,18 @@ fun friendSettingsMenu(): AbstractSurfView = surfView("Freundes Einstellungen") 
         plugin.launch {
             SurfSettingsApi.saveSetting(
                 player.uniqueId,
-                "friend_requests",
+                "friend-request-notifications-enabled",
                 requests[this@onClose].toString()
             )
             SurfSettingsApi.saveSetting(
                 player.uniqueId,
-                "friend_jumps",
-                jumps[this@onClose].toString()
+                "friend-notifications-enabled",
+                notify[this@onClose].toString()
+            )
+            SurfSettingsApi.saveSetting(
+                player.uniqueId,
+                "friend-sounds-enabled",
+                sounds[this@onClose].toString()
             )
         }
     }
@@ -122,9 +151,33 @@ private fun friendRequestsItem(state: Boolean) = buildItem(Material.POPPY) {
     }
 }
 
-private fun friendJumpItem(state: Boolean) = buildItem(Material.RABBIT_FOOT) {
+private fun friendSoundsItem(state: Boolean) =
+    buildItem(if (state) Material.LIME_CANDLE else Material.RED_CANDLE) {
+        displayName {
+            localColored("Freundesbenachrichtungstöne".toSmallCaps(), TextDecoration.BOLD)
+        }
+
+        buildLore {
+            emptyLine()
+            line { variableValue("Beschreibung:".toSmallCaps()) }
+            line { localColored("Passe deine Freundes Einstellungen an.") }
+
+            emptyLine()
+            line { variableValue("Status:".toSmallCaps()) }
+            line {
+                spacer("-")
+                appendSpace()
+                localColored(if (state) "Aktiviert" else "Deaktiviert")
+            }
+
+            emptyLine()
+            line { spacer("Klicke, um die Einstellung zu ändern") }
+        }
+    }
+
+private fun friendNotifyItem(state: Boolean) = buildItem(Material.RABBIT_FOOT) {
     displayName {
-        localColored("Nachspringen von Freunden".toSmallCaps(), TextDecoration.BOLD)
+        localColored("Freundesbenachrichtigungen".toSmallCaps(), TextDecoration.BOLD)
     }
 
     buildLore {

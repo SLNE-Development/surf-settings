@@ -20,7 +20,7 @@ import dev.slne.surf.settings.paper.plugin
 import net.kyori.adventure.text.format.TextDecoration
 import org.bukkit.Material
 
-fun lobbySettingsMenu(): AbstractSurfView = surfView("Lobby Einstellungen") {
+fun lobbySettingsMenu(): AbstractSurfView = surfView("Lobby") {
     val scroll = mutableState(false)
 
     settings {
@@ -35,7 +35,7 @@ fun lobbySettingsMenu(): AbstractSurfView = surfView("Lobby Einstellungen") {
             SurfSettingsApi.getPlayerSetting(player.uniqueId, "lobby_scroll_sound")?.getBoolean()
                 ?: false
 
-        slot(4, 2) {
+        slot(3, 5) {
             withItem(lobbyScrollItem(scroll[this@onFirstRender]))
             onClick { click ->
                 val new = !scroll[this@onFirstRender]

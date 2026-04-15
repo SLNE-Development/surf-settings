@@ -20,7 +20,7 @@ import dev.slne.surf.settings.paper.plugin
 import net.kyori.adventure.text.format.TextDecoration
 import org.bukkit.Material
 
-fun clanSettingsMenu(): AbstractSurfView = surfView("Clan Einstellungen") {
+fun clanSettingsMenu(): AbstractSurfView = surfView("Clansystem") {
     val invites = mutableState(false)
     val chat = mutableState(false)
 
@@ -38,7 +38,7 @@ fun clanSettingsMenu(): AbstractSurfView = surfView("Clan Einstellungen") {
             SurfSettingsApi.getPlayerSetting(player.uniqueId, "clan_chat_messages")?.getBoolean()
                 ?: true
 
-        slot(2, 2) {
+        slot(3, 3) {
             withItem(clanInvitesItem(invites[this@onFirstRender]))
             onClick { click ->
                 val new = !invites[this@onFirstRender]
@@ -53,7 +53,7 @@ fun clanSettingsMenu(): AbstractSurfView = surfView("Clan Einstellungen") {
             }
         }
 
-        slot(6, 2) {
+        slot(3, 7) {
             withItem(clanChatItem(chat[this@onFirstRender]))
             onClick { click ->
                 val new = !chat[this@onFirstRender]

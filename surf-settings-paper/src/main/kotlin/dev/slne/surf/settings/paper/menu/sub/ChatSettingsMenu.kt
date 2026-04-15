@@ -25,7 +25,7 @@ import net.kyori.adventure.text.format.TextDecoration
 import org.bukkit.Material
 import org.bukkit.Sound
 
-fun chatSettingsMenu(): AbstractSurfView = surfView("Chat Einstellungen") {
+fun chatSettingsMenu(): AbstractSurfView = surfView("Chat") {
     val pingsHolder = mutableState(false)
     val deathMessageHolder = mutableState(false)
     val directMessageHolder = mutableState(false)
@@ -47,7 +47,7 @@ fun chatSettingsMenu(): AbstractSurfView = surfView("Chat Einstellungen") {
             SurfSettingsApi.getPlayerSetting(player.uniqueId, "direct_messages")?.getBoolean()
                 ?: true
 
-        slot(2, 2) {
+        slot(3, 3) {
             withItem(chatPingsItem(pingsHolder[this@onFirstRender]))
             onClick { click ->
                 val newValue = !pingsHolder[this@onFirstRender]
@@ -63,7 +63,7 @@ fun chatSettingsMenu(): AbstractSurfView = surfView("Chat Einstellungen") {
             }
         }
 
-        slot(4, 2) {
+        slot(3, 5) {
             withItem(deathMessagesItem(deathMessageHolder[this@onFirstRender]))
             onClick { click ->
                 val newValue = !deathMessageHolder[this@onFirstRender]
@@ -79,7 +79,7 @@ fun chatSettingsMenu(): AbstractSurfView = surfView("Chat Einstellungen") {
             }
         }
 
-        slot(6, 2) {
+        slot(3, 7) {
             withItem(directMessagesItem(directMessageHolder[this@onFirstRender]))
             onClick { click ->
                 val newValue = !directMessageHolder[this@onFirstRender]
@@ -95,7 +95,7 @@ fun chatSettingsMenu(): AbstractSurfView = surfView("Chat Einstellungen") {
             }
         }
 
-        slot(5, 5) {
+        slot(6, 6) {
             withItem(buildItem(Material.BARRIER) {
                 displayName {
                     localColored("Zurück".toSmallCaps(), TextDecoration.BOLD)

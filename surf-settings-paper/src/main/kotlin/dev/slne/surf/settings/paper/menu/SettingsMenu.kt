@@ -23,7 +23,7 @@ fun settingsMenu(): AbstractSurfView = surfView("Einstellungen") {
     }
 
     onFirstRender {
-        slot(2, 2) {
+        slot(2, 3) {
             withItem(chatItem())
             onClick { click ->
                 click.playClickSound()
@@ -31,7 +31,7 @@ fun settingsMenu(): AbstractSurfView = surfView("Einstellungen") {
             }
         }
 
-        slot(4, 2) {
+        slot(2, 5) {
             withItem(lobbyItem())
             onClick { click ->
                 click.playClickSound()
@@ -39,7 +39,7 @@ fun settingsMenu(): AbstractSurfView = surfView("Einstellungen") {
             }
         }
 
-        slot(6, 2) {
+        slot(2, 7) {
             withItem(friendItem())
             onClick { click ->
                 click.playClickSound()
@@ -47,7 +47,7 @@ fun settingsMenu(): AbstractSurfView = surfView("Einstellungen") {
             }
         }
 
-        slot(4, 3) {
+        slot(3, 5) {
             withItem(clanItem())
             onClick { click ->
                 click.playClickSound()
