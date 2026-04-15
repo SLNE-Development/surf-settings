@@ -95,7 +95,7 @@ fun chatSettingsMenu(): AbstractSurfView = surfView("Chat") {
             }
         }
 
-        slot(6, 6) {
+        slot(5, 5) {
             withItem(buildItem(Material.BARRIER) {
                 displayName {
                     localColored("Zurück".toSmallCaps(), TextDecoration.BOLD)
