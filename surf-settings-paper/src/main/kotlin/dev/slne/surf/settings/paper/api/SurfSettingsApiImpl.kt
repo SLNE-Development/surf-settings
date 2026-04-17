@@ -41,6 +41,7 @@ class SurfSettingsApiImpl : SurfSettingsApi, Services.Fallback {
 
     override fun openSettingsGui(playerUuid: UUID) {
         Bukkit.getPlayer(playerUuid)?.let {
+            it.closeInventory()
             SettingsMenu.open(it)
         }
     }
