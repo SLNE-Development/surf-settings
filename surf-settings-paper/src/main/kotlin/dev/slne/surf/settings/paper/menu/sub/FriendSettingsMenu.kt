@@ -8,144 +8,142 @@ import dev.slne.surf.api.paper.builder.buildLore
 import dev.slne.surf.api.paper.builder.displayName
 import dev.slne.surf.api.paper.inventory.framework.dsl.openForPlayer
 import dev.slne.surf.api.paper.inventory.framework.dsl.slot
-import dev.slne.surf.api.paper.inventory.framework.view.*
-import dev.slne.surf.api.paper.inventory.framework.view.state.get
-import dev.slne.surf.api.paper.inventory.framework.view.state.mutableState
-import dev.slne.surf.api.paper.inventory.framework.view.state.set
+import dev.slne.surf.api.paper.inventory.framework.view.AbstractSurfView
 import dev.slne.surf.settings.api.SurfSettingsApi
+import dev.slne.surf.settings.paper.SettingKeys
+import dev.slne.surf.settings.paper.menu.SettingsMenu
 import dev.slne.surf.settings.paper.menu.localColored
 import dev.slne.surf.settings.paper.menu.playClickSound
-import dev.slne.surf.settings.paper.menu.settingsMenu
 import dev.slne.surf.settings.paper.plugin
+import me.devnatan.inventoryframework.ViewConfigBuilder
+import me.devnatan.inventoryframework.context.CloseContext
+import me.devnatan.inventoryframework.context.RenderContext
 import net.kyori.adventure.text.format.TextDecoration
 import org.bukkit.Material
 
-fun friendSettingsMenu(): AbstractSurfView = surfView("Freundesystem") {
+object FriendSettingsMenu : AbstractSurfView("Freundesystem") {
     val requests = mutableState(false)
     val notify = mutableState(false)
     val sounds = mutableState(false)
 
-    settings {
-        rows(5)
-        cancelAllInteractions()
+    val rInit = mutableState(false)
+    val nInit = mutableState(false)
+    val sInit = mutableState(false)
+
+    override fun onViewInit(config: ViewConfigBuilder) {
+        config.size(5).cancelInteractions()
     }
 
-    onFirstRender {
-        val player = this.player
+    override fun onViewRender(render: RenderContext) {
+        val p = render.player
 
-        requests[this] =
-            SurfSettingsApi.getPlayerSetting(
-                player.uniqueId,
-                "friend-request-notifications-enabled"
-            )?.getBoolean()
-                ?: true
-        notify[this] =
-            SurfSettingsApi.getPlayerSetting(player.uniqueId, "friend-notifications-enabled")
-                ?.getBoolean() ?: true
+        val r = SurfSettingsApi.getSettingValue(p.uniqueId, SettingKeys.FRIEND_REQUEST_NOTIFICATIONS)
+        val n = SurfSettingsApi.getSettingValue(p.uniqueId, SettingKeys.FRIEND_NOTIFICATIONS)
+        val s = SurfSettingsApi.getSettingValue(p.uniqueId, SettingKeys.FRIEND_SOUNDS)
 
-        sounds[this] =
-            SurfSettingsApi.getPlayerSetting(player.uniqueId, "friend-sounds-enabled")?.getBoolean()
-                ?: true
+        requests.set(r, render)
+        notify.set(n, render)
+        sounds.set(s, render)
 
-        slot(3, 3) {
-            withItem(friendRequestsItem(requests[this@onFirstRender]))
+        rInit.set(r, render)
+        nInit.set(n, render)
+        sInit.set(s, render)
+
+        render.slot(3, 3) {
+            renderWith { friendRequestsItem(requests[render]) }
             onClick { click ->
-                val new = !requests[this@onFirstRender]
-                requests[this@onFirstRender] = new
+                val v = !requests[render]
+                requests.set(v, render)
                 click.player.sendText {
                     appendSuccessPrefix()
                     success("Du hast Freundschaftsanfragen nun ")
-                    variableValue(if (new) "aktiviert" else "deaktiviert")
+                    variableValue(if (v) "aktiviert" else "deaktiviert")
                     success(".")
                 }
                 click.playClickSound()
             }
+            watch(requests)
         }
 
-        slot(3, 5) {
-            withItem(friendNotifyItem(notify[this@onFirstRender]))
+        render.slot(3, 5) {
+            renderWith { friendNotifyItem(notify[render]) }
             onClick { click ->
-                val new = !notify[this@onFirstRender]
-                notify[this@onFirstRender] = new
+                val v = !notify[render]
+                notify.set(v, render)
                 click.player.sendText {
                     appendSuccessPrefix()
                     success("Du hast Freundesbenachrichtigungen nun ")
-                    variableValue(if (new) "aktiviert" else "deaktiviert")
+                    variableValue(if (v) "aktiviert" else "deaktiviert")
                     success(".")
                 }
                 click.playClickSound()
             }
+            watch(notify)
         }
 
-        slot(3, 7) {
-            withItem(friendSoundsItem(sounds[this@onFirstRender]))
+        render.slot(3, 7) {
+            renderWith { friendSoundsItem(sounds[render]) }
             onClick { click ->
-                val new = !sounds[this@onFirstRender]
-                sounds[this@onFirstRender] = new
+                val v = !sounds[render]
+                sounds.set(v, render)
                 click.player.sendText {
                     appendSuccessPrefix()
                     success("Du hast Freundesbenachrichtungstöne nun ")
-                    variableValue(if (new) "aktiviert" else "deaktiviert")
+                    variableValue(if (v) "aktiviert" else "deaktiviert")
                     success(".")
                 }
                 click.playClickSound()
             }
+            watch(sounds)
         }
 
-        slot(5, 5) {
+        render.slot(5, 5) {
             withItem(buildItem(Material.BARRIER) {
-                displayName {
-                    localColored("Zurück".toSmallCaps(), TextDecoration.BOLD)
-                }
+                displayName { localColored("Zurück".toSmallCaps(), TextDecoration.BOLD) }
             })
             onClick { click ->
                 click.playClickSound()
-                click.openForPlayer(settingsMenu())
+                click.openForPlayer(SettingsMenu)
             }
         }
     }
 
-    onClose {
-        val player = this.player
-
+    override fun onViewClose(close: CloseContext) {
+        val p = close.player
         plugin.launch {
-            SurfSettingsApi.saveSetting(
-                player.uniqueId,
-                "friend-request-notifications-enabled",
-                requests[this@onClose].toString()
-            )
-            SurfSettingsApi.saveSetting(
-                player.uniqueId,
-                "friend-notifications-enabled",
-                notify[this@onClose].toString()
-            )
-            SurfSettingsApi.saveSetting(
-                player.uniqueId,
-                "friend-sounds-enabled",
-                sounds[this@onClose].toString()
-            )
+            if (rInit[close] != requests[close])
+                SurfSettingsApi.saveSetting(p.uniqueId, SettingKeys.FRIEND_REQUEST_NOTIFICATIONS, requests[close])
+            if (nInit[close] != notify[close])
+                SurfSettingsApi.saveSetting(p.uniqueId, SettingKeys.FRIEND_NOTIFICATIONS, notify[close])
+            if (sInit[close] != sounds[close])
+                SurfSettingsApi.saveSetting(p.uniqueId, SettingKeys.FRIEND_SOUNDS, sounds[close])
         }
     }
 }
 
 private fun friendRequestsItem(state: Boolean) = buildItem(Material.POPPY) {
-    displayName {
-        localColored("Freundschaftsanfragen".toSmallCaps(), TextDecoration.BOLD)
-    }
-
+    displayName { localColored("Freundschaftsanfragen".toSmallCaps(), TextDecoration.BOLD) }
     buildLore {
         emptyLine()
         line { variableValue("Beschreibung:".toSmallCaps()) }
         line { localColored("Passe deine Freundes Einstellungen an.") }
-
         emptyLine()
         line { variableValue("Status:".toSmallCaps()) }
-        line {
-            spacer("-")
-            appendSpace()
-            localColored(if (state) "Aktiviert" else "Deaktiviert")
-        }
+        line { spacer("-"); appendSpace(); localColored(if (state) "Aktiviert" else "Deaktiviert") }
+        emptyLine()
+        line { spacer("Klicke, um die Einstellung zu ändern") }
+    }
+}
 
+private fun friendNotifyItem(state: Boolean) = buildItem(Material.RABBIT_FOOT) {
+    displayName { localColored("Freundesbenachrichtigungen".toSmallCaps(), TextDecoration.BOLD) }
+    buildLore {
+        emptyLine()
+        line { variableValue("Beschreibung:".toSmallCaps()) }
+        line { localColored("Passe deine Freundes Einstellungen an.") }
+        emptyLine()
+        line { variableValue("Status:".toSmallCaps()) }
+        line { spacer("-"); appendSpace(); localColored(if (state) "Aktiviert" else "Deaktiviert") }
         emptyLine()
         line { spacer("Klicke, um die Einstellung zu ändern") }
     }
@@ -154,46 +152,19 @@ private fun friendRequestsItem(state: Boolean) = buildItem(Material.POPPY) {
 private fun friendSoundsItem(state: Boolean) =
     buildItem(if (state) Material.LIME_CANDLE else Material.RED_CANDLE) {
         displayName {
-            localColored("Freundesbenachrichtungstöne".toSmallCaps(), TextDecoration.BOLD)
+            localColored(
+                "Freundesbenachrichtungstöne".toSmallCaps(),
+                TextDecoration.BOLD
+            )
         }
-
         buildLore {
             emptyLine()
             line { variableValue("Beschreibung:".toSmallCaps()) }
             line { localColored("Passe deine Freundes Einstellungen an.") }
-
             emptyLine()
             line { variableValue("Status:".toSmallCaps()) }
-            line {
-                spacer("-")
-                appendSpace()
-                localColored(if (state) "Aktiviert" else "Deaktiviert")
-            }
-
+            line { spacer("-"); appendSpace(); localColored(if (state) "Aktiviert" else "Deaktiviert") }
             emptyLine()
             line { spacer("Klicke, um die Einstellung zu ändern") }
         }
     }
-
-private fun friendNotifyItem(state: Boolean) = buildItem(Material.RABBIT_FOOT) {
-    displayName {
-        localColored("Freundesbenachrichtigungen".toSmallCaps(), TextDecoration.BOLD)
-    }
-
-    buildLore {
-        emptyLine()
-        line { variableValue("Beschreibung:".toSmallCaps()) }
-        line { localColored("Passe deine Freundes Einstellungen an.") }
-
-        emptyLine()
-        line { variableValue("Status:".toSmallCaps()) }
-        line {
-            spacer("-")
-            appendSpace()
-            localColored(if (state) "Aktiviert" else "Deaktiviert")
-        }
-
-        emptyLine()
-        line { spacer("Klicke, um die Einstellung zu ändern") }
-    }
-}

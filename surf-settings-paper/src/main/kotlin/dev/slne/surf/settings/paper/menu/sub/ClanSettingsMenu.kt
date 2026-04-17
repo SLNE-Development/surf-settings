@@ -8,161 +8,120 @@ import dev.slne.surf.api.paper.builder.buildLore
 import dev.slne.surf.api.paper.builder.displayName
 import dev.slne.surf.api.paper.inventory.framework.dsl.openForPlayer
 import dev.slne.surf.api.paper.inventory.framework.dsl.slot
-import dev.slne.surf.api.paper.inventory.framework.view.*
-import dev.slne.surf.api.paper.inventory.framework.view.state.get
-import dev.slne.surf.api.paper.inventory.framework.view.state.mutableState
-import dev.slne.surf.api.paper.inventory.framework.view.state.set
+import dev.slne.surf.api.paper.inventory.framework.view.AbstractSurfView
 import dev.slne.surf.settings.api.SurfSettingsApi
+import dev.slne.surf.settings.paper.SettingKeys
+import dev.slne.surf.settings.paper.menu.SettingsMenu
 import dev.slne.surf.settings.paper.menu.localColored
 import dev.slne.surf.settings.paper.menu.playClickSound
-import dev.slne.surf.settings.paper.menu.settingsMenu
 import dev.slne.surf.settings.paper.plugin
+import me.devnatan.inventoryframework.ViewConfigBuilder
+import me.devnatan.inventoryframework.context.CloseContext
+import me.devnatan.inventoryframework.context.RenderContext
 import net.kyori.adventure.text.format.TextDecoration
 import org.bukkit.Material
 
-fun clanSettingsMenu(): AbstractSurfView = surfView("Clansystem") {
+object ClanSettingsMenu : AbstractSurfView("Clansystem") {
     val invites = mutableState(false)
     val chat = mutableState(false)
 
-    settings {
-        rows(5)
-        cancelAllInteractions()
+    val invitesInit = mutableState(false)
+    val chatInit = mutableState(false)
+
+    override fun onViewInit(config: ViewConfigBuilder) {
+        config.size(5).cancelInteractions()
     }
 
-    onFirstRender {
-        val player = this.player
+    override fun onViewRender(render: RenderContext) {
+        val p = render.player
 
-        invites[this] =
-            SurfSettingsApi.getPlayerSetting(player.uniqueId, "clan_invites")?.getBoolean() ?: true
-        chat[this] =
-            SurfSettingsApi.getPlayerSetting(player.uniqueId, "clan_chat_messages")?.getBoolean()
-                ?: true
+        val i = SurfSettingsApi.getSettingValue(p.uniqueId, SettingKeys.CLAN_INVITES)
+        val c = SurfSettingsApi.getSettingValue(p.uniqueId, SettingKeys.CLAN_CHAT_MESSAGES)
 
-        slot(3, 3) {
-            withItem(clanInvitesItem(invites[this@onFirstRender]))
+        invites.set(i, render)
+        chat.set(c, render)
+
+        invitesInit.set(i, render)
+        chatInit.set(c, render)
+
+        render.slot(3, 3) {
+            renderWith { clanInvitesItem(invites[render]) }
             onClick { click ->
-                val new = !invites[this@onFirstRender]
-                invites[this@onFirstRender] = new
+                val n = !invites[render]
+                invites.set(n, render)
                 click.player.sendText {
                     appendSuccessPrefix()
                     success("Du hast Clan Einladungen nun ")
-                    variableValue(if (new) "aktiviert" else "deaktiviert")
+                    variableValue(if (n) "aktiviert" else "deaktiviert")
                     success(".")
                 }
                 click.playClickSound()
             }
+            watch(invites)
         }
 
-        slot(3, 7) {
-            withItem(clanChatItem(chat[this@onFirstRender]))
+        render.slot(3, 7) {
+            renderWith { clanChatItem(chat[render]) }
             onClick { click ->
-                val new = !chat[this@onFirstRender]
-                chat[this@onFirstRender] = new
+                val n = !chat[render]
+                chat.set(n, render)
                 click.player.sendText {
                     appendSuccessPrefix()
                     success("Du hast Clan-Chat nun ")
-                    variableValue(if (new) "aktiviert" else "deaktiviert")
+                    variableValue(if (n) "aktiviert" else "deaktiviert")
                     success(".")
                 }
                 click.playClickSound()
             }
+            watch(chat)
         }
 
-        slot(5, 5) {
+        render.slot(5, 5) {
             withItem(buildItem(Material.BARRIER) {
-                displayName {
-                    localColored("Zurück".toSmallCaps(), TextDecoration.BOLD)
-                }
+                displayName { localColored("Zurück".toSmallCaps(), TextDecoration.BOLD) }
             })
             onClick { click ->
                 click.playClickSound()
-                click.openForPlayer(settingsMenu())
+                click.openForPlayer(SettingsMenu)
             }
         }
     }
 
-    onClose {
-        val player = this.player
-
+    override fun onViewClose(close: CloseContext) {
+        val p = close.player
         plugin.launch {
-            SurfSettingsApi.saveSetting(
-                player.uniqueId,
-                "clan_invites",
-                invites[this@onClose].toString()
-            )
-            SurfSettingsApi.saveSetting(
-                player.uniqueId,
-                "clan_chat_messages",
-                chat[this@onClose].toString()
-            )
+            if (invitesInit[close] != invites[close])
+                SurfSettingsApi.saveSetting(p.uniqueId, SettingKeys.CLAN_INVITES, invites[close])
+            if (chatInit[close] != chat[close])
+                SurfSettingsApi.saveSetting(p.uniqueId, SettingKeys.CLAN_CHAT_MESSAGES, chat[close])
         }
     }
 }
 
-private fun clanInvitesItem(currentState: Boolean) = buildItem(Material.FIREWORK_ROCKET) {
-    displayName {
-        localColored("Clan Einladungen".toSmallCaps(), TextDecoration.BOLD)
-    }
-
+private fun clanInvitesItem(state: Boolean) = buildItem(Material.FIREWORK_ROCKET) {
+    displayName { localColored("Clan Einladungen".toSmallCaps(), TextDecoration.BOLD) }
     buildLore {
         emptyLine()
-        line {
-            variableValue("Beschreibung:".toSmallCaps())
-        }
-
-        line {
-            localColored("Passe deine Clan Einstellungen an.")
-        }
-
+        line { variableValue("Beschreibung:".toSmallCaps()) }
+        line { localColored("Passe deine Clan Einstellungen an.") }
         emptyLine()
-        line {
-            variableValue("Status:".toSmallCaps())
-        }
-
-        line {
-            spacer("-")
-            appendSpace()
-            localColored(if (currentState) "Aktiviert" else "Deaktiviert")
-        }
-
+        line { variableValue("Status:".toSmallCaps()) }
+        line { spacer("-"); appendSpace(); localColored(if (state) "Aktiviert" else "Deaktiviert") }
         emptyLine()
-
-        line {
-            spacer("Klicke, um die Einstellung zu ändern")
-        }
+        line { spacer("Klicke, um die Einstellung zu ändern") }
     }
 }
 
-private fun clanChatItem(currentState: Boolean) = buildItem(Material.CLOCK) {
-    displayName {
-        localColored("Clan Chat".toSmallCaps(), TextDecoration.BOLD)
-    }
-
+private fun clanChatItem(state: Boolean) = buildItem(Material.CLOCK) {
+    displayName { localColored("Clan Chat".toSmallCaps(), TextDecoration.BOLD) }
     buildLore {
         emptyLine()
-        line {
-            variableValue("Beschreibung:".toSmallCaps())
-        }
-
-        line {
-            localColored("Passe deine Clan Einstellungen an.")
-        }
-
+        line { variableValue("Beschreibung:".toSmallCaps()) }
+        line { localColored("Passe deine Clan Einstellungen an.") }
         emptyLine()
-        line {
-            variableValue("Status:".toSmallCaps())
-        }
-
-        line {
-            spacer("-")
-            appendSpace()
-            localColored(if (currentState) "Aktiviert" else "Deaktiviert")
-        }
-
+        line { variableValue("Status:".toSmallCaps()) }
+        line { spacer("-"); appendSpace(); localColored(if (state) "Aktiviert" else "Deaktiviert") }
         emptyLine()
-
-        line {
-            spacer("Klicke, um die Einstellung zu ändern")
-        }
+        line { spacer("Klicke, um die Einstellung zu ändern") }
     }
 }
