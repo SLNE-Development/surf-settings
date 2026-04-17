@@ -6,56 +6,55 @@ import dev.slne.surf.api.paper.builder.displayName
 import dev.slne.surf.api.paper.inventory.framework.dsl.openForPlayer
 import dev.slne.surf.api.paper.inventory.framework.dsl.slot
 import dev.slne.surf.api.paper.inventory.framework.view.AbstractSurfView
-import dev.slne.surf.api.paper.inventory.framework.view.onFirstRender
-import dev.slne.surf.api.paper.inventory.framework.view.settings
-import dev.slne.surf.api.paper.inventory.framework.view.surfView
-import dev.slne.surf.settings.paper.menu.sub.chatSettingsMenu
-import dev.slne.surf.settings.paper.menu.sub.clanSettingsMenu
-import dev.slne.surf.settings.paper.menu.sub.friendSettingsMenu
-import dev.slne.surf.settings.paper.menu.sub.lobbySettingsMenu
+import dev.slne.surf.settings.paper.menu.sub.ChatSettingsMenu
+import dev.slne.surf.settings.paper.menu.sub.ClanSettingsMenu
+import dev.slne.surf.settings.paper.menu.sub.FriendSettingsMenu
+import dev.slne.surf.settings.paper.menu.sub.LobbySettingsMenu
+import me.devnatan.inventoryframework.ViewConfigBuilder
+import me.devnatan.inventoryframework.context.RenderContext
 import net.kyori.adventure.text.format.TextDecoration
 import org.bukkit.Material
 
-fun settingsMenu(): AbstractSurfView = surfView("Einstellungen") {
-    settings {
-        rows(5)
-        cancelAllInteractions()
+
+object SettingsMenu : AbstractSurfView("Einstellungen") {
+    override fun onViewInit(config: ViewConfigBuilder) {
+        config.size(6).cancelInteractions()
     }
 
-    onFirstRender {
-        slot(2, 3) {
+    override fun onViewRender(render: RenderContext) {
+        render.slot(2, 3) {
             withItem(chatItem())
             onClick { click ->
                 click.playClickSound()
-                click.openForPlayer(chatSettingsMenu())
+                click.openForPlayer(ChatSettingsMenu)
             }
         }
 
-        slot(2, 5) {
+        render.slot(2, 5) {
             withItem(lobbyItem())
             onClick { click ->
                 click.playClickSound()
-                click.openForPlayer(lobbySettingsMenu())
+                click.openForPlayer(LobbySettingsMenu)
             }
         }
 
-        slot(2, 7) {
+        render.slot(2, 7) {
             withItem(friendItem())
             onClick { click ->
                 click.playClickSound()
-                click.openForPlayer(friendSettingsMenu())
+                click.openForPlayer(FriendSettingsMenu)
             }
         }
 
-        slot(3, 5) {
+        render.slot(3, 5) {
             withItem(clanItem())
             onClick { click ->
                 click.playClickSound()
-                click.openForPlayer(clanSettingsMenu())
+                click.openForPlayer(ClanSettingsMenu)
             }
         }
 
-        slot(5, 5) {
+        render.slot(5, 5) {
             withItem(buildItem(Material.BARRIER) {
                 displayName {
                     localColored("Schließen".toSmallCaps(), TextDecoration.BOLD)

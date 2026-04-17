@@ -2,242 +2,172 @@ package dev.slne.surf.settings.paper.menu.sub
 
 import com.github.shynixn.mccoroutine.folia.launch
 import dev.slne.surf.api.core.font.toSmallCaps
-import dev.slne.surf.api.core.messages.adventure.playSound
 import dev.slne.surf.api.core.messages.adventure.sendText
-import dev.slne.surf.api.core.messages.builder.SurfComponentBuilder
 import dev.slne.surf.api.paper.builder.buildItem
 import dev.slne.surf.api.paper.builder.buildLore
 import dev.slne.surf.api.paper.builder.displayName
 import dev.slne.surf.api.paper.inventory.framework.dsl.openForPlayer
 import dev.slne.surf.api.paper.inventory.framework.dsl.slot
-import dev.slne.surf.api.paper.inventory.framework.view.*
-import dev.slne.surf.api.paper.inventory.framework.view.state.get
-import dev.slne.surf.api.paper.inventory.framework.view.state.mutableState
-import dev.slne.surf.api.paper.inventory.framework.view.state.set
+import dev.slne.surf.api.paper.inventory.framework.view.AbstractSurfView
 import dev.slne.surf.settings.api.SurfSettingsApi
+import dev.slne.surf.settings.paper.menu.SettingsMenu
 import dev.slne.surf.settings.paper.menu.localColored
 import dev.slne.surf.settings.paper.menu.playClickSound
-import dev.slne.surf.settings.paper.menu.settingsMenu
 import dev.slne.surf.settings.paper.plugin
-import me.devnatan.inventoryframework.context.SlotClickContext
-import net.kyori.adventure.text.format.TextColor
+import me.devnatan.inventoryframework.ViewConfigBuilder
+import me.devnatan.inventoryframework.context.CloseContext
+import me.devnatan.inventoryframework.context.RenderContext
 import net.kyori.adventure.text.format.TextDecoration
 import org.bukkit.Material
-import org.bukkit.Sound
 
-fun chatSettingsMenu(): AbstractSurfView = surfView("Chat") {
-    val pingsHolder = mutableState(false)
-    val deathMessageHolder = mutableState(false)
-    val directMessageHolder = mutableState(false)
+object ChatSettingsMenu : AbstractSurfView("Chat") {
 
-    settings {
-        rows(5)
-        cancelAllInteractions()
+    val pings = mutableState(false)
+    val death = mutableState(false)
+    val direct = mutableState(false)
+
+    val pingsInit = mutableState(false)
+    val deathInit = mutableState(false)
+    val directInit = mutableState(false)
+
+    override fun onViewInit(config: ViewConfigBuilder) {
+        config.size(5).cancelInteractions()
     }
 
-    onFirstRender {
-        val player = this.player
+    override fun onViewRender(render: RenderContext) {
+        val p = render.player
 
-        pingsHolder[this] =
-            SurfSettingsApi.getPlayerSetting(player.uniqueId, "chat_pings")?.getBoolean() ?: true
-        deathMessageHolder[this] =
-            SurfSettingsApi.getPlayerSetting(player.uniqueId, "chat_deathmessages")?.getBoolean()
-                ?: true
-        directMessageHolder[this] =
-            SurfSettingsApi.getPlayerSetting(player.uniqueId, "direct_messages")?.getBoolean()
-                ?: true
+        val pv = SurfSettingsApi.getPlayerSetting(p.uniqueId, "chat_pings")?.getBoolean() ?: true
+        val dv =
+            SurfSettingsApi.getPlayerSetting(p.uniqueId, "chat_deathmessages")?.getBoolean() ?: true
+        val dm =
+            SurfSettingsApi.getPlayerSetting(p.uniqueId, "direct_messages")?.getBoolean() ?: true
 
-        slot(3, 3) {
-            withItem(chatPingsItem(pingsHolder[this@onFirstRender]))
+        pings.set(pv, render)
+        death.set(dv, render)
+        direct.set(dm, render)
+
+        pingsInit.set(pv, render)
+        deathInit.set(dv, render)
+        directInit.set(dm, render)
+
+        render.slot(3, 3) {
+            renderWith { chatPingsItem(pings[render]) }
             onClick { click ->
-                val newValue = !pingsHolder[this@onFirstRender]
-                pingsHolder[this@onFirstRender] = newValue
-
+                val n = !pings[render]
+                pings.set(n, render)
                 click.player.sendText {
                     appendSuccessPrefix()
                     success("Du hast Chat Pings nun ")
-                    variableValue(if (newValue) "aktiviert" else "deaktiviert")
+                    variableValue(if (n) "aktiviert" else "deaktiviert")
                     success(".")
                 }
                 click.playClickSound()
             }
+            watch(pings)
         }
 
-        slot(3, 5) {
-            withItem(deathMessagesItem(deathMessageHolder[this@onFirstRender]))
+        render.slot(3, 5) {
+            renderWith { deathMessagesItem(death[render]) }
             onClick { click ->
-                val newValue = !deathMessageHolder[this@onFirstRender]
-                deathMessageHolder[this@onFirstRender] = newValue
-
+                val n = !death[render]
+                death.set(n, render)
                 click.player.sendText {
                     appendSuccessPrefix()
                     success("Du hast Todesnachrichten nun ")
-                    variableValue(if (newValue) "aktiviert" else "deaktiviert")
+                    variableValue(if (n) "aktiviert" else "deaktiviert")
                     success(".")
                 }
                 click.playClickSound()
             }
+            watch(death)
         }
 
-        slot(3, 7) {
-            withItem(directMessagesItem(directMessageHolder[this@onFirstRender]))
+        render.slot(3, 7) {
+            renderWith { directMessagesItem(direct[render]) }
             onClick { click ->
-                val newValue = !directMessageHolder[this@onFirstRender]
-                directMessageHolder[this@onFirstRender] = newValue
-
+                val n = !direct[render]
+                direct.set(n, render)
                 click.player.sendText {
                     appendSuccessPrefix()
                     success("Du hast Direktnachrichten nun ")
-                    variableValue(if (newValue) "aktiviert" else "deaktiviert")
+                    variableValue(if (n) "aktiviert" else "deaktiviert")
                     success(".")
                 }
                 click.playClickSound()
             }
+            watch(direct)
         }
 
-        slot(5, 5) {
+        render.slot(5, 5) {
             withItem(buildItem(Material.BARRIER) {
-                displayName {
-                    localColored("Zurück".toSmallCaps(), TextDecoration.BOLD)
-                }
+                displayName { localColored("Zurück".toSmallCaps(), TextDecoration.BOLD) }
             })
             onClick { click ->
                 click.playClickSound()
-                click.openForPlayer(settingsMenu())
+                click.openForPlayer(SettingsMenu)
             }
         }
     }
 
-    onClose {
-        val player = this.player
-
+    override fun onViewClose(close: CloseContext) {
+        val p = close.player
         plugin.launch {
-            SurfSettingsApi.saveSetting(
-                player.uniqueId,
-                "chat_pings",
-                pingsHolder[this@onClose].toString()
-            )
-            SurfSettingsApi.saveSetting(
-                player.uniqueId,
-                "chat_deathmessages",
-                deathMessageHolder[this@onClose].toString()
-            )
-            SurfSettingsApi.saveSetting(
-                player.uniqueId,
-                "direct_messages",
-                directMessageHolder[this@onClose].toString()
-            )
+            if (pingsInit[close] != pings[close]) {
+                SurfSettingsApi.saveSetting(p.uniqueId, "chat_pings", pings[close].toString())
+            }
+            if (deathInit[close] != death[close]) {
+                SurfSettingsApi.saveSetting(
+                    p.uniqueId,
+                    "chat_deathmessages",
+                    death[close].toString()
+                )
+            }
+            if (directInit[close] != direct[close]) {
+                SurfSettingsApi.saveSetting(p.uniqueId, "direct_messages", direct[close].toString())
+            }
         }
     }
 }
 
-private fun SlotClickContext.playClickSound() {
-    this.player.playSound(true) {
-        type(Sound.UI_BUTTON_CLICK)
-    }
-}
-
-private fun chatPingsItem(currentState: Boolean) = buildItem(Material.BELL) {
-    displayName {
-        localColored("Chat Pings".toSmallCaps(), TextDecoration.BOLD)
-    }
-
+private fun chatPingsItem(state: Boolean) = buildItem(Material.BELL) {
+    displayName { localColored("Chat Pings".toSmallCaps(), TextDecoration.BOLD) }
     buildLore {
         emptyLine()
-        line {
-            variableValue("Beschreibung:".toSmallCaps())
-        }
-
-        line {
-            localColored("Passe deine Chat Einstellungen an.")
-        }
-
+        line { variableValue("Beschreibung:".toSmallCaps()) }
+        line { localColored("Passe deine Chat Einstellungen an.") }
         emptyLine()
-        line {
-            variableValue("Status:".toSmallCaps())
-        }
-
-        line {
-            spacer("-")
-            appendSpace()
-            localColored(if (currentState) "Aktiviert" else "Deaktiviert")
-        }
-
+        line { variableValue("Status:".toSmallCaps()) }
+        line { spacer("-"); appendSpace(); localColored(if (state) "Aktiviert" else "Deaktiviert") }
         emptyLine()
-
-        line {
-            spacer("Klicke, um die Einstellung zu ändern")
-        }
-    }
-}
-
-private fun directMessagesItem(currentState: Boolean) = buildItem(Material.RED_DYE) {
-    displayName {
-        localColored("Direktnachrichten".toSmallCaps(), TextDecoration.BOLD)
-    }
-
-    buildLore {
-        emptyLine()
-        line {
-            variableValue("Beschreibung:".toSmallCaps())
-        }
-
-        line {
-            localColored("Passe deine Chat Einstellungen an.")
-        }
-
-        emptyLine()
-        line {
-            variableValue("Status:".toSmallCaps())
-        }
-
-        line {
-            spacer("-")
-            appendSpace()
-            localColored(if (currentState) "Aktiviert" else "Deaktiviert")
-        }
-
-        emptyLine()
-
-        line {
-            spacer("Klicke, um die Einstellung zu ändern")
-        }
+        line { spacer("Klicke, um die Einstellung zu ändern") }
     }
 }
 
 private fun deathMessagesItem(state: Boolean) = buildItem(Material.SKELETON_SKULL) {
-    displayName {
-        localColored("Todesnachrichten".toSmallCaps(), TextDecoration.BOLD)
-    }
-
+    displayName { localColored("Todesnachrichten".toSmallCaps(), TextDecoration.BOLD) }
     buildLore {
         emptyLine()
-        line {
-            variableValue("Beschreibung:".toSmallCaps())
-        }
-
-        line {
-            localColored("Passe deine Chat Einstellungen an.")
-        }
-
+        line { variableValue("Beschreibung:".toSmallCaps()) }
+        line { localColored("Passe deine Chat Einstellungen an.") }
         emptyLine()
-        line {
-            variableValue("Status:".toSmallCaps())
-        }
-
-        line {
-            spacer("-")
-            appendSpace()
-            localColored(if (state) "Aktiviert" else "Deaktiviert")
-        }
-
+        line { variableValue("Status:".toSmallCaps()) }
+        line { spacer("-"); appendSpace(); localColored(if (state) "Aktiviert" else "Deaktiviert") }
         emptyLine()
-
-        line {
-            spacer("Klicke, um die Einstellung zu ändern")
-        }
+        line { spacer("Klicke, um die Einstellung zu ändern") }
     }
 }
 
-private fun SurfComponentBuilder.localColored(text: Any, vararg decoration: TextDecoration) =
-    text(text.toString(), TextColor.fromHexString("#42f590"), *decoration)
+private fun directMessagesItem(state: Boolean) = buildItem(Material.RED_DYE) {
+    displayName { localColored("Direktnachrichten".toSmallCaps(), TextDecoration.BOLD) }
+    buildLore {
+        emptyLine()
+        line { variableValue("Beschreibung:".toSmallCaps()) }
+        line { localColored("Passe deine Chat Einstellungen an.") }
+        emptyLine()
+        line { variableValue("Status:".toSmallCaps()) }
+        line { spacer("-"); appendSpace(); localColored(if (state) "Aktiviert" else "Deaktiviert") }
+        emptyLine()
+        line { spacer("Klicke, um die Einstellung zu ändern") }
+    }
+}

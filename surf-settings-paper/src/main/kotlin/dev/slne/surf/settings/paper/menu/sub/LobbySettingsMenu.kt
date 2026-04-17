@@ -8,38 +8,47 @@ import dev.slne.surf.api.paper.builder.buildLore
 import dev.slne.surf.api.paper.builder.displayName
 import dev.slne.surf.api.paper.inventory.framework.dsl.openForPlayer
 import dev.slne.surf.api.paper.inventory.framework.dsl.slot
-import dev.slne.surf.api.paper.inventory.framework.view.*
-import dev.slne.surf.api.paper.inventory.framework.view.state.get
-import dev.slne.surf.api.paper.inventory.framework.view.state.mutableState
-import dev.slne.surf.api.paper.inventory.framework.view.state.set
+import dev.slne.surf.api.paper.inventory.framework.view.AbstractSurfView
 import dev.slne.surf.settings.api.SurfSettingsApi
+import dev.slne.surf.settings.paper.menu.SettingsMenu
 import dev.slne.surf.settings.paper.menu.localColored
 import dev.slne.surf.settings.paper.menu.playClickSound
-import dev.slne.surf.settings.paper.menu.settingsMenu
 import dev.slne.surf.settings.paper.plugin
+import me.devnatan.inventoryframework.ViewConfigBuilder
+import me.devnatan.inventoryframework.context.CloseContext
+import me.devnatan.inventoryframework.context.RenderContext
 import net.kyori.adventure.text.format.TextDecoration
 import org.bukkit.Material
 
-fun lobbySettingsMenu(): AbstractSurfView = surfView("Lobby") {
+object LobbySettingsMenu : AbstractSurfView("Lobby") {
     val scroll = mutableState(false)
+    val joinScroll = mutableState(false)
 
-    settings {
-        rows(5)
-        cancelAllInteractions()
+    override fun onViewInit(config: ViewConfigBuilder) {
+        config.size(5).cancelInteractions()
     }
 
-    onFirstRender {
-        val player = this.player
+    override fun onViewRender(render: RenderContext) {
+        val player = render.player
 
-        scroll[this] =
+        scroll.set(
             SurfSettingsApi.getPlayerSetting(player.uniqueId, "lobby_scroll_sound")?.getBoolean()
-                ?: false
+                ?: false, render
+        )
 
-        slot(3, 5) {
-            withItem(lobbyScrollItem(scroll[this@onFirstRender]))
+        joinScroll.set(
+            SurfSettingsApi.getPlayerSetting(player.uniqueId, "lobby_scroll_sound")?.getBoolean()
+                ?: false, render
+        )
+
+        render.slot(3, 5) {
+            renderWith {
+                lobbyScrollItem(scroll[render])
+            }
             onClick { click ->
-                val new = !scroll[this@onFirstRender]
-                scroll[this@onFirstRender] = new
+                val new = !scroll[render]
+                scroll.set(new, render)
+
                 click.player.sendText {
                     appendSuccessPrefix()
                     success("Du hast Scroll Sounds nun ")
@@ -48,9 +57,10 @@ fun lobbySettingsMenu(): AbstractSurfView = surfView("Lobby") {
                 }
                 click.playClickSound()
             }
+            watch(scroll)
         }
 
-        slot(5, 5) {
+        render.slot(5, 5) {
             withItem(buildItem(Material.BARRIER) {
                 displayName {
                     localColored("Zurück".toSmallCaps(), TextDecoration.BOLD)
@@ -58,20 +68,22 @@ fun lobbySettingsMenu(): AbstractSurfView = surfView("Lobby") {
             })
             onClick { click ->
                 click.playClickSound()
-                click.openForPlayer(settingsMenu())
+                click.openForPlayer(SettingsMenu)
             }
         }
     }
 
-    onClose {
-        val player = this.player
+    override fun onViewClose(close: CloseContext) {
+        val player = close.player
 
         plugin.launch {
-            SurfSettingsApi.saveSetting(
-                player.uniqueId,
-                "lobby_scroll_sound",
-                scroll[this@onClose].toString()
-            )
+            if (joinScroll[close] != scroll[close]) {
+                SurfSettingsApi.saveSetting(
+                    player.uniqueId,
+                    "lobby_scroll_sound",
+                    scroll.get(close).toString()
+                )
+            }
         }
     }
 }

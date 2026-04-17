@@ -6,7 +6,7 @@ import dev.slne.surf.settings.api.SurfSettingsApi
 import dev.slne.surf.settings.api.setting.PlayerSetting
 import dev.slne.surf.settings.api.setting.Setting
 import dev.slne.surf.settings.core.common.service.SettingsService
-import dev.slne.surf.settings.paper.menu.settingsMenu
+import dev.slne.surf.settings.paper.menu.SettingsMenu
 import it.unimi.dsi.fastutil.objects.ObjectSet
 import net.kyori.adventure.util.Services
 import org.bukkit.Bukkit
@@ -53,7 +53,7 @@ class SurfSettingsApiImpl : SurfSettingsApi, Services.Fallback {
     override fun getSettings(): ObjectSet<Setting> = SettingsService.settings
     override fun openSettingsGui(playerUuid: UUID) {
         Bukkit.getPlayer(playerUuid)?.let {
-            settingsMenu().open(it)
+            SettingsMenu.open(it)
         }
     }
 }

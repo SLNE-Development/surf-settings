@@ -9,11 +9,11 @@ import dev.slne.surf.settings.core.paper.PaperSettingsInstance
 import dev.slne.surf.settings.paper.command.settingsCommand
 import dev.slne.surf.settings.paper.command.surfSettingsCommand
 import dev.slne.surf.settings.paper.listener.PlayerConnectionListener
-import dev.slne.surf.settings.paper.menu.settingsMenu
-import dev.slne.surf.settings.paper.menu.sub.chatSettingsMenu
-import dev.slne.surf.settings.paper.menu.sub.clanSettingsMenu
-import dev.slne.surf.settings.paper.menu.sub.friendSettingsMenu
-import dev.slne.surf.settings.paper.menu.sub.lobbySettingsMenu
+import dev.slne.surf.settings.paper.menu.SettingsMenu
+import dev.slne.surf.settings.paper.menu.sub.ChatSettingsMenu
+import dev.slne.surf.settings.paper.menu.sub.ClanSettingsMenu
+import dev.slne.surf.settings.paper.menu.sub.FriendSettingsMenu
+import dev.slne.surf.settings.paper.menu.sub.LobbySettingsMenu
 import org.bukkit.plugin.java.JavaPlugin
 
 val plugin get() = JavaPlugin.getPlugin(PaperMain::class.java)
@@ -22,11 +22,11 @@ class PaperMain : SuspendingJavaPlugin() {
     override suspend fun onLoadAsync() {
         PaperSettingsInstance.paperLoader.onLoad()
 
-        chatSettingsMenu().register()
-        clanSettingsMenu().register()
-        friendSettingsMenu().register()
-        lobbySettingsMenu().register()
-        settingsMenu().register()
+        ChatSettingsMenu.register()
+        ClanSettingsMenu.register()
+        FriendSettingsMenu.register()
+        LobbySettingsMenu.register()
+        SettingsMenu.register()
     }
 
     override suspend fun onEnableAsync() {
