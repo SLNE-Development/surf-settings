@@ -10,6 +10,7 @@ import dev.slne.surf.api.paper.inventory.framework.dsl.openForPlayer
 import dev.slne.surf.api.paper.inventory.framework.dsl.slot
 import dev.slne.surf.api.paper.inventory.framework.view.AbstractSurfView
 import dev.slne.surf.settings.api.SurfSettingsApi
+import dev.slne.surf.settings.paper.SettingKeys
 import dev.slne.surf.settings.paper.menu.SettingsMenu
 import dev.slne.surf.settings.paper.menu.localColored
 import dev.slne.surf.settings.paper.menu.playClickSound
@@ -32,13 +33,11 @@ object LobbySettingsMenu : AbstractSurfView("Lobby") {
         val player = render.player
 
         scroll.set(
-            SurfSettingsApi.getPlayerSetting(player.uniqueId, "lobby_scroll_sound")?.getBoolean()
-                ?: false, render
+            SurfSettingsApi.getSettingValue(player.uniqueId, SettingKeys.LOBBY_SCROLL_SOUND), render
         )
 
         joinScroll.set(
-            SurfSettingsApi.getPlayerSetting(player.uniqueId, "lobby_scroll_sound")?.getBoolean()
-                ?: false, render
+            SurfSettingsApi.getSettingValue(player.uniqueId, SettingKeys.LOBBY_SCROLL_SOUND), render
         )
 
         render.slot(3, 5) {
@@ -80,8 +79,8 @@ object LobbySettingsMenu : AbstractSurfView("Lobby") {
             if (joinScroll[close] != scroll[close]) {
                 SurfSettingsApi.saveSetting(
                     player.uniqueId,
-                    "lobby_scroll_sound",
-                    scroll.get(close).toString()
+                    SettingKeys.LOBBY_SCROLL_SOUND,
+                    scroll.get(close)
                 )
             }
         }

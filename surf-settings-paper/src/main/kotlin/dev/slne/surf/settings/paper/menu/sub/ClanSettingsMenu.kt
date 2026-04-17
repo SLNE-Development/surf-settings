@@ -10,6 +10,7 @@ import dev.slne.surf.api.paper.inventory.framework.dsl.openForPlayer
 import dev.slne.surf.api.paper.inventory.framework.dsl.slot
 import dev.slne.surf.api.paper.inventory.framework.view.AbstractSurfView
 import dev.slne.surf.settings.api.SurfSettingsApi
+import dev.slne.surf.settings.paper.SettingKeys
 import dev.slne.surf.settings.paper.menu.SettingsMenu
 import dev.slne.surf.settings.paper.menu.localColored
 import dev.slne.surf.settings.paper.menu.playClickSound
@@ -34,9 +35,8 @@ object ClanSettingsMenu : AbstractSurfView("Clansystem") {
     override fun onViewRender(render: RenderContext) {
         val p = render.player
 
-        val i = SurfSettingsApi.getPlayerSetting(p.uniqueId, "clan_invites")?.getBoolean() ?: true
-        val c =
-            SurfSettingsApi.getPlayerSetting(p.uniqueId, "clan_chat_messages")?.getBoolean() ?: true
+        val i = SurfSettingsApi.getSettingValue(p.uniqueId, SettingKeys.CLAN_INVITES)
+        val c = SurfSettingsApi.getSettingValue(p.uniqueId, SettingKeys.CLAN_CHAT_MESSAGES)
 
         invites.set(i, render)
         chat.set(c, render)
@@ -91,13 +91,9 @@ object ClanSettingsMenu : AbstractSurfView("Clansystem") {
         val p = close.player
         plugin.launch {
             if (invitesInit[close] != invites[close])
-                SurfSettingsApi.saveSetting(p.uniqueId, "clan_invites", invites[close].toString())
+                SurfSettingsApi.saveSetting(p.uniqueId, SettingKeys.CLAN_INVITES, invites[close])
             if (chatInit[close] != chat[close])
-                SurfSettingsApi.saveSetting(
-                    p.uniqueId,
-                    "clan_chat_messages",
-                    chat[close].toString()
-                )
+                SurfSettingsApi.saveSetting(p.uniqueId, SettingKeys.CLAN_CHAT_MESSAGES, chat[close])
         }
     }
 }

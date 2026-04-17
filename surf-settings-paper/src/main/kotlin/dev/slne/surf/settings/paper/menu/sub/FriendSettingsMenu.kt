@@ -10,6 +10,7 @@ import dev.slne.surf.api.paper.inventory.framework.dsl.openForPlayer
 import dev.slne.surf.api.paper.inventory.framework.dsl.slot
 import dev.slne.surf.api.paper.inventory.framework.view.AbstractSurfView
 import dev.slne.surf.settings.api.SurfSettingsApi
+import dev.slne.surf.settings.paper.SettingKeys
 import dev.slne.surf.settings.paper.menu.SettingsMenu
 import dev.slne.surf.settings.paper.menu.localColored
 import dev.slne.surf.settings.paper.menu.playClickSound
@@ -36,12 +37,9 @@ object FriendSettingsMenu : AbstractSurfView("Freundesystem") {
     override fun onViewRender(render: RenderContext) {
         val p = render.player
 
-        val r = SurfSettingsApi.getPlayerSetting(p.uniqueId, "friend-request-notifications-enabled")
-            ?.getBoolean() ?: true
-        val n = SurfSettingsApi.getPlayerSetting(p.uniqueId, "friend-notifications-enabled")
-            ?.getBoolean() ?: true
-        val s = SurfSettingsApi.getPlayerSetting(p.uniqueId, "friend-sounds-enabled")?.getBoolean()
-            ?: true
+        val r = SurfSettingsApi.getSettingValue(p.uniqueId, SettingKeys.FRIEND_REQUEST_NOTIFICATIONS)
+        val n = SurfSettingsApi.getSettingValue(p.uniqueId, SettingKeys.FRIEND_NOTIFICATIONS)
+        val s = SurfSettingsApi.getSettingValue(p.uniqueId, SettingKeys.FRIEND_SOUNDS)
 
         requests.set(r, render)
         notify.set(n, render)
@@ -114,23 +112,11 @@ object FriendSettingsMenu : AbstractSurfView("Freundesystem") {
         val p = close.player
         plugin.launch {
             if (rInit[close] != requests[close])
-                SurfSettingsApi.saveSetting(
-                    p.uniqueId,
-                    "friend-request-notifications-enabled",
-                    requests[close].toString()
-                )
+                SurfSettingsApi.saveSetting(p.uniqueId, SettingKeys.FRIEND_REQUEST_NOTIFICATIONS, requests[close])
             if (nInit[close] != notify[close])
-                SurfSettingsApi.saveSetting(
-                    p.uniqueId,
-                    "friend-notifications-enabled",
-                    notify[close].toString()
-                )
+                SurfSettingsApi.saveSetting(p.uniqueId, SettingKeys.FRIEND_NOTIFICATIONS, notify[close])
             if (sInit[close] != sounds[close])
-                SurfSettingsApi.saveSetting(
-                    p.uniqueId,
-                    "friend-sounds-enabled",
-                    sounds[close].toString()
-                )
+                SurfSettingsApi.saveSetting(p.uniqueId, SettingKeys.FRIEND_SOUNDS, sounds[close])
         }
     }
 }

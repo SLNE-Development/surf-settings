@@ -10,6 +10,7 @@ import dev.slne.surf.api.paper.inventory.framework.dsl.openForPlayer
 import dev.slne.surf.api.paper.inventory.framework.dsl.slot
 import dev.slne.surf.api.paper.inventory.framework.view.AbstractSurfView
 import dev.slne.surf.settings.api.SurfSettingsApi
+import dev.slne.surf.settings.paper.SettingKeys
 import dev.slne.surf.settings.paper.menu.SettingsMenu
 import dev.slne.surf.settings.paper.menu.localColored
 import dev.slne.surf.settings.paper.menu.playClickSound
@@ -37,11 +38,9 @@ object ChatSettingsMenu : AbstractSurfView("Chat") {
     override fun onViewRender(render: RenderContext) {
         val p = render.player
 
-        val pv = SurfSettingsApi.getPlayerSetting(p.uniqueId, "chat_pings")?.getBoolean() ?: true
-        val dv =
-            SurfSettingsApi.getPlayerSetting(p.uniqueId, "chat_deathmessages")?.getBoolean() ?: true
-        val dm =
-            SurfSettingsApi.getPlayerSetting(p.uniqueId, "direct_messages")?.getBoolean() ?: true
+        val pv = SurfSettingsApi.getSettingValue(p.uniqueId, SettingKeys.CHAT_PINGS)
+        val dv = SurfSettingsApi.getSettingValue(p.uniqueId, SettingKeys.CHAT_DEATH_MESSAGES)
+        val dm = SurfSettingsApi.getSettingValue(p.uniqueId, SettingKeys.DIRECT_MESSAGES)
 
         pings.set(pv, render)
         death.set(dv, render)
@@ -114,17 +113,13 @@ object ChatSettingsMenu : AbstractSurfView("Chat") {
         val p = close.player
         plugin.launch {
             if (pingsInit[close] != pings[close]) {
-                SurfSettingsApi.saveSetting(p.uniqueId, "chat_pings", pings[close].toString())
+                SurfSettingsApi.saveSetting(p.uniqueId, SettingKeys.CHAT_PINGS, pings[close])
             }
             if (deathInit[close] != death[close]) {
-                SurfSettingsApi.saveSetting(
-                    p.uniqueId,
-                    "chat_deathmessages",
-                    death[close].toString()
-                )
+                SurfSettingsApi.saveSetting(p.uniqueId, SettingKeys.CHAT_DEATH_MESSAGES, death[close])
             }
             if (directInit[close] != direct[close]) {
-                SurfSettingsApi.saveSetting(p.uniqueId, "direct_messages", direct[close].toString())
+                SurfSettingsApi.saveSetting(p.uniqueId, SettingKeys.DIRECT_MESSAGES, direct[close])
             }
         }
     }

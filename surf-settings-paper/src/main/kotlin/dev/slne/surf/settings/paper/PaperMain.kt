@@ -39,16 +39,15 @@ class PaperMain : SuspendingJavaPlugin() {
         settingsCommand()
 
         // @formatter:off
-        SurfSettingsApi.createSetting("chat_pings", true.toString())
-        SurfSettingsApi.createSetting("chat_deathmessages", true.toString())
-        SurfSettingsApi.createSetting("direct_messages", true.toString())
-        SurfSettingsApi.createSetting("lobby_scroll_sound", false.toString())
-        SurfSettingsApi.createSetting("clan_invites", true.toString())
-        SurfSettingsApi.createSetting("clan_chat_messages", true.toString())
-        SurfSettingsApi.createSetting("friend-request-notifications-enabled", true.toString())
-        SurfSettingsApi.createSetting("friend-notifications-enabled", true.toString())
-        SurfSettingsApi.createSetting("friend-sounds-enabled", true.toString())
-
+        SurfSettingsApi.createSetting(SettingKeys.CHAT_PINGS)
+        SurfSettingsApi.createSetting(SettingKeys.CHAT_DEATH_MESSAGES)
+        SurfSettingsApi.createSetting(SettingKeys.DIRECT_MESSAGES)
+        SurfSettingsApi.createSetting(SettingKeys.LOBBY_SCROLL_SOUND)
+        SurfSettingsApi.createSetting(SettingKeys.CLAN_INVITES)
+        SurfSettingsApi.createSetting(SettingKeys.CLAN_CHAT_MESSAGES)
+        SurfSettingsApi.createSetting(SettingKeys.FRIEND_REQUEST_NOTIFICATIONS)
+        SurfSettingsApi.createSetting(SettingKeys.FRIEND_NOTIFICATIONS)
+        SurfSettingsApi.createSetting(SettingKeys.FRIEND_SOUNDS)
         // @formatter:on
     }
 
