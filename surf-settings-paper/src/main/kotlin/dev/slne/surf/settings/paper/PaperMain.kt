@@ -4,6 +4,7 @@ import com.github.shynixn.mccoroutine.folia.SuspendingJavaPlugin
 import dev.slne.surf.api.paper.event.register
 import dev.slne.surf.api.paper.inventory.framework.register
 import dev.slne.surf.settings.api.SurfSettingsApi
+import dev.slne.surf.settings.api.setting.SettingKeys
 import dev.slne.surf.settings.core.common.service.SettingsService
 import dev.slne.surf.settings.core.paper.PaperSettingsInstance
 import dev.slne.surf.settings.paper.command.settingsCommand

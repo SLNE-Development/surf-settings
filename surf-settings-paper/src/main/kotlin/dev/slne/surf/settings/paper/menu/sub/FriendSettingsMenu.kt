@@ -10,7 +10,7 @@ import dev.slne.surf.api.paper.inventory.framework.dsl.openForPlayer
 import dev.slne.surf.api.paper.inventory.framework.dsl.slot
 import dev.slne.surf.api.paper.inventory.framework.view.AbstractSurfView
 import dev.slne.surf.settings.api.SurfSettingsApi
-import dev.slne.surf.settings.paper.SettingKeys
+import dev.slne.surf.settings.api.setting.SettingKeys
 import dev.slne.surf.settings.paper.menu.SettingsMenu
 import dev.slne.surf.settings.paper.menu.localColored
 import dev.slne.surf.settings.paper.menu.playClickSound
@@ -37,7 +37,8 @@ object FriendSettingsMenu : AbstractSurfView("Freundesystem") {
     override fun onViewRender(render: RenderContext) {
         val p = render.player
 
-        val r = SurfSettingsApi.getSettingValue(p.uniqueId, SettingKeys.FRIEND_REQUEST_NOTIFICATIONS)
+        val r =
+            SurfSettingsApi.getSettingValue(p.uniqueId, SettingKeys.FRIEND_REQUEST_NOTIFICATIONS)
         val n = SurfSettingsApi.getSettingValue(p.uniqueId, SettingKeys.FRIEND_NOTIFICATIONS)
         val s = SurfSettingsApi.getSettingValue(p.uniqueId, SettingKeys.FRIEND_SOUNDS)
 
@@ -112,9 +113,17 @@ object FriendSettingsMenu : AbstractSurfView("Freundesystem") {
         val p = close.player
         plugin.launch {
             if (rInit[close] != requests[close])
-                SurfSettingsApi.saveSetting(p.uniqueId, SettingKeys.FRIEND_REQUEST_NOTIFICATIONS, requests[close])
+                SurfSettingsApi.saveSetting(
+                    p.uniqueId,
+                    SettingKeys.FRIEND_REQUEST_NOTIFICATIONS,
+                    requests[close]
+                )
             if (nInit[close] != notify[close])
-                SurfSettingsApi.saveSetting(p.uniqueId, SettingKeys.FRIEND_NOTIFICATIONS, notify[close])
+                SurfSettingsApi.saveSetting(
+                    p.uniqueId,
+                    SettingKeys.FRIEND_NOTIFICATIONS,
+                    notify[close]
+                )
             if (sInit[close] != sounds[close])
                 SurfSettingsApi.saveSetting(p.uniqueId, SettingKeys.FRIEND_SOUNDS, sounds[close])
         }

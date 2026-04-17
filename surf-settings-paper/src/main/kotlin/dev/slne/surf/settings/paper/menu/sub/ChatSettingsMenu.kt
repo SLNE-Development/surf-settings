@@ -10,7 +10,7 @@ import dev.slne.surf.api.paper.inventory.framework.dsl.openForPlayer
 import dev.slne.surf.api.paper.inventory.framework.dsl.slot
 import dev.slne.surf.api.paper.inventory.framework.view.AbstractSurfView
 import dev.slne.surf.settings.api.SurfSettingsApi
-import dev.slne.surf.settings.paper.SettingKeys
+import dev.slne.surf.settings.api.setting.SettingKeys
 import dev.slne.surf.settings.paper.menu.SettingsMenu
 import dev.slne.surf.settings.paper.menu.localColored
 import dev.slne.surf.settings.paper.menu.playClickSound
@@ -116,7 +116,11 @@ object ChatSettingsMenu : AbstractSurfView("Chat") {
                 SurfSettingsApi.saveSetting(p.uniqueId, SettingKeys.CHAT_PINGS, pings[close])
             }
             if (deathInit[close] != death[close]) {
-                SurfSettingsApi.saveSetting(p.uniqueId, SettingKeys.CHAT_DEATH_MESSAGES, death[close])
+                SurfSettingsApi.saveSetting(
+                    p.uniqueId,
+                    SettingKeys.CHAT_DEATH_MESSAGES,
+                    death[close]
+                )
             }
             if (directInit[close] != direct[close]) {
                 SurfSettingsApi.saveSetting(p.uniqueId, SettingKeys.DIRECT_MESSAGES, direct[close])
