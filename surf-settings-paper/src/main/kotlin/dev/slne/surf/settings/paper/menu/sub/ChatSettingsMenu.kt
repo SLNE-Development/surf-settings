@@ -22,14 +22,15 @@ import net.kyori.adventure.text.format.TextDecoration
 import org.bukkit.Material
 
 object ChatSettingsMenu : AbstractSurfView("Chat") {
+    private val pings = mutableState(false)
+    private val death = mutableState(false)
+    private val direct = mutableState(false)
+    private val connectionMessages = mutableState(false)
 
-    val pings = mutableState(false)
-    val death = mutableState(false)
-    val direct = mutableState(false)
-
-    val pingsInit = mutableState(false)
-    val deathInit = mutableState(false)
-    val directInit = mutableState(false)
+    private val pingsInit = mutableState(false)
+    private val deathInit = mutableState(false)
+    private val directInit = mutableState(false)
+    private val connectionMessagesInit = mutableState(false)
 
     override fun onViewInit(config: ViewConfigBuilder) {
         config.size(5).cancelInteractions()
@@ -41,16 +42,19 @@ object ChatSettingsMenu : AbstractSurfView("Chat") {
         val pv = SurfSettingsApi.getSettingValue(p.uniqueId, SettingKeys.CHAT_PINGS)
         val dv = SurfSettingsApi.getSettingValue(p.uniqueId, SettingKeys.CHAT_DEATH_MESSAGES)
         val dm = SurfSettingsApi.getSettingValue(p.uniqueId, SettingKeys.DIRECT_MESSAGES)
+        val cm = SurfSettingsApi.getSettingValue(p.uniqueId, SettingKeys.CONNECTION_MESSAGES)
 
         pings.set(pv, render)
         death.set(dv, render)
         direct.set(dm, render)
+        connectionMessages.set(cm, render)
 
         pingsInit.set(pv, render)
         deathInit.set(dv, render)
         directInit.set(dm, render)
+        connectionMessagesInit.set(cm, render)
 
-        render.slot(3, 3) {
+        render.slot(3, 2) {
             renderWith { chatPingsItem(pings[render]) }
             onClick { click ->
                 val n = !pings[render]
@@ -66,7 +70,7 @@ object ChatSettingsMenu : AbstractSurfView("Chat") {
             watch(pings)
         }
 
-        render.slot(3, 5) {
+        render.slot(3, 4) {
             renderWith { deathMessagesItem(death[render]) }
             onClick { click ->
                 val n = !death[render]
@@ -82,7 +86,23 @@ object ChatSettingsMenu : AbstractSurfView("Chat") {
             watch(death)
         }
 
-        render.slot(3, 7) {
+        render.slot(3, 6) {
+            renderWith { connectionMessagesItem(connectionMessages[render]) }
+            onClick { click ->
+                val n = !connectionMessages[render]
+                connectionMessages.set(n, render)
+                click.player.sendText {
+                    appendSuccessPrefix()
+                    success("Du hast Verbindungsnachrichten nun ")
+                    variableValue(if (n) "aktiviert" else "deaktiviert")
+                    success(".")
+                }
+                click.playClickSound()
+            }
+            watch(connectionMessages)
+        }
+
+        render.slot(3, 8) {
             renderWith { directMessagesItem(direct[render]) }
             onClick { click ->
                 val n = !direct[render]
@@ -125,48 +145,70 @@ object ChatSettingsMenu : AbstractSurfView("Chat") {
             if (directInit[close] != direct[close]) {
                 SurfSettingsApi.saveSetting(p.uniqueId, SettingKeys.DIRECT_MESSAGES, direct[close])
             }
+
+            if (connectionMessagesInit[close] != connectionMessages[close]) {
+                SurfSettingsApi.saveSetting(
+                    p.uniqueId,
+                    SettingKeys.CONNECTION_MESSAGES,
+                    connectionMessages[close]
+                )
+            }
         }
     }
-}
 
-private fun chatPingsItem(state: Boolean) = buildItem(Material.BELL) {
-    displayName { localColored("Chat Pings".toSmallCaps(), TextDecoration.BOLD) }
-    buildLore {
-        emptyLine()
-        line { variableValue("Beschreibung:".toSmallCaps()) }
-        line { localColored("Passe deine Chat Einstellungen an.") }
-        emptyLine()
-        line { variableValue("Status:".toSmallCaps()) }
-        line { spacer("-"); appendSpace(); localColored(if (state) "Aktiviert" else "Deaktiviert") }
-        emptyLine()
-        line { spacer("Klicke, um die Einstellung zu ändern") }
+    private fun chatPingsItem(state: Boolean) = buildItem(Material.BELL) {
+        displayName { localColored("Chat Pings".toSmallCaps(), TextDecoration.BOLD) }
+        buildLore {
+            emptyLine()
+            line { variableValue("Beschreibung:".toSmallCaps()) }
+            line { localColored("Passe deine Chat Einstellungen an.") }
+            emptyLine()
+            line { variableValue("Status:".toSmallCaps()) }
+            line { spacer("-"); appendSpace(); localColored(if (state) "Aktiviert" else "Deaktiviert") }
+            emptyLine()
+            line { spacer("Klicke, um die Einstellung zu ändern") }
+        }
     }
-}
 
-private fun deathMessagesItem(state: Boolean) = buildItem(Material.SKELETON_SKULL) {
-    displayName { localColored("Todesnachrichten".toSmallCaps(), TextDecoration.BOLD) }
-    buildLore {
-        emptyLine()
-        line { variableValue("Beschreibung:".toSmallCaps()) }
-        line { localColored("Passe deine Chat Einstellungen an.") }
-        emptyLine()
-        line { variableValue("Status:".toSmallCaps()) }
-        line { spacer("-"); appendSpace(); localColored(if (state) "Aktiviert" else "Deaktiviert") }
-        emptyLine()
-        line { spacer("Klicke, um die Einstellung zu ändern") }
+    private fun connectionMessagesItem(state: Boolean) = buildItem(Material.OAK_DOOR) {
+        displayName { localColored("Verbindungsnachrichten".toSmallCaps(), TextDecoration.BOLD) }
+        buildLore {
+            emptyLine()
+            line { variableValue("Beschreibung:".toSmallCaps()) }
+            line { localColored("Passe deine Chat Einstellungen an.") }
+            emptyLine()
+            line { variableValue("Status:".toSmallCaps()) }
+            line { spacer("-"); appendSpace(); localColored(if (state) "Aktiviert" else "Deaktiviert") }
+            emptyLine()
+            line { spacer("Klicke, um die Einstellung zu ändern") }
+        }
     }
-}
 
-private fun directMessagesItem(state: Boolean) = buildItem(Material.RED_DYE) {
-    displayName { localColored("Direktnachrichten".toSmallCaps(), TextDecoration.BOLD) }
-    buildLore {
-        emptyLine()
-        line { variableValue("Beschreibung:".toSmallCaps()) }
-        line { localColored("Passe deine Chat Einstellungen an.") }
-        emptyLine()
-        line { variableValue("Status:".toSmallCaps()) }
-        line { spacer("-"); appendSpace(); localColored(if (state) "Aktiviert" else "Deaktiviert") }
-        emptyLine()
-        line { spacer("Klicke, um die Einstellung zu ändern") }
+    private fun deathMessagesItem(state: Boolean) = buildItem(Material.SKELETON_SKULL) {
+        displayName { localColored("Todesnachrichten".toSmallCaps(), TextDecoration.BOLD) }
+        buildLore {
+            emptyLine()
+            line { variableValue("Beschreibung:".toSmallCaps()) }
+            line { localColored("Passe deine Chat Einstellungen an.") }
+            emptyLine()
+            line { variableValue("Status:".toSmallCaps()) }
+            line { spacer("-"); appendSpace(); localColored(if (state) "Aktiviert" else "Deaktiviert") }
+            emptyLine()
+            line { spacer("Klicke, um die Einstellung zu ändern") }
+        }
+    }
+
+    private fun directMessagesItem(state: Boolean) = buildItem(Material.RED_DYE) {
+        displayName { localColored("Direktnachrichten".toSmallCaps(), TextDecoration.BOLD) }
+        buildLore {
+            emptyLine()
+            line { variableValue("Beschreibung:".toSmallCaps()) }
+            line { localColored("Passe deine Chat Einstellungen an.") }
+            emptyLine()
+            line { variableValue("Status:".toSmallCaps()) }
+            line { spacer("-"); appendSpace(); localColored(if (state) "Aktiviert" else "Deaktiviert") }
+            emptyLine()
+            line { spacer("Klicke, um die Einstellung zu ändern") }
+        }
     }
 }
