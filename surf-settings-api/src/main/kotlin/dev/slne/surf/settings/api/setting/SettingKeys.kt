@@ -12,6 +12,10 @@ object SettingKeys {
         SettingKey.ofBoolean(key("chat", "death-messages"), defaultValue = true)
     val DIRECT_MESSAGES =
         SettingKey.ofBoolean(key("chat", "direct-messages"), defaultValue = true)
+    val CONNECTION_MESSAGES = SettingKey.ofBoolean(
+        key("chat", "connection-messages"),
+        defaultValue = true
+    )
 
     // Lobby
     val LOBBY_SCROLL_SOUND =
