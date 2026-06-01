@@ -17,6 +17,12 @@ interface SurfSettingsApi {
     fun <T : Any> getSettingValue(playerUuid: UUID, key: SettingKey<T>): T
 
     /**
+     * Gets the value of a setting for an offline player using a typesafe [SettingKey].
+     * Returns the cached value, or loaded from the database or the [SettingKey.defaultValue] if the player has no value set.
+     */
+    suspend fun <T : Any> getCachedValueOrLoad(playerUuid: UUID, key: SettingKey<T>): T
+
+    /**
      * Saves a typesafe setting value for a player.
      */
     suspend fun <T : Any> saveSetting(playerUuid: UUID, key: SettingKey<T>, value: T)
