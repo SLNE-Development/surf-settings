@@ -34,8 +34,9 @@ fun settingsCommand() = commandTree("settings") {
                 return@playerExecutor
             }
 
-            val playerSetting = SettingsService.getSettingForPlayer(player.uniqueId, setting.name)
-                ?: error("Setting not found")
+            val playerSetting =
+                SettingsService.getSettingForPlayerOrDefault(player.uniqueId, setting.name)
+                    ?: error("Setting not found")
 
             playerSetting.toggle()
 
@@ -69,7 +70,7 @@ fun settingsCommand() = commandTree("settings") {
                 }
 
                 val playerSetting =
-                    SettingsService.getSettingForPlayer(player.uniqueId, setting.name)
+                    SettingsService.getSettingForPlayerOrDefault(player.uniqueId, setting.name)
                         ?: error("Setting not found")
 
                 playerSetting.settingValue = state.toString()
@@ -96,7 +97,7 @@ fun settingsCommand() = commandTree("settings") {
                 val setting: Setting by args
 
                 val playerSetting =
-                    SettingsService.getSettingForPlayer(player.uniqueId, setting.name)
+                    SettingsService.getSettingForPlayerOrDefault(player.uniqueId, setting.name)
                         ?: error("Setting not found")
 
                 player.sendText {

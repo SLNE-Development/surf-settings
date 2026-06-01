@@ -26,7 +26,7 @@ class SettingServiceImpl : SettingsService, Services.Fallback {
     override fun getSettingsForPlayer(playerUuid: UUID): ObjectSet<PlayerSetting> =
         _playerSettings[playerUuid] ?: mutableObjectSetOf()
 
-    override fun getSettingForPlayer(
+    override fun getSettingForPlayerOrDefault(
         playerUuid: UUID,
         settingName: String
     ): PlayerSetting? =
@@ -37,6 +37,9 @@ class SettingServiceImpl : SettingsService, Services.Fallback {
                 settingValue = setting.defaultValue
             )
         }
+
+    override fun getSettingForPlayer(playerUuid: UUID, settingName: String): PlayerSetting? =
+        getSettingsForPlayer(playerUuid).firstOrNull { it.setting.name == settingName }
 
     override fun cachePlayerSetting(
         playerUuid: UUID,
