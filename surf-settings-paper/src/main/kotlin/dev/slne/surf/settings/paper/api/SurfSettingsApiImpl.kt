@@ -16,7 +16,19 @@ import java.util.*
 @AutoService(SurfSettingsApi::class)
 class SurfSettingsApiImpl : SurfSettingsApi, Services.Fallback {
     override fun <T : Any> getSettingValue(playerUuid: UUID, key: SettingKey<T>): T {
-        val playerSetting = SettingsService.getSettingForPlayer(playerUuid, key.name)
+        val playerSetting = SettingsService.getSettingForPlayerOrDefault(playerUuid, key.name)
+            ?: return key.defaultValue
+        return key.deserialize(playerSetting.settingValue)
+    }
+
+    override suspend fun <T : Any> getCachedValueOrLoad(playerUuid: UUID, key: SettingKey<T>): T {
+        val cached = SettingsService.getSettingForPlayer(playerUuid, key.name)
+
+        if (cached == null) {
+            SettingsService.cachePlayerSettings(playerUuid)
+        }
+
+        val playerSetting = SettingsService.getSettingForPlayerOrDefault(playerUuid, key.name)
             ?: return key.defaultValue
         return key.deserialize(playerSetting.settingValue)
     }
@@ -58,7 +70,7 @@ class SurfSettingsApiImpl : SurfSettingsApi, Services.Fallback {
         ReplaceWith("getSettingValue(playerUuid, key)")
     )
     override fun getPlayerSetting(playerUuid: UUID, settingName: String): PlayerSetting? =
-        SettingsService.getSettingForPlayer(playerUuid, settingName)
+        SettingsService.getSettingForPlayerOrDefault(playerUuid, settingName)
 
     @Deprecated("Use createSetting(key) instead.", ReplaceWith("createSetting(key)"))
     override suspend fun createSetting(name: String, defaultValue: String): Setting =

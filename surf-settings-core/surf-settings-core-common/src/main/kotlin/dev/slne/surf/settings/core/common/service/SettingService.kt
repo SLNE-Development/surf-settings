@@ -14,6 +14,7 @@ interface SettingsService {
 
     fun getSettingByName(name: String): Setting?
     fun getSettingsForPlayer(playerUuid: UUID): ObjectSet<PlayerSetting>
+    fun getSettingForPlayerOrDefault(playerUuid: UUID, settingName: String): PlayerSetting?
     fun getSettingForPlayer(playerUuid: UUID, settingName: String): PlayerSetting?
 
     fun cachePlayerSetting(playerUuid: UUID, playerSetting: PlayerSetting)
