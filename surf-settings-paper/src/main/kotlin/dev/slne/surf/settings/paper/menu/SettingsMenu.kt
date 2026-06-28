@@ -31,7 +31,7 @@ object SettingsMenu : AbstractSurfView("Einstellungen") {
         }
 
         render.slot(2, 5) {
-            withItem(lobbyItem())
+            withItem(otherItem())
             onClick { click ->
                 click.playClickSound()
                 click.openForPlayer(OtherSettingsMenu)
@@ -74,9 +74,9 @@ private fun chatItem() = buildItem(Material.BELL) {
     }
 }
 
-private fun lobbyItem() = buildItem(Material.GOLD_NUGGET) {
+private fun otherItem() = buildItem(Material.GOLD_NUGGET) {
     displayName {
-        localColored("Lobby Einstellungen".toSmallCaps(), TextDecoration.BOLD)
+        localColored("Allgemeine Einstellungen".toSmallCaps(), TextDecoration.BOLD)
     }
 }
 

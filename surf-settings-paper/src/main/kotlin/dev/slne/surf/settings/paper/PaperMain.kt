@@ -50,6 +50,7 @@ class PaperMain : SuspendingJavaPlugin() {
         SurfSettingsApi.createSetting(SettingKeys.FRIEND_REQUEST_NOTIFICATIONS)
         SurfSettingsApi.createSetting(SettingKeys.FRIEND_NOTIFICATIONS)
         SurfSettingsApi.createSetting(SettingKeys.FRIEND_SOUNDS)
+        SurfSettingsApi.createSetting(SettingKeys.SHOW_NAMETAGS)
         // @formatter:on
     }
 
