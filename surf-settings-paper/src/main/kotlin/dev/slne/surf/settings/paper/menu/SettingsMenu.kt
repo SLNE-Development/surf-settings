@@ -9,7 +9,7 @@ import dev.slne.surf.api.paper.inventory.framework.view.AbstractSurfView
 import dev.slne.surf.settings.paper.menu.sub.ChatSettingsMenu
 import dev.slne.surf.settings.paper.menu.sub.ClanSettingsMenu
 import dev.slne.surf.settings.paper.menu.sub.FriendSettingsMenu
-import dev.slne.surf.settings.paper.menu.sub.LobbySettingsMenu
+import dev.slne.surf.settings.paper.menu.sub.OtherSettingsMenu
 import me.devnatan.inventoryframework.ViewConfigBuilder
 import me.devnatan.inventoryframework.context.RenderContext
 import net.kyori.adventure.text.format.TextDecoration
@@ -34,7 +34,7 @@ object SettingsMenu : AbstractSurfView("Einstellungen") {
             withItem(lobbyItem())
             onClick { click ->
                 click.playClickSound()
-                click.openForPlayer(LobbySettingsMenu)
+                click.openForPlayer(OtherSettingsMenu)
             }
         }
 

@@ -38,4 +38,8 @@ object SettingKeys {
         )
     val FRIEND_SOUNDS =
         SettingKey.ofBoolean(key("friend", "sounds"), defaultValue = true)
+
+    // Nametag
+
+    val SHOW_NAMETAGS = SettingKey.ofBoolean(key("nametag", "show-nametags"), defaultValue = true)
 }

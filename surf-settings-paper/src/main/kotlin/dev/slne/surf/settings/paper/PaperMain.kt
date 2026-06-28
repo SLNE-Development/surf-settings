@@ -14,7 +14,7 @@ import dev.slne.surf.settings.paper.menu.SettingsMenu
 import dev.slne.surf.settings.paper.menu.sub.ChatSettingsMenu
 import dev.slne.surf.settings.paper.menu.sub.ClanSettingsMenu
 import dev.slne.surf.settings.paper.menu.sub.FriendSettingsMenu
-import dev.slne.surf.settings.paper.menu.sub.LobbySettingsMenu
+import dev.slne.surf.settings.paper.menu.sub.OtherSettingsMenu
 import org.bukkit.plugin.java.JavaPlugin
 
 val plugin get() = JavaPlugin.getPlugin(PaperMain::class.java)
@@ -26,7 +26,7 @@ class PaperMain : SuspendingJavaPlugin() {
         ChatSettingsMenu.register()
         ClanSettingsMenu.register()
         FriendSettingsMenu.register()
-        LobbySettingsMenu.register()
+        OtherSettingsMenu.register()
         SettingsMenu.register()
     }
 
