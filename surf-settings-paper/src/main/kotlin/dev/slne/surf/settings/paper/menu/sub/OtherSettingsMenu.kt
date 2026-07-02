@@ -21,9 +21,11 @@ import me.devnatan.inventoryframework.context.RenderContext
 import net.kyori.adventure.text.format.TextDecoration
 import org.bukkit.Material
 
-object LobbySettingsMenu : AbstractSurfView("Lobby") {
-    val scroll = mutableState(false)
-    val joinScroll = mutableState(false)
+object OtherSettingsMenu : AbstractSurfView("Allgemein") {
+    private val scroll = mutableState(false)
+    private val joinScroll = mutableState(false)
+    private val nametag = mutableState(false)
+    private val joinNametag = mutableState(false)
 
     override fun onViewInit(config: ViewConfigBuilder) {
         config.size(5).cancelInteractions()
@@ -33,14 +35,25 @@ object LobbySettingsMenu : AbstractSurfView("Lobby") {
         val player = render.player
 
         scroll.set(
-            SurfSettingsApi.getSettingValue(player.uniqueId, SettingKeys.LOBBY_SCROLL_SOUND), render
+            SurfSettingsApi.getSettingValue(player.uniqueId, SettingKeys.LOBBY_SCROLL_SOUND),
+            render
         )
-
         joinScroll.set(
-            SurfSettingsApi.getSettingValue(player.uniqueId, SettingKeys.LOBBY_SCROLL_SOUND), render
+            SurfSettingsApi.getSettingValue(
+                player.uniqueId,
+                SettingKeys.LOBBY_SCROLL_SOUND
+            ), render
+        )
+        nametag.set(
+            SurfSettingsApi.getSettingValue(player.uniqueId, SettingKeys.SHOW_NAMETAGS),
+            render
+        )
+        joinNametag.set(
+            SurfSettingsApi.getSettingValue(player.uniqueId, SettingKeys.SHOW_NAMETAGS),
+            render
         )
 
-        render.slot(3, 5) {
+        render.slot(3, 4) {
             renderWith {
                 lobbyScrollItem(scroll[render])
             }
@@ -57,6 +70,25 @@ object LobbySettingsMenu : AbstractSurfView("Lobby") {
                 click.playClickSound()
             }
             watch(scroll)
+        }
+
+        render.slot(3, 6) {
+            renderWith {
+                nameTagItem(nametag[render])
+            }
+            onClick { click ->
+                val new = !nametag[render]
+                nametag.set(new, render)
+
+                click.player.sendText {
+                    appendSuccessPrefix()
+                    success("Du hast Nametags nun ")
+                    variableValue(if (new) "aktiviert" else "deaktiviert")
+                    success(".")
+                }
+                click.playClickSound()
+            }
+            watch(nametag)
         }
 
         render.slot(5, 5) {
@@ -83,13 +115,21 @@ object LobbySettingsMenu : AbstractSurfView("Lobby") {
                     scroll.get(close)
                 )
             }
+
+            if (joinNametag[close] != nametag[close]) {
+                SurfSettingsApi.saveSetting(
+                    player.uniqueId,
+                    SettingKeys.SHOW_NAMETAGS,
+                    nametag.get(close)
+                )
+            }
         }
     }
 }
 
 private fun lobbyScrollItem(state: Boolean) = buildItem(Material.STONE_BUTTON) {
     displayName {
-        localColored("Hotbar Scroll Sounds".toSmallCaps(), TextDecoration.BOLD)
+        localColored("Lobby Hotbar Scroll Sounds".toSmallCaps(), TextDecoration.BOLD)
     }
 
     buildLore {
@@ -107,5 +147,32 @@ private fun lobbyScrollItem(state: Boolean) = buildItem(Material.STONE_BUTTON) {
 
         emptyLine()
         line { spacer("Klicke, um die Einstellung zu ändern") }
+    }
+}
+
+private fun nameTagItem(state: Boolean) = buildItem(Material.NAME_TAG) {
+    displayName {
+        localColored("Nametag Sichtbarkeit".toSmallCaps(), TextDecoration.BOLD)
+    }
+
+    buildLore {
+        emptyLine()
+        line { variableValue("Beschreibung:".toSmallCaps()) }
+        line { localColored("Passe die Nametag Sichtbarkeit an.") }
+
+        emptyLine()
+        line { variableValue("Status:".toSmallCaps()) }
+        line {
+            spacer("-")
+            appendSpace()
+            localColored(if (state) "Aktiviert" else "Deaktiviert")
+        }
+
+        emptyLine()
+        line { spacer("Klicke, um die Einstellung zu ändern") }
+
+        emptyLine()
+        line { error("In einigen Fällen kann diese Einstellung") }
+        line { error("vom Server überschrieben werden.") }
     }
 }
