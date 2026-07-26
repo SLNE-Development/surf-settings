@@ -64,7 +64,7 @@ object OtherSettingsMenu : AbstractSurfView("Allgemein") {
             render
         )
 
-        render.slot(2, 6) {
+        render.slot(3, 3) {
             renderWith {
                 nameTagItem(nametag[render])
             }
@@ -83,7 +83,7 @@ object OtherSettingsMenu : AbstractSurfView("Allgemein") {
             watch(nametag)
         }
 
-        render.slot(4, 4) {
+        render.slot(3, 5) {
             renderWith {
                 lobbyScrollItem(scroll[render])
             }
@@ -102,7 +102,7 @@ object OtherSettingsMenu : AbstractSurfView("Allgemein") {
             watch(scroll)
         }
 
-        render.slot(6, 6) {
+        render.slot(3, 7) {
             renderWith {
                 scoreboardItem(scoreboard[render])
             }
