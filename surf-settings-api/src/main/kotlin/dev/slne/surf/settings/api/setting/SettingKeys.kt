@@ -42,4 +42,7 @@ object SettingKeys {
     // Nametag
 
     val SHOW_NAMETAGS = SettingKey.ofBoolean(key("nametag", "show-nametags"), defaultValue = true)
+
+    val SHOW_SCOREBOARD =
+        SettingKey.ofBoolean(key("scoreboard", "show-scoreboard"), defaultValue = true)
 }
