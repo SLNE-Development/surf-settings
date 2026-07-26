@@ -26,6 +26,8 @@ object OtherSettingsMenu : AbstractSurfView("Allgemein") {
     private val joinScroll = mutableState(false)
     private val nametag = mutableState(false)
     private val joinNametag = mutableState(false)
+    private val scoreboard = mutableState(false)
+    private val joinScoreboard = mutableState(false)
 
     override fun onViewInit(config: ViewConfigBuilder) {
         config.size(5).cancelInteractions()
@@ -53,7 +55,35 @@ object OtherSettingsMenu : AbstractSurfView("Allgemein") {
             render
         )
 
-        render.slot(3, 4) {
+        scoreboard.set(
+            SurfSettingsApi.getSettingValue(player.uniqueId, SettingKeys.SHOW_SCOREBOARD),
+            render
+        )
+        joinScoreboard.set(
+            SurfSettingsApi.getSettingValue(player.uniqueId, SettingKeys.SHOW_SCOREBOARD),
+            render
+        )
+
+        render.slot(2, 6) {
+            renderWith {
+                nameTagItem(nametag[render])
+            }
+            onClick { click ->
+                val new = !nametag[render]
+                nametag.set(new, render)
+
+                click.player.sendText {
+                    appendSuccessPrefix()
+                    success("Du hast Nametags nun ")
+                    variableValue(if (new) "aktiviert" else "deaktiviert")
+                    success(".")
+                }
+                click.playClickSound()
+            }
+            watch(nametag)
+        }
+
+        render.slot(4, 4) {
             renderWith {
                 lobbyScrollItem(scroll[render])
             }
@@ -72,23 +102,23 @@ object OtherSettingsMenu : AbstractSurfView("Allgemein") {
             watch(scroll)
         }
 
-        render.slot(3, 6) {
+        render.slot(6, 6) {
             renderWith {
-                nameTagItem(nametag[render])
+                scoreboardItem(scoreboard[render])
             }
             onClick { click ->
-                val new = !nametag[render]
-                nametag.set(new, render)
+                val new = !scoreboard[render]
+                scoreboard.set(new, render)
 
                 click.player.sendText {
                     appendSuccessPrefix()
-                    success("Du hast Nametags nun ")
+                    success("Du hast Scoreboards nun ")
                     variableValue(if (new) "aktiviert" else "deaktiviert")
                     success(".")
                 }
                 click.playClickSound()
             }
-            watch(nametag)
+            watch(scoreboard)
         }
 
         render.slot(5, 5) {
@@ -121,6 +151,14 @@ object OtherSettingsMenu : AbstractSurfView("Allgemein") {
                     player.uniqueId,
                     SettingKeys.SHOW_NAMETAGS,
                     nametag.get(close)
+                )
+            }
+
+            if (joinScoreboard[close] != scoreboard[close]) {
+                SurfSettingsApi.saveSetting(
+                    player.uniqueId,
+                    SettingKeys.SHOW_SCOREBOARD,
+                    scoreboard.get(close)
                 )
             }
         }
@@ -159,6 +197,33 @@ private fun nameTagItem(state: Boolean) = buildItem(Material.NAME_TAG) {
         emptyLine()
         line { variableValue("Beschreibung:".toSmallCaps()) }
         line { localColored("Passe die Nametag Sichtbarkeit an.") }
+
+        emptyLine()
+        line { variableValue("Status:".toSmallCaps()) }
+        line {
+            spacer("-")
+            appendSpace()
+            localColored(if (state) "Aktiviert" else "Deaktiviert")
+        }
+
+        emptyLine()
+        line { spacer("Klicke, um die Einstellung zu ändern") }
+
+        emptyLine()
+        line { error("In einigen Fällen kann diese Einstellung") }
+        line { error("vom Server überschrieben werden.") }
+    }
+}
+
+private fun scoreboardItem(state: Boolean) = buildItem(Material.WRITABLE_BOOK) {
+    displayName {
+        localColored("Scoreboard Sichtbarkeit".toSmallCaps(), TextDecoration.BOLD)
+    }
+
+    buildLore {
+        emptyLine()
+        line { variableValue("Beschreibung:".toSmallCaps()) }
+        line { localColored("Passe die Scoreboard Sichtbarkeit an.") }
 
         emptyLine()
         line { variableValue("Status:".toSmallCaps()) }
