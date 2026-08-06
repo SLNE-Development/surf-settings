@@ -23,7 +23,7 @@ class SettingRepository {
     }
 
     suspend fun createSetting(name: String, defaultValue: String): Setting = suspendTransaction {
-        SettingsTable.upsert {
+        SettingsTable.upsert(SettingsTable.name) {
             it[SettingsTable.name] = name
             it[SettingsTable.defaultValue] = defaultValue
         }
