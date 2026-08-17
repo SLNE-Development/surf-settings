@@ -4,7 +4,7 @@ import com.github.shynixn.mccoroutine.folia.launch
 import dev.jorel.commandapi.kotlindsl.anyExecutor
 import dev.jorel.commandapi.kotlindsl.commandTree
 import dev.jorel.commandapi.kotlindsl.literalArgument
-import dev.slne.surf.api.core.messages.adventure.sendText
+import dev.slne.surf.settings.core.client.command.SettingsCommandMessages
 import dev.slne.surf.settings.core.common.service.SettingsService
 import dev.slne.surf.settings.paper.permission.PermissionRegistry
 import dev.slne.surf.settings.paper.plugin
@@ -20,10 +20,9 @@ fun surfSettingsCommand() = commandTree("surfSettings") {
                     SettingsService.refreshSettings()
                 }
 
-                executor.sendText {
-                    appendSuccessPrefix()
-                    success("Es wurden alle Einstellungen neu geladen (${SettingsService.settings.size} in ${ms}ms)!")
-                }
+                executor.sendMessage(
+                    SettingsCommandMessages.refreshed(SettingsService.settings.size, ms)
+                )
             }
         }
     }
@@ -32,25 +31,11 @@ fun surfSettingsCommand() = commandTree("surfSettings") {
         withPermission(PermissionRegistry.COMMAND_SURF_SETTINGS_LIST)
         anyExecutor { executor, _ ->
             if (SettingsService.settings.isEmpty()) {
-                executor.sendText {
-                    appendErrorPrefix()
-                    error("Es sind keine Einstellungen verfügbar.")
-                }
+                executor.sendMessage(SettingsCommandMessages.noSettings)
                 return@anyExecutor
             }
 
-            executor.sendText {
-                appendInfoPrefix()
-                info("Verfügbare Einstellungen: ")
-                variableValue(buildString {
-                    SettingsService.settings.forEachIndexed { index, setting ->
-                        append(setting.name)
-                        if (index < SettingsService.settings.size - 1) {
-                            append(", ")
-                        }
-                    }
-                })
-            }
+            executor.sendMessage(SettingsCommandMessages.list(SettingsService.settings))
         }
     }
 }

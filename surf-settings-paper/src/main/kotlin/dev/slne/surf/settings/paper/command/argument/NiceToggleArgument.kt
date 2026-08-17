@@ -6,31 +6,19 @@ import dev.jorel.commandapi.arguments.Argument
 import dev.jorel.commandapi.arguments.ArgumentSuggestions
 import dev.jorel.commandapi.arguments.CustomArgument
 import dev.jorel.commandapi.arguments.StringArgument
-import dev.slne.surf.api.core.messages.adventure.buildText
+import dev.slne.surf.settings.core.client.command.NiceToggle
+import dev.slne.surf.settings.core.client.command.SettingsCommandMessages
 
 class NiceToggleArgument(nodeName: String) :
     CustomArgument<Boolean, String>(StringArgument(nodeName), { info ->
-        when (info.input()) {
-            "enable", "on", "an" -> true
-            "disable", "off", "aus" -> false
-            else -> throw CustomArgumentException.fromAdventureComponent {
-                buildText {
-                    appendErrorPrefix()
-                    error("Bitte gebe entweder 'enable', 'disable', 'on' oder 'off' an.")
-                }
-            }
-        }
+        NiceToggle.parse(info.input())
+            ?: throw CustomArgumentException.fromAdventureComponent(
+                SettingsCommandMessages.invalidToggle
+            )
     }) {
     init {
         this.replaceSuggestions(
-            ArgumentSuggestions.strings(
-                "enable",
-                "disable",
-                "on",
-                "off",
-                "an",
-                "aus"
-            )
+            ArgumentSuggestions.strings(*NiceToggle.suggestions.toTypedArray())
         )
     }
 }

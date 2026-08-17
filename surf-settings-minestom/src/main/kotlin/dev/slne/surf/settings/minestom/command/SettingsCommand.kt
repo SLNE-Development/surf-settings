@@ -1,23 +1,21 @@
-package dev.slne.surf.settings.paper.command
+package dev.slne.surf.settings.minestom.command
 
-import dev.jorel.commandapi.kotlindsl.commandTree
-import dev.jorel.commandapi.kotlindsl.getValue
-import dev.jorel.commandapi.kotlindsl.literalArgument
-import dev.jorel.commandapi.kotlindsl.playerExecutor
-import dev.slne.surf.api.paper.inventory.framework.open
+import dev.slne.minestom.lobby.api.command.commandapi.dsl.commandTree
+import dev.slne.minestom.lobby.api.command.commandapi.dsl.literalArgument
+import dev.slne.minestom.lobby.api.command.commandapi.dsl.playerExecutor
+import dev.slne.surf.settings.api.SurfSettingsApi
 import dev.slne.surf.settings.api.setting.Setting
 import dev.slne.surf.settings.core.client.command.SettingsCommandActions
 import dev.slne.surf.settings.core.client.command.SettingsCommandMessages
-import dev.slne.surf.settings.paper.command.argument.niceToggleArgument
-import dev.slne.surf.settings.paper.command.argument.settingArgument
-import dev.slne.surf.settings.paper.menu.SettingsMenu
-import dev.slne.surf.settings.paper.permission.PermissionRegistry
+import dev.slne.surf.settings.core.client.permission.SettingsPermissions
+import dev.slne.surf.settings.minestom.command.argument.niceToggleArgument
+import dev.slne.surf.settings.minestom.command.argument.settingArgument
 
 fun settingsCommand() = commandTree("settings") {
-    withPermission(PermissionRegistry.COMMAND_SETTINGS)
+    withPermission(SettingsPermissions.COMMAND_SETTINGS)
 
     playerExecutor { player, _ ->
-        SettingsMenu.open(player)
+        SurfSettingsApi.openSettingsGui(player.uuid)
     }
 
     settingArgument("setting") {
@@ -29,10 +27,9 @@ fun settingsCommand() = commandTree("settings") {
                 return@playerExecutor
             }
 
-            val value = SettingsCommandActions.toggle(player.uniqueId, setting)
+            val value = SettingsCommandActions.toggle(player.uuid, setting)
             player.sendMessage(SettingsCommandMessages.changed(setting.name, value))
         }
-
 
         niceToggleArgument("state") {
             playerExecutor { player, args ->
@@ -44,7 +41,7 @@ fun settingsCommand() = commandTree("settings") {
                     return@playerExecutor
                 }
 
-                val value = SettingsCommandActions.set(player.uniqueId, setting, state)
+                val value = SettingsCommandActions.set(player.uuid, setting, state)
                 player.sendMessage(SettingsCommandMessages.changed(setting.name, value))
             }
         }
@@ -52,7 +49,7 @@ fun settingsCommand() = commandTree("settings") {
         literalArgument("#info") {
             playerExecutor { player, args ->
                 val setting: Setting by args
-                val value = SettingsCommandActions.get(player.uniqueId, setting)
+                val value = SettingsCommandActions.get(player.uuid, setting)
                 player.sendMessage(SettingsCommandMessages.info(setting.name, value))
             }
         }

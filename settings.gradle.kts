@@ -2,8 +2,9 @@ rootProject.name = "surf-settings"
 
 include("surf-settings-api")
 include("surf-settings-core:surf-settings-core-common")
-include("surf-settings-core:surf-settings-core-paper")
+include("surf-settings-core:surf-settings-core-client")
 include("surf-settings-paper")
+include("surf-settings-minestom")
 include("surf-settings-microservice")
 
 pluginManagement {

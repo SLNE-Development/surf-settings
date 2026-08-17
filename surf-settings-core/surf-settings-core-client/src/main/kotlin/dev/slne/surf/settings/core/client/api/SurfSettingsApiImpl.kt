@@ -1,16 +1,14 @@
-package dev.slne.surf.settings.paper.api
+package dev.slne.surf.settings.core.client.api
 
 import com.google.auto.service.AutoService
-import dev.slne.surf.api.paper.inventory.framework.open
 import dev.slne.surf.settings.api.SurfSettingsApi
 import dev.slne.surf.settings.api.setting.PlayerSetting
 import dev.slne.surf.settings.api.setting.Setting
 import dev.slne.surf.settings.api.setting.SettingKey
+import dev.slne.surf.settings.core.client.platform.SettingsPlatform
 import dev.slne.surf.settings.core.common.service.SettingsService
-import dev.slne.surf.settings.paper.menu.SettingsMenu
 import it.unimi.dsi.fastutil.objects.ObjectSet
 import net.kyori.adventure.util.Services
-import org.bukkit.Bukkit
 import java.util.*
 
 @AutoService(SurfSettingsApi::class)
@@ -52,10 +50,7 @@ class SurfSettingsApiImpl : SurfSettingsApi, Services.Fallback {
     override fun getSettings(): ObjectSet<Setting> = SettingsService.settings
 
     override fun openSettingsGui(playerUuid: UUID) {
-        Bukkit.getPlayer(playerUuid)?.let {
-            it.closeInventory()
-            SettingsMenu.open(it)
-        }
+        SettingsPlatform.openSettingsGui(playerUuid)
     }
 
     @Deprecated(

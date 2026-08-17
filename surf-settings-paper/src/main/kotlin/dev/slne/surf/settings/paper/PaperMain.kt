@@ -3,10 +3,9 @@ package dev.slne.surf.settings.paper
 import com.github.shynixn.mccoroutine.folia.SuspendingJavaPlugin
 import dev.slne.surf.api.paper.event.register
 import dev.slne.surf.api.paper.inventory.framework.register
-import dev.slne.surf.settings.api.SurfSettingsApi
-import dev.slne.surf.settings.api.setting.SettingKeys
 import dev.slne.surf.settings.core.common.service.SettingsService
-import dev.slne.surf.settings.core.paper.PaperSettingsInstance
+import dev.slne.surf.settings.core.client.ClientSettingsInstance
+import dev.slne.surf.settings.core.client.createDefaultSettings
 import dev.slne.surf.settings.paper.command.settingsCommand
 import dev.slne.surf.settings.paper.command.surfSettingsCommand
 import dev.slne.surf.settings.paper.listener.PlayerConnectionListener
@@ -21,7 +20,7 @@ val plugin get() = JavaPlugin.getPlugin(PaperMain::class.java)
 
 class PaperMain : SuspendingJavaPlugin() {
     override suspend fun onLoadAsync() {
-        PaperSettingsInstance.paperLoader.onLoad()
+        ClientSettingsInstance.clientLoader.onLoad()
 
         ChatSettingsMenu.register()
         ClanSettingsMenu.register()
@@ -31,7 +30,7 @@ class PaperMain : SuspendingJavaPlugin() {
     }
 
     override suspend fun onEnableAsync() {
-        PaperSettingsInstance.paperLoader.onEnable()
+        ClientSettingsInstance.clientLoader.onEnable()
         PlayerConnectionListener.register()
 
         SettingsService.refreshSettings()
@@ -39,24 +38,11 @@ class PaperMain : SuspendingJavaPlugin() {
         surfSettingsCommand()
         settingsCommand()
 
-        // @formatter:off
-        SurfSettingsApi.createSetting(SettingKeys.CHAT_PINGS)
-        SurfSettingsApi.createSetting(SettingKeys.CHAT_DEATH_MESSAGES)
-        SurfSettingsApi.createSetting(SettingKeys.DIRECT_MESSAGES)
-        SurfSettingsApi.createSetting(SettingKeys.CONNECTION_MESSAGES)
-        SurfSettingsApi.createSetting(SettingKeys.LOBBY_SCROLL_SOUND)
-        SurfSettingsApi.createSetting(SettingKeys.CLAN_INVITES)
-        SurfSettingsApi.createSetting(SettingKeys.CLAN_CHAT_MESSAGES)
-        SurfSettingsApi.createSetting(SettingKeys.FRIEND_REQUEST_NOTIFICATIONS)
-        SurfSettingsApi.createSetting(SettingKeys.FRIEND_NOTIFICATIONS)
-        SurfSettingsApi.createSetting(SettingKeys.FRIEND_SOUNDS)
-        SurfSettingsApi.createSetting(SettingKeys.SHOW_NAMETAGS)
-        SurfSettingsApi.createSetting(SettingKeys.SHOW_SCOREBOARD)
-        // @formatter:on
+        createDefaultSettings()
     }
 
     override suspend fun onDisableAsync() {
-        PaperSettingsInstance.paperLoader.onDisable()
+        ClientSettingsInstance.clientLoader.onDisable()
     }
 
     fun isFolia(): Boolean = runCatching {

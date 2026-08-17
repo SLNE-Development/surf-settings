@@ -1,4 +1,4 @@
-package dev.slne.surf.settings.core.paper.service
+package dev.slne.surf.settings.core.client.service
 
 import com.google.auto.service.AutoService
 import dev.slne.surf.api.core.util.mutableObject2ObjectMapOf
@@ -9,7 +9,7 @@ import dev.slne.surf.settings.api.setting.PlayerSetting
 import dev.slne.surf.settings.api.setting.Setting
 import dev.slne.surf.settings.core.common.rabbit.packet.request.*
 import dev.slne.surf.settings.core.common.service.SettingsService
-import dev.slne.surf.settings.core.paper.PaperSettingsInstance
+import dev.slne.surf.settings.core.client.ClientSettingsInstance
 import it.unimi.dsi.fastutil.objects.ObjectSet
 import net.kyori.adventure.util.Services
 import java.util.*
@@ -57,7 +57,7 @@ class SettingServiceImpl : SettingsService, Services.Fallback {
         playerUuid: UUID,
         playerSetting: PlayerSetting
     ) {
-        PaperSettingsInstance.rabbitApi.sendRequest(
+        ClientSettingsInstance.rabbitApi.sendRequest(
             SavePlayerSettingRequestPacket(
                 playerUuid,
                 playerSetting
@@ -66,7 +66,7 @@ class SettingServiceImpl : SettingsService, Services.Fallback {
     }
 
     override suspend fun cachePlayerSettings(playerUuid: UUID) {
-        _playerSettings[playerUuid] = PaperSettingsInstance.rabbitApi.sendRequest(
+        _playerSettings[playerUuid] = ClientSettingsInstance.rabbitApi.sendRequest(
             LoadPlayerSettingsRequestPacket(playerUuid)
         ).playerSettings.mapNotNull {
             val setting = getSettingByName(it.first) ?: return@mapNotNull null
@@ -83,7 +83,7 @@ class SettingServiceImpl : SettingsService, Services.Fallback {
 
     override suspend fun refreshSettings() {
         settings.clear()
-        settings.addAll(PaperSettingsInstance.rabbitApi.sendRequest(LoadSettingsRequestPacket()).settings)
+        settings.addAll(ClientSettingsInstance.rabbitApi.sendRequest(LoadSettingsRequestPacket()).settings)
     }
 
     override suspend fun createSetting(
@@ -95,7 +95,7 @@ class SettingServiceImpl : SettingsService, Services.Fallback {
             return existing
         }
 
-        return PaperSettingsInstance.rabbitApi.sendRequest(
+        return ClientSettingsInstance.rabbitApi.sendRequest(
             CreateSettingRequestPacket(
                 name,
                 defaultValue
@@ -106,7 +106,7 @@ class SettingServiceImpl : SettingsService, Services.Fallback {
     }
 
     override suspend fun deleteSetting(name: String) {
-        PaperSettingsInstance.rabbitApi.sendRequest(
+        ClientSettingsInstance.rabbitApi.sendRequest(
             DeleteSettingRequestPacket(name)
         ).also {
             settings.removeIf { it.name == name }

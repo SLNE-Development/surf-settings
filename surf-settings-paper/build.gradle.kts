@@ -13,5 +13,5 @@ surfPaperPluginApi {
 }
 
 dependencies {
-    api(projects.surfSettingsCore.surfSettingsCorePaper)
+    api(projects.surfSettingsCore.surfSettingsCoreClient)
 }

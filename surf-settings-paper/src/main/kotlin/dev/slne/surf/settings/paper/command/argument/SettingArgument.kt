@@ -6,18 +6,16 @@ import dev.jorel.commandapi.arguments.Argument
 import dev.jorel.commandapi.arguments.ArgumentSuggestions
 import dev.jorel.commandapi.arguments.CustomArgument
 import dev.jorel.commandapi.arguments.StringArgument
-import dev.slne.surf.api.core.messages.adventure.buildText
 import dev.slne.surf.settings.api.setting.Setting
+import dev.slne.surf.settings.core.client.command.SettingsCommandMessages
 import dev.slne.surf.settings.core.common.service.SettingsService
 
 class SettingArgument(nodeName: String) :
     CustomArgument<Setting, String>(StringArgument(nodeName), { info ->
         SettingsService.getSettingByName(info.input)
             ?: throw CustomArgumentException.fromAdventureComponent(
-                buildText {
-                    appendErrorPrefix()
-                    error("Die Einstellung wurde nicht gefunden.")
-                })
+                SettingsCommandMessages.settingNotFound
+            )
     }) {
     init {
         this.replaceSuggestions(
