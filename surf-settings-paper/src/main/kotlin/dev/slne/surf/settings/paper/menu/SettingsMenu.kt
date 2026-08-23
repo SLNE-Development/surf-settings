@@ -1,93 +1,120 @@
 package dev.slne.surf.settings.paper.menu
 
+import com.github.shynixn.mccoroutine.folia.launch
 import dev.slne.surf.api.core.font.toSmallCaps
 import dev.slne.surf.api.paper.builder.buildItem
+import dev.slne.surf.api.paper.builder.buildLore
 import dev.slne.surf.api.paper.builder.displayName
-import dev.slne.surf.api.paper.inventory.framework.dsl.openForPlayer
-import dev.slne.surf.api.paper.inventory.framework.dsl.slot
-import dev.slne.surf.api.paper.inventory.framework.view.AbstractSurfView
-import dev.slne.surf.settings.paper.menu.sub.ChatSettingsMenu
-import dev.slne.surf.settings.paper.menu.sub.ClanSettingsMenu
-import dev.slne.surf.settings.paper.menu.sub.FriendSettingsMenu
-import dev.slne.surf.settings.paper.menu.sub.OtherSettingsMenu
-import me.devnatan.inventoryframework.ViewConfigBuilder
-import me.devnatan.inventoryframework.context.RenderContext
+import dev.slne.surf.api.paper.inventory.framework.view.*
+import dev.slne.surf.api.paper.inventory.framework.view.icon.ViewIcon
+import dev.slne.surf.api.paper.inventory.framework.view.icon.ViewIconColor
+import dev.slne.surf.api.paper.inventory.framework.view.icon.ViewIconType
+import dev.slne.surf.api.paper.inventory.framework.view.pagination.pagination
+import dev.slne.surf.api.paper.inventory.framework.view.settings.PaginationViewRows
+import dev.slne.surf.settings.api.setting.PlayerSetting
+import dev.slne.surf.settings.api.setting.Setting
+import dev.slne.surf.settings.core.common.service.SettingsService
+import dev.slne.surf.settings.paper.plugin
+import me.devnatan.inventoryframework.context.Context
 import net.kyori.adventure.text.format.TextDecoration
-import org.bukkit.Material
 
+val settingsView = paginatedSurfView("Einstellungen") {
+    val initialValues = mutableMapOf<Setting, Boolean>()
+    val changedValues = mutableMapOf<Setting, Boolean>()
 
-object SettingsMenu : AbstractSurfView("Einstellungen") {
-    override fun onViewInit(config: ViewConfigBuilder) {
-        config.size(6).cancelInteractions()
+    fun values(context: Context) =
+        SettingsService.getLoadedSettingsWithDefaults(context.player.uniqueId)
+            .filter { it.setting.defaultValue.toBooleanStrictOrNull() != null }
+
+    settings {
+        paginationViewRows(PaginationViewRows.THREE)
     }
 
-    override fun onViewRender(render: RenderContext) {
-        render.slot(2, 3) {
-            withItem(chatItem())
-            onClick { click ->
-                click.playClickSound()
-                click.openForPlayer(ChatSettingsMenu)
-            }
+    layoutTarget('I')
+
+    pagination {
+        computedSource { context ->
+            values(context)
         }
 
-        render.slot(2, 5) {
-            withItem(otherItem())
-            onClick { click ->
-                click.playClickSound()
-                click.openForPlayer(OtherSettingsMenu)
-            }
-        }
+        itemFactory { playerSetting ->
+            val display = settingKeyMappings[playerSetting.setting.name]
 
-        render.slot(2, 7) {
-            withItem(friendItem())
-            onClick { click ->
-                click.playClickSound()
-                click.openForPlayer(FriendSettingsMenu)
-            }
-        }
+            if (display == null) {
+                withItem(ViewIcon(ViewIconType.QUESTION_MARK, ViewIconColor.RED).build {
+                    displayName {
+                        error("Unbekannte Einstellung", TextDecoration.BOLD)
+                    }
 
-        render.slot(3, 5) {
-            withItem(clanItem())
-            onClick { click ->
-                click.playClickSound()
-                click.openForPlayer(ClanSettingsMenu)
+                    buildLore {
+                        line {
+                            spacer(playerSetting.setting.name)
+                        }
+                    }
+                })
+                return@itemFactory
             }
-        }
 
-        render.slot(5, 5) {
-            withItem(buildItem(Material.BARRIER) {
-                displayName {
-                    localColored("Schließen".toSmallCaps(), TextDecoration.BOLD)
+            renderWith {
+                val currentValue = changedValues[playerSetting.setting]
+                    ?: initialValues[playerSetting.setting]
+                    ?: playerSetting.getBoolean()
+
+                buildItem(display.material) {
+                    displayName {
+                        white(display.displayName.toSmallCaps())
+                    }
+
+                    buildLore {
+                        emptyLine()
+                        line {
+                            spacer(display.description)
+                        }
+                        emptyLine()
+                        line {
+                            darkSpacer("▪")
+                            appendSpace()
+                            variableValue("Aktiviert")
+                            if (currentValue) decorate(TextDecoration.BOLD)
+                        }
+                        line {
+                            darkSpacer("▪")
+                            appendSpace()
+                            variableValue("Deaktiviert")
+                            if (!currentValue) decorate(TextDecoration.BOLD)
+                        }
+                    }
                 }
-            })
+            }
             onClick { click ->
-                click.playClickSound()
-                click.closeForPlayer()
+                val currentValue = changedValues[playerSetting.setting]
+                    ?: initialValues[playerSetting.setting]
+                    ?: playerSetting.getBoolean()
+
+                val newValue = !currentValue
+                changedValues[playerSetting.setting] = newValue
+
+                click.update()
             }
         }
     }
-}
 
-private fun chatItem() = buildItem(Material.BELL) {
-    displayName {
-        localColored("Chat Einstellungen".toSmallCaps(), TextDecoration.BOLD)
+    onFirstRender {
+        initialValues.clear()
+        initialValues.putAll(values(this).associate { it.setting to it.getBoolean() })
     }
-}
 
-private fun otherItem() = buildItem(Material.GOLD_NUGGET) {
-    displayName {
-        localColored("Allgemeine Einstellungen".toSmallCaps(), TextDecoration.BOLD)
-    }
-}
+    onClose {
+        val playerUuid = this.player.uniqueId
 
-private fun friendItem() = buildItem(Material.POPPY) {
-    displayName {
-        localColored("Freundes Einstellungen".toSmallCaps(), TextDecoration.BOLD)
-    }
-}
-
-private fun clanItem() = buildItem(Material.CLOCK) {
-    displayName {
-        localColored("Clan Einstellungen".toSmallCaps(), TextDecoration.BOLD)
+        plugin.launch {
+            changedValues.forEach { (setting, newValue) ->
+                SettingsService.savePlayerSetting(
+                    playerUuid, PlayerSetting(
+                        setting, newValue.toString()
+                    )
+                )
+            }
+        }
     }
 }

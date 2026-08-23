@@ -7,9 +7,9 @@ import dev.slne.surf.api.core.util.toMutableObjectSet
 import dev.slne.surf.api.core.util.toObjectSet
 import dev.slne.surf.settings.api.setting.PlayerSetting
 import dev.slne.surf.settings.api.setting.Setting
+import dev.slne.surf.settings.core.client.ClientSettingsInstance
 import dev.slne.surf.settings.core.common.rabbit.packet.request.*
 import dev.slne.surf.settings.core.common.service.SettingsService
-import dev.slne.surf.settings.core.client.ClientSettingsInstance
 import it.unimi.dsi.fastutil.objects.ObjectSet
 import net.kyori.adventure.util.Services
 import java.util.*
@@ -40,6 +40,14 @@ class SettingServiceImpl : SettingsService, Services.Fallback {
 
     override fun getSettingForPlayer(playerUuid: UUID, settingName: String): PlayerSetting? =
         getSettingsForPlayer(playerUuid).firstOrNull { it.setting.name == settingName }
+
+    override fun getLoadedSettingsWithDefaults(playerUuid: UUID) = settings.map { setting ->
+        getSettingsForPlayer(playerUuid).associateBy { it.setting.name }[setting.name]
+            ?: PlayerSetting(
+                setting = setting,
+                settingValue = setting.defaultValue
+            )
+    }.toObjectSet()
 
     override fun cachePlayerSetting(
         playerUuid: UUID,
