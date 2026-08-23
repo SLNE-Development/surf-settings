@@ -123,7 +123,6 @@ val settingsView = paginatedSurfView("Einstellungen") {
 
         plugin.launch {
             draftSettings.filter { it.first == playerUuid }.forEach { (player, setting) ->
-                println("Saving setting ${setting.setting.name} for player $playerUuid with value ${setting.settingValue}")
                 draftSettings.removeIf { it.first == playerUuid && it.second.setting.name == setting.setting.name }
                 SettingsService.cachePlayerSetting(playerUuid, setting)
                 SettingsService.savePlayerSetting(

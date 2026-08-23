@@ -26,7 +26,7 @@ val settingKeyMappings = mapOf(
     ),
     SettingKeys.LOBBY_SCROLL_SOUND to SettingKeyDisplay(
         "Scroll-Sound",
-        "Spielt einen Sound beim Scrollen im Lobby-Menü ab",
+        "Spielt einen Sound beim Scrollen in der Lobby ab",
         Material.NOTE_BLOCK
     ),
     SettingKeys.CLAN_INVITES to SettingKeyDisplay(
