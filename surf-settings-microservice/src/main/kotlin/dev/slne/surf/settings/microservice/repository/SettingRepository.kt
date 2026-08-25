@@ -2,7 +2,7 @@ package dev.slne.surf.settings.microservice.repository
 
 import dev.slne.surf.database.libs.org.jetbrains.exposed.v1.core.eq
 import dev.slne.surf.database.libs.org.jetbrains.exposed.v1.r2dbc.deleteWhere
-import dev.slne.surf.database.libs.org.jetbrains.exposed.v1.r2dbc.selectAll
+import dev.slne.surf.database.libs.org.jetbrains.exposed.v1.r2dbc.select
 import dev.slne.surf.database.libs.org.jetbrains.exposed.v1.r2dbc.transactions.suspendTransaction
 import dev.slne.surf.database.libs.org.jetbrains.exposed.v1.r2dbc.upsert
 import dev.slne.surf.settings.api.setting.Setting
@@ -14,7 +14,7 @@ val settingRepository = SettingRepository()
 
 class SettingRepository {
     suspend fun loadSettings(): List<Setting> = suspendTransaction {
-        SettingsTable.selectAll().map {
+        SettingsTable.select(SettingsTable.name, SettingsTable.defaultValue).map {
             Setting(
                 name = it[SettingsTable.name],
                 defaultValue = it[SettingsTable.defaultValue]

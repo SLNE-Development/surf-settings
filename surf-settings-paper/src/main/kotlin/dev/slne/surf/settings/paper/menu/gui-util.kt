@@ -13,5 +13,7 @@ fun SlotClickContext.playClickSound() {
     }
 }
 
+private val LOCAL_COLOR: TextColor = TextColor.color(0x42f590)
+
 fun SurfComponentBuilder.localColored(text: Any, vararg decoration: TextDecoration) =
-    text(text.toString(), TextColor.fromHexString("#42f590"), *decoration)
+    text(text.toString(), LOCAL_COLOR, *decoration)

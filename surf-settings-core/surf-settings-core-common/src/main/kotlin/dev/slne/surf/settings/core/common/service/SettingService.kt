@@ -17,6 +17,8 @@ interface SettingsService {
     fun getSettingForPlayerOrDefault(playerUuid: UUID, settingName: String): PlayerSetting?
     fun getSettingForPlayer(playerUuid: UUID, settingName: String): PlayerSetting?
 
+    fun getSettingValueOrDefault(playerUuid: UUID, settingName: String): String?
+
     fun cachePlayerSetting(playerUuid: UUID, playerSetting: PlayerSetting)
     suspend fun savePlayerSetting(playerUuid: UUID, playerSetting: PlayerSetting)
 

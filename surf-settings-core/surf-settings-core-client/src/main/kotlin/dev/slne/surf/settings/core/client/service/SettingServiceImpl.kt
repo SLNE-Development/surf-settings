@@ -1,56 +1,98 @@
 package dev.slne.surf.settings.core.client.service
 
 import com.google.auto.service.AutoService
+import dev.slne.surf.api.core.util.emptyObjectSet
+import dev.slne.surf.api.core.util.freeze
 import dev.slne.surf.api.core.util.mutableObject2ObjectMapOf
 import dev.slne.surf.api.core.util.mutableObjectSetOf
-import dev.slne.surf.api.core.util.toMutableObjectSet
-import dev.slne.surf.api.core.util.toObjectSet
 import dev.slne.surf.settings.api.setting.PlayerSetting
 import dev.slne.surf.settings.api.setting.Setting
+import dev.slne.surf.settings.core.client.ClientSettingsInstance
 import dev.slne.surf.settings.core.common.rabbit.packet.request.*
 import dev.slne.surf.settings.core.common.service.SettingsService
-import dev.slne.surf.settings.core.client.ClientSettingsInstance
+import it.unimi.dsi.fastutil.objects.Object2ObjectOpenHashMap
 import it.unimi.dsi.fastutil.objects.ObjectSet
 import net.kyori.adventure.util.Services
 import java.util.*
+import java.util.concurrent.ConcurrentHashMap
+import java.util.concurrent.atomic.AtomicReference
 
 @AutoService(SettingsService::class)
 class SettingServiceImpl : SettingsService, Services.Fallback {
-    private val _playerSettings = mutableObject2ObjectMapOf<UUID, ObjectSet<PlayerSetting>>()
 
-    override val settings = mutableObjectSetOf<Setting>()
-    override val playerSettings: ObjectSet<PlayerSetting> =
-        _playerSettings.values.flatten().toObjectSet()
+    /**
+     * Immutable view of the global setting registry.
+     */
+    private class Registry(val byName: Object2ObjectOpenHashMap<String, Setting>) {
+        val all: ObjectSet<Setting> = mutableObjectSetOf<Setting>(byName.size)
+            .apply { addAll(byName.values) }
+            .freeze()
 
-    override fun getSettingByName(name: String): Setting? = settings.firstOrNull { it.name == name }
+        companion object {
+            val EMPTY = Registry(mutableObject2ObjectMapOf())
+        }
+    }
+
+    /** Immutable view of one player's cached settings, keyed by [Setting.name]. */
+    private class PlayerSettings(val byName: Object2ObjectOpenHashMap<String, PlayerSetting>) {
+        val all: ObjectSet<PlayerSetting> = mutableObjectSetOf<PlayerSetting>(byName.size)
+            .apply { addAll(byName.values) }
+            .freeze()
+
+        /** Returns a new snapshot with [playerSetting] replacing any entry of the same name. */
+        fun with(playerSetting: PlayerSetting): PlayerSettings {
+            val copy = mutableObject2ObjectMapOf<String, PlayerSetting>(byName.size + 1)
+            copy.putAll(byName)
+            copy[playerSetting.setting.name] = playerSetting
+            return PlayerSettings(copy)
+        }
+    }
+
+    private val registry = AtomicReference(Registry.EMPTY)
+    private val playerCache = ConcurrentHashMap<UUID, PlayerSettings>()
+
+    override val settings: ObjectSet<Setting> get() = registry.get().all
+
+    override val playerSettings: ObjectSet<PlayerSetting>
+        get() {
+            val result = mutableObjectSetOf<PlayerSetting>()
+            for (snapshot in playerCache.values) {
+                result.addAll(snapshot.all)
+            }
+            return result.freeze()
+        }
+
+    override fun getSettingByName(name: String): Setting? = registry.get().byName[name]
+
     override fun getSettingsForPlayer(playerUuid: UUID): ObjectSet<PlayerSetting> =
-        _playerSettings[playerUuid] ?: mutableObjectSetOf()
+        playerCache[playerUuid]?.all ?: emptyObjectSet()
+
+    override fun getSettingForPlayer(playerUuid: UUID, settingName: String): PlayerSetting? =
+        playerCache[playerUuid]?.byName?.get(settingName)
 
     override fun getSettingForPlayerOrDefault(
         playerUuid: UUID,
         settingName: String
-    ): PlayerSetting? =
-        getSettingsForPlayer(playerUuid).firstOrNull { it.setting.name == settingName } ?: run {
-            val setting = getSettingByName(settingName) ?: return null
-            PlayerSetting(
-                setting = setting,
-                settingValue = setting.defaultValue
-            )
-        }
+    ): PlayerSetting? {
+        val cached = playerCache[playerUuid]?.byName?.get(settingName)
+        if (cached != null) return cached
 
-    override fun getSettingForPlayer(playerUuid: UUID, settingName: String): PlayerSetting? =
-        getSettingsForPlayer(playerUuid).firstOrNull { it.setting.name == settingName }
+        val setting = registry.get().byName[settingName] ?: return null
+        return PlayerSetting(setting = setting, settingValue = setting.defaultValue)
+    }
+
+    override fun getSettingValueOrDefault(playerUuid: UUID, settingName: String): String? {
+        val cached = playerCache[playerUuid]?.byName?.get(settingName)
+        if (cached != null) return cached.settingValue
+
+        return registry.get().byName[settingName]?.defaultValue
+    }
 
     override fun cachePlayerSetting(
         playerUuid: UUID,
         playerSetting: PlayerSetting
     ) {
-        val playerSettings =
-            _playerSettings.getOrPut(playerUuid) { mutableObjectSetOf() }.toMutableObjectSet()
-        playerSettings.removeIf { it.setting.name == playerSetting.setting.name }
-        playerSettings.add(playerSetting)
-
-        _playerSettings[playerUuid] = playerSettings
+        playerCache.computeIfPresent(playerUuid) { _, existing -> existing.with(playerSetting) }
     }
 
     override suspend fun savePlayerSetting(
@@ -66,50 +108,70 @@ class SettingServiceImpl : SettingsService, Services.Fallback {
     }
 
     override suspend fun cachePlayerSettings(playerUuid: UUID) {
-        _playerSettings[playerUuid] = ClientSettingsInstance.rabbitApi.sendRequest(
+        val loaded = ClientSettingsInstance.rabbitApi.sendRequest(
             LoadPlayerSettingsRequestPacket(playerUuid)
-        ).playerSettings.mapNotNull {
-            val setting = getSettingByName(it.first) ?: return@mapNotNull null
-            PlayerSetting(
-                setting = setting,
-                settingValue = it.second
-            )
-        }.toObjectSet()
+        ).playerSettings
+
+        val byName = mutableObject2ObjectMapOf<String, PlayerSetting>(loaded.size)
+        val currentSettings = registry.get().byName
+        for ((settingName, value) in loaded) {
+            val setting = currentSettings[settingName] ?: continue
+            byName[settingName] = PlayerSetting(setting = setting, settingValue = value)
+        }
+
+        playerCache[playerUuid] = PlayerSettings(byName)
     }
 
     override fun invalidatePlayerSettingsCache(playerUuid: UUID) {
-        _playerSettings.remove(playerUuid)
+        playerCache.remove(playerUuid)
     }
 
     override suspend fun refreshSettings() {
-        settings.clear()
-        settings.addAll(ClientSettingsInstance.rabbitApi.sendRequest(LoadSettingsRequestPacket()).settings)
+        val loaded = ClientSettingsInstance.rabbitApi.sendRequest(LoadSettingsRequestPacket()).settings
+
+        val byName = mutableObject2ObjectMapOf<String, Setting>(loaded.size)
+        for (setting in loaded) {
+            byName[setting.name] = setting
+        }
+
+        registry.set(Registry(byName))
     }
 
     override suspend fun createSetting(
         name: String,
         defaultValue: String
     ): Setting {
-        val existing = getSettingByName(name)
-        if (existing != null) {
-            return existing
-        }
+        registry.get().byName[name]?.let { return it }
 
-        return ClientSettingsInstance.rabbitApi.sendRequest(
+        val created = ClientSettingsInstance.rabbitApi.sendRequest(
             CreateSettingRequestPacket(
                 name,
                 defaultValue
             )
-        ).setting.also {
-            settings.add(it)
+        ).setting
+
+        registry.updateAndGet { current ->
+            if (current.byName.containsKey(name)) return@updateAndGet current
+
+            val copy = mutableObject2ObjectMapOf<String, Setting>(current.byName.size + 1)
+            copy.putAll(current.byName)
+            copy[name] = created
+            Registry(copy)
         }
+
+        return created
     }
 
     override suspend fun deleteSetting(name: String) {
-        ClientSettingsInstance.rabbitApi.sendRequest(
-            DeleteSettingRequestPacket(name)
-        ).also {
-            settings.removeIf { it.name == name }
+        ClientSettingsInstance.rabbitApi.sendRequest(DeleteSettingRequestPacket(name))
+
+        registry.updateAndGet { current ->
+            if (!current.byName.containsKey(name)) return@updateAndGet current
+
+            val copy = mutableObject2ObjectMapOf<String, Setting>(current.byName.size)
+            copy.putAll(current.byName)
+            copy.remove(name)
+            Registry(copy)
         }
     }
 }

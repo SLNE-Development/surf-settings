@@ -14,9 +14,9 @@ import java.util.*
 @AutoService(SurfSettingsApi::class)
 class SurfSettingsApiImpl : SurfSettingsApi, Services.Fallback {
     override fun <T : Any> getSettingValue(playerUuid: UUID, key: SettingKey<T>): T {
-        val playerSetting = SettingsService.getSettingForPlayerOrDefault(playerUuid, key.name)
+        val value = SettingsService.getSettingValueOrDefault(playerUuid, key.name)
             ?: return key.defaultValue
-        return key.deserialize(playerSetting.settingValue)
+        return key.deserialize(value)
     }
 
     override suspend fun <T : Any> getCachedValueOrLoad(playerUuid: UUID, key: SettingKey<T>): T {
@@ -26,9 +26,9 @@ class SurfSettingsApiImpl : SurfSettingsApi, Services.Fallback {
             SettingsService.cachePlayerSettings(playerUuid)
         }
 
-        val playerSetting = SettingsService.getSettingForPlayerOrDefault(playerUuid, key.name)
+        val value = SettingsService.getSettingValueOrDefault(playerUuid, key.name)
             ?: return key.defaultValue
-        return key.deserialize(playerSetting.settingValue)
+        return key.deserialize(value)
     }
 
     override suspend fun <T : Any> saveSetting(playerUuid: UUID, key: SettingKey<T>, value: T) {
