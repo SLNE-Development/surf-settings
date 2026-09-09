@@ -41,13 +41,16 @@ class SettingServiceImpl : SettingsService, Services.Fallback {
     override fun getSettingForPlayer(playerUuid: UUID, settingName: String): PlayerSetting? =
         getSettingsForPlayer(playerUuid).firstOrNull { it.setting.name == settingName }
 
-    override fun getLoadedSettingsWithDefaults(playerUuid: UUID) = settings.map { setting ->
-        getSettingsForPlayer(playerUuid).associateBy { it.setting.name }[setting.name]
-            ?: PlayerSetting(
+    override fun getLoadedSettingsWithDefaults(playerUuid: UUID): ObjectSet<PlayerSetting> {
+        val playerSettings = getSettingsForPlayer(playerUuid).associateBy { it.setting.name }
+
+        return settings.map { setting ->
+            playerSettings[setting.name] ?: PlayerSetting(
                 setting = setting,
                 settingValue = setting.defaultValue
             )
-    }.toObjectSet()
+        }.toObjectSet()
+    }
 
     override fun cachePlayerSetting(
         playerUuid: UUID,
