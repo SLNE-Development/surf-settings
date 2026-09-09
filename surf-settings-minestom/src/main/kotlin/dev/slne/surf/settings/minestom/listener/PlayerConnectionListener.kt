@@ -13,13 +13,8 @@ class PlayerConnectionListener : EventRegistrar {
     override fun register(node: EventNode<Event>) {
         node.addListener<PlayerSpawnEvent> { event ->
             if (event.isFirstSpawn) {
-                val player = event.player
                 SettingsPlatform.launchAsync {
-                    SettingsService.cachePlayerSettings(player.uuid)
-
-                    if (!player.isOnline) {
-                        SettingsService.invalidatePlayerSettingsCache(player.uuid)
-                    }
+                    SettingsService.cachePlayerSettings(event.player.uuid)
                 }
             }
         }

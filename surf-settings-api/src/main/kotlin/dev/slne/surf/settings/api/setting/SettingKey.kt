@@ -20,7 +20,7 @@ class SettingKey<T : Any>(
     /**
      * The string representation of the key, used for storage.
      */
-    val name: String = key.asString()
+    val name: String get() = key.asString()
 
     fun serialize(value: T): String = serializer(value)
     fun deserialize(value: String): T = deserializer(value)
