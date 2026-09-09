@@ -24,7 +24,10 @@ class PlayerSettingsRepository {
         playerUuid: UUID,
         playerSetting: PlayerSetting
     ) = suspendTransaction {
-        SettingEntriesTable.upsert(SettingEntriesTable.playerUuid, SettingEntriesTable.settingName) {
+        SettingEntriesTable.upsert(
+            SettingEntriesTable.settingName,
+            SettingEntriesTable.playerUuid
+        ) {
             it[SettingEntriesTable.playerUuid] = playerUuid
             it[SettingEntriesTable.settingName] = playerSetting.setting.name
             it[SettingEntriesTable.value] = playerSetting.settingValue
