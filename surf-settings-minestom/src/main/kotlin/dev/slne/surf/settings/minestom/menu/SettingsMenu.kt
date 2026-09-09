@@ -22,8 +22,9 @@ import me.devnatan.inventoryframework.context.Context
 import net.kyori.adventure.text.Component
 import net.kyori.adventure.text.format.TextDecoration
 import java.util.*
+import java.util.concurrent.ConcurrentHashMap
 
-private val draftSettings = mutableListOf<Pair<UUID, PlayerSetting>>()
+private val draftSettings = ConcurrentHashMap.newKeySet<Pair<UUID, PlayerSetting>>()
 
 val settingsView = paginatedSurfView("Einstellungen") {
     fun values(context: Context) =
