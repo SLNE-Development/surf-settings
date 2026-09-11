@@ -20,14 +20,14 @@ object NiceToggle {
 
 object SettingsCommandActions {
     fun toggle(playerUuid: UUID, setting: Setting): String {
-        val playerSetting = getPlayerSetting(playerUuid, setting).copy()
+        val playerSetting = getPlayerSetting(playerUuid, setting)
         playerSetting.toggle()
         cacheAndSave(playerUuid, playerSetting)
         return playerSetting.getString()
     }
 
     fun set(playerUuid: UUID, setting: Setting, state: Boolean): String {
-        val playerSetting = getPlayerSetting(playerUuid, setting).copy()
+        val playerSetting = getPlayerSetting(playerUuid, setting)
         playerSetting.settingValue = state.toString()
         cacheAndSave(playerUuid, playerSetting)
         return playerSetting.getString()

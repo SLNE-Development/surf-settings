@@ -11,13 +11,8 @@ import org.bukkit.event.player.PlayerQuitEvent
 object PlayerConnectionListener : Listener {
     @EventHandler
     fun onJoin(event: PlayerJoinEvent) {
-        val player = event.player
         plugin.launch {
-            SettingsService.cachePlayerSettings(player.uniqueId)
-
-            if (!player.isOnline) {
-                SettingsService.invalidatePlayerSettingsCache(player.uniqueId)
-            }
+            SettingsService.cachePlayerSettings(event.player.uniqueId)
         }
     }
 
