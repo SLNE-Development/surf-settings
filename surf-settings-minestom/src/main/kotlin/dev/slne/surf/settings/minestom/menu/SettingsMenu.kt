@@ -2,7 +2,6 @@ package dev.slne.surf.settings.minestom.menu
 
 import dev.slne.surf.api.core.font.toSmallCaps
 import dev.slne.surf.api.core.messages.adventure.buildText
-import dev.slne.surf.api.core.messages.adventure.key
 import dev.slne.surf.api.core.messages.adventure.playSound
 import dev.slne.surf.api.minestom.builder.buildItem
 import dev.slne.surf.api.minestom.inventory.framework.dsl.onItemRender
@@ -20,6 +19,7 @@ import dev.slne.surf.settings.core.client.platform.SettingsPlatform
 import dev.slne.surf.settings.core.common.service.SettingsService
 import net.kyori.adventure.text.Component
 import net.kyori.adventure.text.format.TextDecoration
+import net.minestom.server.sound.SoundEventKeys
 import java.util.*
 import java.util.concurrent.ConcurrentHashMap
 
@@ -107,7 +107,7 @@ val settingsView = paginatedSurfView("Einstellungen") {
                 }
 
                 click.player.playSound(true) {
-                    type(key("minecraft", "ui.button.click"))
+                    type(SoundEventKeys.UI_BUTTON_CLICK.key())
                 }
 
                 click.update()
