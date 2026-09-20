@@ -18,21 +18,14 @@ import dev.slne.surf.api.minestom.inventory.framework.view.settings.PaginationVi
 import dev.slne.surf.settings.api.setting.PlayerSetting
 import dev.slne.surf.settings.core.client.platform.SettingsPlatform
 import dev.slne.surf.settings.core.common.service.SettingsService
-import me.devnatan.inventoryframework.context.Context
 import net.kyori.adventure.text.Component
 import net.kyori.adventure.text.format.TextDecoration
 import java.util.*
 import java.util.concurrent.ConcurrentHashMap
 
-private val draftSettings = ConcurrentHashMap.newKeySet<Pair<UUID, PlayerSetting>>()
+private val draftSettings = ConcurrentHashMap<UUID, ConcurrentHashMap<String, PlayerSetting>>()
 
 val settingsView = paginatedSurfView("Einstellungen") {
-    fun values(context: Context) =
-        SettingsService.getLoadedSettingsWithDefaults(context.player.uuid)
-            .filter { it.setting.defaultValue.toBooleanStrictOrNull() != null }
-            .filter { settingKeyMappings.containsKey(it.setting.name) }
-            .sortedBy { it.setting.name }
-
     settings {
         paginationViewRows(PaginationViewRows.TWO)
         navigateBackOnOutsideClick(false)
@@ -42,7 +35,10 @@ val settingsView = paginatedSurfView("Einstellungen") {
 
     pagination {
         computedSource { context ->
-            values(context)
+            SettingsService.getLoadedSettingsWithDefaults(context.player.uuid)
+                .filter { it.setting.defaultValue.toBooleanStrictOrNull() != null }
+                .filter { settingKeyMappings.containsKey(it.setting.name) }
+                .sortedBy { it.setting.name }
         }
 
         itemFactory { playerSetting ->
@@ -63,7 +59,7 @@ val settingsView = paginatedSurfView("Einstellungen") {
 
             onItemRender {
                 val currentValue =
-                    draftSettings.find { it.first == this.player.uuid && it.second.setting.name == playerSetting.setting.name }?.second?.getBoolean()
+                    draftSettings[player.uuid]?.get(playerSetting.setting.name)?.getBoolean()
                         ?: playerSetting.getBoolean()
 
                 item = buildItem(display.material) {
@@ -96,18 +92,19 @@ val settingsView = paginatedSurfView("Einstellungen") {
             }
             onClick { click ->
                 val currentValue =
-                    draftSettings.find { it.first == click.player.uuid && it.second.setting.name == playerSetting.setting.name }?.second?.getBoolean()
+                    draftSettings[click.player.uuid]?.get(playerSetting.setting.name)?.getBoolean()
                         ?: playerSetting.getBoolean()
 
                 val newValue = !currentValue
 
-                draftSettings.removeIf { it.first == click.player.uuid && it.second.setting.name == playerSetting.setting.name }
-                draftSettings.add(
-                    click.player.uuid to PlayerSetting(
+                draftSettings.compute(click.player.uuid) { _, settings ->
+                    val updatedSettings = settings ?: ConcurrentHashMap()
+                    updatedSettings[playerSetting.setting.name] = PlayerSetting(
                         playerSetting.setting,
                         newValue.toString()
                     )
-                )
+                    updatedSettings
+                }
 
                 click.player.playSound(true) {
                     type(key("minecraft", "ui.button.click"))
@@ -120,10 +117,10 @@ val settingsView = paginatedSurfView("Einstellungen") {
 
     onClose {
         val playerUuid = this.player.uuid
+        val changedSettings = draftSettings.remove(playerUuid) ?: return@onClose
 
         SettingsPlatform.launchAsync {
-            draftSettings.filter { it.first == playerUuid }.forEach { (player, setting) ->
-                draftSettings.removeIf { it.first == playerUuid && it.second.setting.name == setting.setting.name }
+            changedSettings.forEach { (_, setting) ->
                 SettingsService.cachePlayerSetting(playerUuid, setting)
                 SettingsService.savePlayerSetting(
                     playerUuid, setting

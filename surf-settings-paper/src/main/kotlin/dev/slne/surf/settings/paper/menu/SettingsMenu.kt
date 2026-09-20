@@ -1,6 +1,5 @@
 package dev.slne.surf.settings.paper.menu
 
-import com.github.shynixn.mccoroutine.folia.launch
 import dev.slne.surf.api.core.font.toSmallCaps
 import dev.slne.surf.api.core.messages.adventure.playSound
 import dev.slne.surf.api.paper.builder.buildItem
@@ -18,22 +17,15 @@ import dev.slne.surf.api.paper.inventory.framework.view.settings
 import dev.slne.surf.api.paper.inventory.framework.view.settings.PaginationViewRows
 import dev.slne.surf.api.paper.util.BukkitSound
 import dev.slne.surf.settings.api.setting.PlayerSetting
+import dev.slne.surf.settings.core.client.platform.SettingsPlatform
 import dev.slne.surf.settings.core.common.service.SettingsService
-import dev.slne.surf.settings.paper.plugin
-import me.devnatan.inventoryframework.context.Context
 import net.kyori.adventure.text.format.TextDecoration
 import java.util.*
 import java.util.concurrent.ConcurrentHashMap
 
-private val draftSettings = ConcurrentHashMap.newKeySet<Pair<UUID, PlayerSetting>>()
+private val draftSettings = ConcurrentHashMap<UUID, ConcurrentHashMap<String, PlayerSetting>>()
 
 val settingsView = paginatedSurfView("Einstellungen") {
-    fun values(context: Context) =
-        SettingsService.getLoadedSettingsWithDefaults(context.player.uniqueId)
-            .filter { it.setting.defaultValue.toBooleanStrictOrNull() != null }
-            .filter { settingKeyMappings.containsKey(it.setting.name) }
-            .sortedBy { it.setting.name }
-
     settings {
         paginationViewRows(PaginationViewRows.TWO)
         navigateBackOnOutsideClick(false)
@@ -43,7 +35,10 @@ val settingsView = paginatedSurfView("Einstellungen") {
 
     pagination {
         computedSource { context ->
-            values(context)
+            SettingsService.getLoadedSettingsWithDefaults(context.player.uniqueId)
+                .filter { it.setting.defaultValue.toBooleanStrictOrNull() != null }
+                .filter { settingKeyMappings.containsKey(it.setting.name) }
+                .sortedBy { it.setting.name }
         }
 
         itemFactory { playerSetting ->
@@ -66,7 +61,8 @@ val settingsView = paginatedSurfView("Einstellungen") {
 
             onItemRender {
                 val currentValue =
-                    draftSettings.find { it.first == this.player.uniqueId && it.second.setting.name == playerSetting.setting.name }?.second?.getBoolean()
+                    draftSettings[this.player.uniqueId]?.get(playerSetting.setting.name)
+                        ?.getBoolean()
                         ?: playerSetting.getBoolean()
 
                 item = buildItem(display.material) {
@@ -97,18 +93,20 @@ val settingsView = paginatedSurfView("Einstellungen") {
             }
             onClick { click ->
                 val currentValue =
-                    draftSettings.find { it.first == click.player.uniqueId && it.second.setting.name == playerSetting.setting.name }?.second?.getBoolean()
+                    draftSettings[click.player.uniqueId]?.get(playerSetting.setting.name)
+                        ?.getBoolean()
                         ?: playerSetting.getBoolean()
 
                 val newValue = !currentValue
 
-                draftSettings.removeIf { it.first == click.player.uniqueId && it.second.setting.name == playerSetting.setting.name }
-                draftSettings.add(
-                    click.player.uniqueId to PlayerSetting(
+                draftSettings.compute(click.player.uniqueId) { _, settings ->
+                    val updatedSettings = settings ?: ConcurrentHashMap()
+                    updatedSettings[playerSetting.setting.name] = PlayerSetting(
                         playerSetting.setting,
                         newValue.toString()
                     )
-                )
+                    updatedSettings
+                }
 
                 click.player.playSound(true) {
                     type(BukkitSound.UI_BUTTON_CLICK)
@@ -121,10 +119,10 @@ val settingsView = paginatedSurfView("Einstellungen") {
 
     onClose {
         val playerUuid = this.player.uniqueId
+        val changedSettings = draftSettings.remove(playerUuid) ?: return@onClose
 
-        plugin.launch {
-            draftSettings.filter { it.first == playerUuid }.forEach { (player, setting) ->
-                draftSettings.removeIf { it.first == playerUuid && it.second.setting.name == setting.setting.name }
+        SettingsPlatform.launchAsync {
+            changedSettings.forEach { (_, setting) ->
                 SettingsService.cachePlayerSetting(playerUuid, setting)
                 SettingsService.savePlayerSetting(
                     playerUuid, setting
