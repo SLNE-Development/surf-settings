@@ -1,9 +1,9 @@
 package dev.slne.surf.settings.core.client.service
 
 import com.google.auto.service.AutoService
-import dev.slne.surf.api.core.util.mutableObject2ObjectMapOf
+import dev.slne.surf.api.core.util.emptyObjectSet
+import dev.slne.surf.api.core.util.freeze
 import dev.slne.surf.api.core.util.mutableObjectSetOf
-import dev.slne.surf.api.core.util.toMutableObjectSet
 import dev.slne.surf.api.core.util.toObjectSet
 import dev.slne.surf.settings.api.setting.PlayerSetting
 import dev.slne.surf.settings.api.setting.Setting
@@ -13,18 +13,25 @@ import dev.slne.surf.settings.core.common.service.SettingsService
 import it.unimi.dsi.fastutil.objects.ObjectSet
 import net.kyori.adventure.util.Services
 import java.util.*
+import java.util.concurrent.ConcurrentHashMap
 
 @AutoService(SettingsService::class)
 class SettingServiceImpl : SettingsService, Services.Fallback {
-    private val _playerSettings = mutableObject2ObjectMapOf<UUID, ObjectSet<PlayerSetting>>()
+    private val _playerSettings = ConcurrentHashMap<UUID, ObjectSet<PlayerSetting>>()
+    private val settingsLock = Any()
 
-    override val settings = mutableObjectSetOf<Setting>()
-    override val playerSettings: ObjectSet<PlayerSetting> =
-        _playerSettings.values.flatten().toObjectSet()
+    @Volatile
+    private var _settings: ObjectSet<Setting> = emptyObjectSet()
+
+    override val settings: ObjectSet<Setting>
+        get() = _settings
+
+    override val playerSettings: ObjectSet<PlayerSetting>
+        get() = _playerSettings.values.flatten().toObjectSet()
 
     override fun getSettingByName(name: String): Setting? = settings.firstOrNull { it.name == name }
     override fun getSettingsForPlayer(playerUuid: UUID): ObjectSet<PlayerSetting> =
-        _playerSettings[playerUuid] ?: mutableObjectSetOf()
+        _playerSettings[playerUuid] ?: emptyObjectSet()
 
     override fun getSettingForPlayerOrDefault(
         playerUuid: UUID,
@@ -56,12 +63,12 @@ class SettingServiceImpl : SettingsService, Services.Fallback {
         playerUuid: UUID,
         playerSetting: PlayerSetting
     ) {
-        val playerSettings =
-            _playerSettings.getOrPut(playerUuid) { mutableObjectSetOf() }.toMutableObjectSet()
-        playerSettings.removeIf { it.setting.name == playerSetting.setting.name }
-        playerSettings.add(playerSetting)
-
-        _playerSettings[playerUuid] = playerSettings
+        _playerSettings.compute(playerUuid) { _, current ->
+            val updated = mutableObjectSetOf<PlayerSetting>()
+            current?.filterTo(updated) { it.setting.name != playerSetting.setting.name }
+            updated.add(playerSetting)
+            updated.freeze()
+        }
     }
 
     override suspend fun savePlayerSetting(
@@ -93,8 +100,12 @@ class SettingServiceImpl : SettingsService, Services.Fallback {
     }
 
     override suspend fun refreshSettings() {
-        settings.clear()
-        settings.addAll(ClientSettingsInstance.rabbitApi.sendRequest(LoadSettingsRequestPacket()).settings)
+        val loaded =
+            ClientSettingsInstance.rabbitApi.sendRequest(LoadSettingsRequestPacket()).settings
+
+        synchronized(settingsLock) {
+            _settings = loaded.toObjectSet()
+        }
     }
 
     override suspend fun createSetting(
@@ -111,8 +122,12 @@ class SettingServiceImpl : SettingsService, Services.Fallback {
                 name,
                 defaultValue
             )
-        ).setting.also {
-            settings.add(it)
+        ).setting.also { created ->
+            synchronized(settingsLock) {
+                val updated = mutableObjectSetOf(_settings)
+                updated.add(created)
+                _settings = updated.freeze()
+            }
         }
     }
 
@@ -120,7 +135,11 @@ class SettingServiceImpl : SettingsService, Services.Fallback {
         ClientSettingsInstance.rabbitApi.sendRequest(
             DeleteSettingRequestPacket(name)
         ).also {
-            settings.removeIf { it.name == name }
+            synchronized(settingsLock) {
+                val updated = mutableObjectSetOf(_settings)
+                updated.removeIf { it.name == name }
+                _settings = updated.freeze()
+            }
         }
     }
 }
