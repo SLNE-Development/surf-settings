@@ -22,13 +22,13 @@ class SurfSettingsApiImpl : SurfSettingsApi, Services.Fallback {
     override suspend fun <T : Any> getCachedValueOrLoad(playerUuid: UUID, key: SettingKey<T>): T {
         val cached = SettingsService.getSettingForPlayer(playerUuid, key.name)
 
-        if (cached == null) {
-            SettingsService.cachePlayerSettings(playerUuid)
+        if (cached != null) {
+            return key.deserialize(cached.settingValue)
         }
 
-        val playerSetting = SettingsService.getSettingForPlayerOrDefault(playerUuid, key.name)
-            ?: return key.defaultValue
-        return key.deserialize(playerSetting.settingValue)
+        val loaded = SettingsService.loadPlayerSettings(playerUuid)
+            .firstOrNull { it.setting.name == key.name } ?: return key.defaultValue
+        return key.deserialize(loaded.settingValue)
     }
 
     override suspend fun <T : Any> saveSetting(playerUuid: UUID, key: SettingKey<T>, value: T) {

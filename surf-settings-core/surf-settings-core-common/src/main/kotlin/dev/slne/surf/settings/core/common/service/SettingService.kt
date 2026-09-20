@@ -21,6 +21,7 @@ interface SettingsService {
     fun cachePlayerSetting(playerUuid: UUID, playerSetting: PlayerSetting)
     suspend fun savePlayerSetting(playerUuid: UUID, playerSetting: PlayerSetting)
 
+    suspend fun loadPlayerSettings(playerUuid: UUID): ObjectSet<PlayerSetting>
     suspend fun cachePlayerSettings(playerUuid: UUID)
     fun invalidatePlayerSettingsCache(playerUuid: UUID)
 
