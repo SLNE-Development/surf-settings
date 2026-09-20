@@ -19,10 +19,6 @@ import java.util.concurrent.atomic.AtomicReference
 
 @AutoService(SettingsService::class)
 class SettingServiceImpl : SettingsService, Services.Fallback {
-
-    /**
-     * Immutable view of the global setting registry.
-     */
     private class Registry(val byName: Object2ObjectOpenHashMap<String, Setting>) {
         val all: ObjectSet<Setting> = mutableObjectSetOf<Setting>(byName.size)
             .apply { addAll(byName.values) }
@@ -33,13 +29,11 @@ class SettingServiceImpl : SettingsService, Services.Fallback {
         }
     }
 
-    /** Immutable view of one player's cached settings, keyed by [Setting.name]. */
     private class PlayerSettings(val byName: Object2ObjectOpenHashMap<String, PlayerSetting>) {
         val all: ObjectSet<PlayerSetting> = mutableObjectSetOf<PlayerSetting>(byName.size)
             .apply { addAll(byName.values) }
             .freeze()
 
-        /** Returns a new snapshot with [playerSetting] replacing any entry of the same name. */
         fun with(playerSetting: PlayerSetting): PlayerSettings {
             val copy = mutableObject2ObjectMapOf<String, PlayerSetting>(byName.size + 1)
             copy.putAll(byName)
@@ -88,6 +82,23 @@ class SettingServiceImpl : SettingsService, Services.Fallback {
         return registry.get().byName[settingName]?.defaultValue
     }
 
+    override fun getLoadedSettingsWithDefaults(playerUuid: UUID): ObjectSet<PlayerSetting> {
+        val cached = playerCache[playerUuid]?.byName
+        val known = registry.get().byName
+        val result = mutableObjectSetOf<PlayerSetting>(known.size)
+
+        for (setting in known.values) {
+            result.add(
+                cached?.get(setting.name) ?: PlayerSetting(
+                    setting = setting,
+                    settingValue = setting.defaultValue
+                )
+            )
+        }
+
+        return result.freeze()
+    }
+
     override fun cachePlayerSetting(
         playerUuid: UUID,
         playerSetting: PlayerSetting
@@ -127,7 +138,8 @@ class SettingServiceImpl : SettingsService, Services.Fallback {
     }
 
     override suspend fun refreshSettings() {
-        val loaded = ClientSettingsInstance.rabbitApi.sendRequest(LoadSettingsRequestPacket()).settings
+        val loaded =
+            ClientSettingsInstance.rabbitApi.sendRequest(LoadSettingsRequestPacket()).settings
 
         val byName = mutableObject2ObjectMapOf<String, Setting>(loaded.size)
         for (setting in loaded) {

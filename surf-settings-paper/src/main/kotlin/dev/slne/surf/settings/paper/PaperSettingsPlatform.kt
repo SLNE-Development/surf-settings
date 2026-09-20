@@ -4,7 +4,7 @@ import com.github.shynixn.mccoroutine.folia.launch
 import com.google.auto.service.AutoService
 import dev.slne.surf.api.paper.inventory.framework.open
 import dev.slne.surf.settings.core.client.platform.SettingsPlatform
-import dev.slne.surf.settings.paper.menu.SettingsMenu
+import dev.slne.surf.settings.paper.menu.settingsView
 import kotlinx.coroutines.CoroutineScope
 import net.kyori.adventure.util.Services
 import org.bukkit.Bukkit
@@ -15,7 +15,7 @@ class PaperSettingsPlatform : SettingsPlatform, Services.Fallback {
     override fun openSettingsGui(playerUuid: UUID) {
         Bukkit.getPlayer(playerUuid)?.let { player ->
             player.closeInventory()
-            SettingsMenu.open(player)
+            settingsView.open(player)
         }
     }
 

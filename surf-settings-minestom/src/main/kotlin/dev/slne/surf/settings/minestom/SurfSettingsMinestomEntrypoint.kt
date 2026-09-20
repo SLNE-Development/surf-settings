@@ -8,11 +8,7 @@ import dev.slne.surf.api.minestom.inventory.framework.register
 import dev.slne.surf.settings.core.client.ClientSettingsInstance
 import dev.slne.surf.settings.core.client.createDefaultSettings
 import dev.slne.surf.settings.core.common.service.SettingsService
-import dev.slne.surf.settings.minestom.menu.SettingsMenu
-import dev.slne.surf.settings.minestom.menu.sub.ChatSettingsMenu
-import dev.slne.surf.settings.minestom.menu.sub.ClanSettingsMenu
-import dev.slne.surf.settings.minestom.menu.sub.FriendSettingsMenu
-import dev.slne.surf.settings.minestom.menu.sub.OtherSettingsMenu
+import dev.slne.surf.settings.minestom.menu.settingsView
 import java.nio.file.Path
 
 @Singleton
@@ -24,11 +20,7 @@ class SurfSettingsMinestomEntrypoint @Inject constructor(
     }
 
     override suspend fun start() {
-        ChatSettingsMenu.register()
-        ClanSettingsMenu.register()
-        FriendSettingsMenu.register()
-        OtherSettingsMenu.register()
-        SettingsMenu.register()
+        settingsView.register()
 
         ClientSettingsInstance.clientLoader.onLoad()
         ClientSettingsInstance.clientLoader.onEnable()
