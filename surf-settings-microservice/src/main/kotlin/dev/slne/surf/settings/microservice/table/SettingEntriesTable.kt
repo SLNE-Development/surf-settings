@@ -10,5 +10,6 @@ object SettingEntriesTable : AuditableLongIdTable("settings_entries") {
 
     init {
         uniqueIndex(settingName, playerUuid)
+        index(false, playerUuid)
     }
 }

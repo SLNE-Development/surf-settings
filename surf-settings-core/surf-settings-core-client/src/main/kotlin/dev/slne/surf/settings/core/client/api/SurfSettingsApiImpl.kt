@@ -14,21 +14,21 @@ import java.util.*
 @AutoService(SurfSettingsApi::class)
 class SurfSettingsApiImpl : SurfSettingsApi, Services.Fallback {
     override fun <T : Any> getSettingValue(playerUuid: UUID, key: SettingKey<T>): T {
-        val playerSetting = SettingsService.getSettingForPlayerOrDefault(playerUuid, key.name)
+        val value = SettingsService.getSettingValueOrDefault(playerUuid, key.name)
             ?: return key.defaultValue
-        return key.deserialize(playerSetting.settingValue)
+        return key.deserialize(value)
     }
 
     override suspend fun <T : Any> getCachedValueOrLoad(playerUuid: UUID, key: SettingKey<T>): T {
         val cached = SettingsService.getSettingForPlayer(playerUuid, key.name)
 
-        if (cached != null) {
-            return key.deserialize(cached.settingValue)
+        if (cached == null) {
+            SettingsService.cachePlayerSettings(playerUuid)
         }
 
-        val loaded = SettingsService.loadPlayerSettings(playerUuid)
-            .firstOrNull { it.setting.name == key.name } ?: return key.defaultValue
-        return key.deserialize(loaded.settingValue)
+        val value = SettingsService.getSettingValueOrDefault(playerUuid, key.name)
+            ?: return key.defaultValue
+        return key.deserialize(value)
     }
 
     override suspend fun <T : Any> saveSetting(playerUuid: UUID, key: SettingKey<T>, value: T) {
