@@ -10,5 +10,5 @@ jobs:
   build:
     uses: SLNE-Development/surf-workflows/.github/workflows/build-publish-release-gradle.yml@master
     with:
-      modules: "surf-settings-paper-*-all.jar;surf-settings-microservice-*-all.jar"
+      modules: "surf-settings-paper-*-all.jar;surf-settings-microservice-*-all.jar;surf-settings-velocity-*all.jar"
     secrets: inherit

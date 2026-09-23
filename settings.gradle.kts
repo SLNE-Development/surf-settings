@@ -6,6 +6,7 @@ include("surf-settings-core:surf-settings-core-client")
 include("surf-settings-paper")
 include("surf-settings-minestom")
 include("surf-settings-microservice")
+include("surf-settings-velocity")
 
 pluginManagement {
     repositories {
