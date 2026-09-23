@@ -45,4 +45,7 @@ object SettingKeys {
 
     val SHOW_SCOREBOARD =
         SettingKey.ofBoolean(key("scoreboard", "show-scoreboard"), defaultValue = true)
+
+    // Queue
+    val AUTO_QUEUE_AFTER_RECONNECT = SettingKey.ofBoolean(key("queue", "auto-queue-after-reconnect"), defaultValue = true)
 }

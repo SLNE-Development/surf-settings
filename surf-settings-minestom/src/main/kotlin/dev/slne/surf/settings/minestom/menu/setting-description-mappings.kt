@@ -63,5 +63,10 @@ val settingKeyMappings = mapOf(
         "Scoreboard anzeigen",
         "Zeigt das Scoreboard auf der rechten Seite an",
         Material.SLIME_BLOCK
-    )
+    ),
+    SettingKeys.AUTO_QUEUE_AFTER_RECONNECT to SettingKeyDisplay(
+        "Automatische Rückkehr",
+        "Bringt dich nach einem kurzen Verbindungsabbruch automatisch zurück auf deinen vorherigen Server",
+        Material.RECOVERY_COMPASS
+    ),
 ).mapKeys { it.key.name }

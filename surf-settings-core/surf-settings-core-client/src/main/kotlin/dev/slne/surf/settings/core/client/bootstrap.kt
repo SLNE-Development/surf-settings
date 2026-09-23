@@ -16,4 +16,5 @@ suspend fun createDefaultSettings() {
     SurfSettingsApi.createSetting(SettingKeys.FRIEND_SOUNDS)
     SurfSettingsApi.createSetting(SettingKeys.SHOW_NAMETAGS)
     SurfSettingsApi.createSetting(SettingKeys.SHOW_SCOREBOARD)
+    SurfSettingsApi.createSetting(SettingKeys.AUTO_QUEUE_AFTER_RECONNECT)
 }
