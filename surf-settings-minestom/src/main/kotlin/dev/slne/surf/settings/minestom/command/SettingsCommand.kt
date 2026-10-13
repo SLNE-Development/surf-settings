@@ -1,8 +1,8 @@
 package dev.slne.surf.settings.minestom.command
 
-import dev.slne.minestom.lobby.api.command.commandapi.dsl.commandTree
-import dev.slne.minestom.lobby.api.command.commandapi.dsl.literalArgument
-import dev.slne.minestom.lobby.api.command.commandapi.dsl.playerExecutor
+import dev.slne.surf.api.minestom.command.dsl.commandTree
+import dev.slne.surf.api.minestom.command.dsl.literalArgument
+import dev.slne.surf.api.minestom.command.dsl.playerExecutor
 import dev.slne.surf.settings.api.SurfSettingsApi
 import dev.slne.surf.settings.api.setting.Setting
 import dev.slne.surf.settings.core.client.command.SettingsCommandActions

@@ -1,11 +1,11 @@
 package dev.slne.surf.settings.minestom.command.argument
 
-import dev.slne.minestom.lobby.api.command.commandapi.CommandAPI
-import dev.slne.minestom.lobby.api.command.commandapi.CommandTree
-import dev.slne.minestom.lobby.api.command.commandapi.argument.Argument
-import dev.slne.minestom.lobby.api.command.commandapi.argument.CustomArgument
-import dev.slne.minestom.lobby.api.command.commandapi.argument.StringArgument
-import dev.slne.minestom.lobby.api.command.commandapi.suggestion.ArgumentSuggestions
+import dev.slne.surf.api.minestom.command.CommandAPI
+import dev.slne.surf.api.minestom.command.CommandTree
+import dev.slne.surf.api.minestom.command.argument.Argument
+import dev.slne.surf.api.minestom.command.argument.CustomArgument
+import dev.slne.surf.api.minestom.command.argument.StringArgument
+import dev.slne.surf.api.minestom.command.suggestion.ArgumentSuggestions
 import dev.slne.surf.settings.core.client.command.NiceToggle
 import dev.slne.surf.settings.core.client.command.SettingsCommandMessages
 
