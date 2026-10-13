@@ -11,7 +11,6 @@ include("surf-settings-velocity")
 pluginManagement {
     repositories {
         gradlePluginPortal()
-        mavenLocal()
         maven("https://reposilite.slne.dev/releases")
     }
 }
