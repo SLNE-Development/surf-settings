@@ -10,10 +10,6 @@ surfMinestomApi {
     withCoreMinestom()
 }
 
-repositories {
-    mavenLocal()
-}
-
 minestomPluginFile {
     main = "dev.slne.surf.settings.minestom.SurfSettingsMinestomPlugin"
     authors = listOf("red")
