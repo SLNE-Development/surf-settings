@@ -1,20 +1,34 @@
 package dev.slne.surf.settings.minestom
 
-import com.google.auto.service.AutoService
-import dev.slne.minestom.lobby.api.plugin.MinestomPlugin
-import dev.slne.minestom.lobby.api.plugin.annotation.MinestomPluginMeta
-import dev.slne.surf.settings.minestom.command.SettingsCommandRegistrar
+import dev.slne.surf.api.minestom.inventory.framework.register
+import dev.slne.surf.api.minestom.plugin.SurfMinestomPlugin
+import dev.slne.surf.settings.core.client.ClientSettingsInstance
+import dev.slne.surf.settings.core.client.createDefaultSettings
+import dev.slne.surf.settings.core.common.service.SettingsService
+import dev.slne.surf.settings.minestom.command.settingsCommand
+import dev.slne.surf.settings.minestom.command.surfSettingsCommand
 import dev.slne.surf.settings.minestom.listener.PlayerConnectionListener
+import dev.slne.surf.settings.minestom.menu.settingsView
 
-@AutoService(MinestomPlugin::class)
-@MinestomPluginMeta(
-    "surf-settings-minestom",
-    dependsOn = ["surf-api-minestom", "surf-rabbitmq-minestom"]
-)
-class SurfSettingsMinestomPlugin :
-    MinestomPlugin(SurfSettingsMinestomEntrypoint::class.java) {
-    override fun configurePlugin() {
-        bindEventRegistrar<PlayerConnectionListener>()
-        bindCommandRegistrar<SettingsCommandRegistrar>()
+object SurfSettingsMinestomPlugin : SurfMinestomPlugin() {
+    override suspend fun onLoad() {
+        settingsView.register()
+
+        ClientSettingsInstance.clientLoader.onLoad()
+
+        SettingsService.refreshSettings()
+        createDefaultSettings()
+    }
+
+    override suspend fun onEnable() {
+        ClientSettingsInstance.clientLoader.onEnable()
+        settingsCommand()
+        surfSettingsCommand()
+
+        PlayerConnectionListener.register(eventNode)
+    }
+
+    override suspend fun onDisable() {
+        ClientSettingsInstance.clientLoader.onDisable()
     }
 }

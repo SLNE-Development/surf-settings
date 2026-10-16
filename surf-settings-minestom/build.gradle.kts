@@ -10,6 +10,15 @@ surfMinestomApi {
     withCoreMinestom()
 }
 
+minestomPluginFile {
+    main = "dev.slne.surf.settings.minestom.SurfSettingsMinestomPlugin"
+    authors = listOf("red")
+
+    pluginDependencies {
+        register("surf-rabbitmq-minestom")
+    }
+}
+
 surfMicroservice {
     withRabbitModule(RabbitModule.CLIENT_API)
 }

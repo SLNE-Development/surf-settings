@@ -1,9 +1,8 @@
 package dev.slne.surf.settings.minestom
 
 import com.google.auto.service.AutoService
-import dev.slne.minestom.lobby.api.coroutine.minestomAsyncScope
-import dev.slne.minestom.lobby.api.extension.ConnectionManager
-import dev.slne.minestom.lobby.api.player.getOnlineLobbyPlayerByUuid
+import dev.slne.surf.api.minestom.coroutine.minestomAsyncScope
+import dev.slne.surf.api.minestom.extension.ConnectionManager
 import dev.slne.surf.api.minestom.inventory.framework.open
 import dev.slne.surf.settings.core.client.platform.SettingsPlatform
 import dev.slne.surf.settings.minestom.menu.settingsView
@@ -15,7 +14,7 @@ import java.util.*
 @AutoService(SettingsPlatform::class)
 class MinestomSettingsPlatform : SettingsPlatform, Services.Fallback {
     override fun openSettingsGui(playerUuid: UUID) {
-        val player = ConnectionManager.getOnlineLobbyPlayerByUuid(playerUuid) ?: return
+        val player = ConnectionManager.getOnlinePlayerByUuid(playerUuid) ?: return
         player.closeInventory()
         settingsView.open(player)
     }

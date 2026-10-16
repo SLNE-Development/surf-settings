@@ -8,5 +8,5 @@ import net.kyori.adventure.util.Services
 
 @AutoService(SettingsInstance::class)
 class MinestomSettingsInstanceImpl : ClientSettingsInstance, Services.Fallback {
-    override val clientLoader = ClientLoader(SurfSettingsMinestomEntrypoint.dataPath)
+    override val clientLoader = ClientLoader(SurfSettingsMinestomPlugin.dataDirectory)
 }
