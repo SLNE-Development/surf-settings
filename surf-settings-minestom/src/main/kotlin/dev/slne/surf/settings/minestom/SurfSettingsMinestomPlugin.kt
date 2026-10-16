@@ -15,13 +15,13 @@ object SurfSettingsMinestomPlugin : SurfMinestomPlugin() {
         settingsView.register()
 
         ClientSettingsInstance.clientLoader.onLoad()
-        ClientSettingsInstance.clientLoader.onEnable()
 
         SettingsService.refreshSettings()
         createDefaultSettings()
     }
 
     override suspend fun onEnable() {
+        ClientSettingsInstance.clientLoader.onEnable()
         settingsCommand()
         surfSettingsCommand()
 
