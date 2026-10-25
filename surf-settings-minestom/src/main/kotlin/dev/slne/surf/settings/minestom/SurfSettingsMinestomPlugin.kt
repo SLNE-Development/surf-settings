@@ -8,11 +8,13 @@ import dev.slne.surf.settings.core.common.service.SettingsService
 import dev.slne.surf.settings.minestom.command.settingsCommand
 import dev.slne.surf.settings.minestom.command.surfSettingsCommand
 import dev.slne.surf.settings.minestom.listener.PlayerConnectionListener
+import dev.slne.surf.settings.minestom.menu.settingsCategoryView
 import dev.slne.surf.settings.minestom.menu.settingsView
 
 object SurfSettingsMinestomPlugin : SurfMinestomPlugin() {
     override suspend fun onLoad() {
         settingsView.register()
+        settingsCategoryView.register()
 
         ClientSettingsInstance.clientLoader.onLoad()
 
