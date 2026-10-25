@@ -9,6 +9,7 @@ import dev.slne.surf.settings.core.common.service.SettingsService
 import dev.slne.surf.settings.paper.command.settingsCommand
 import dev.slne.surf.settings.paper.command.surfSettingsCommand
 import dev.slne.surf.settings.paper.listener.PlayerConnectionListener
+import dev.slne.surf.settings.paper.menu.settingsCategoryView
 import dev.slne.surf.settings.paper.menu.settingsView
 import org.bukkit.plugin.java.JavaPlugin
 
@@ -19,6 +20,7 @@ class PaperMain : SuspendingJavaPlugin() {
         ClientSettingsInstance.clientLoader.onLoad()
 
         settingsView.register()
+        settingsCategoryView.register()
     }
 
     override suspend fun onEnableAsync() {
